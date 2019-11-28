@@ -8,6 +8,9 @@ fPrice   DWORD 149, 99, 79, 49                                        ; To store
 dePrice  DWORD 799, 699, 99, 69                                       ; To store the prices of Dessert...
 drPrice  DWORD 99, 99, 49 ,49, 69, 64, 89, 49                         ; To store the prices of Drinks...
 
+dealRep  DWORD 0													  ; To store the number of deal 
+dealQuan DWORD 0												  ; TO store the quantity of dishes added in 
+
 welcome  BYTE " *** Welcome To Restaurant Transylvania *** ", 0       ; Welcome note...
                  
 options  BYTE " Enter 1 : To see our Menu and Prices.", 0ah, 0dh
@@ -52,13 +55,13 @@ pMenu    BYTE " Restaurant Transylvania proudly present our Menu ... ", 0ah, 0dh
 		 BYTE "		Tea             : 49 per Cup. ", 0
 
 deals    BYTE " *** Deals and Offers *** ", 0ah, 0dh                         ; Deals and Offers...
-		 BYTE " FOR ANY DEAL ENTER THE RELATED NUMBER. " , 0ah, 0dh
+		 BYTE " * You will Get 10% Discount on any order above RS 1,999. * " , 0ah, 0dh
+		 BYTE " For any Deal enter the related number..." , 0ah, 0dh
 		 BYTE " Deal 1 : Buy any 3 or more Oriental Dishes and get 1 Dessert free. " , 0ah, 0dh
 		 BYTE " Deal 2 : Buy any 2 or more Chinese Dishes and get 1 Drink free. " , 0ah, 0dh
 		 BYTE " Deal 3 : Buy any 2 or more Fast Foods and get 1 Regular Drink free. " , 0ah, 0dh
 		 BYTE " Deal 4 : Buy any 2 or more '1.5' Liters Drink and get 1 Regular Drink free. " , 0ah, 0dh
-		 BYTE " Deal 5 : Get 20% Discount on an order above RS 1,999. " , 0ah, 0dh
-		 BYTE " To Exit... ", 0ah, 0dh, 0
+		 BYTE "      5 : To Exit... ", 0ah, 0dh, 0
 		 
 cMenu    BYTE " *** Menu *** ", 0ah, 0dh, 0ah, 0dh                            ; Choice Menu...
          BYTE " Enter 1 : For Oriental.", 0ah, 0dh
@@ -111,6 +114,17 @@ drinks   BYTE " *** Drinks *** ", 0ah, 0dh
 	     BYTE " Enter 8 : Tea             : 49 per Cup. ", 0ah, 0dh
          BYTE " Enter 9 : To Exit. ", 0ah, 0dh , 0
 
+regDrink BYTE " Enter 1 : Coca Cola       : 49 Regular. ", 0ah, 0dh
+		 BYTE " Enter 2 : Sprite          : 49 Regular. ", 0ah, 0dh
+		 BYTE " Enter 3 : Pineapple Juice : 69 per Glass. ", 0ah, 0dh
+		 BYTE " Enter 4 : Mint Margarita  : 64 per Glass. ", 0ah, 0dh
+		 BYTE " Enter 9 : To Exit. ", 0ah, 0dh , 0
+
+drinks1_5 BYTE " Enter 1 : Coca Cola       : 99 (1.5) Liters. ", 0ah, 0dh
+		  BYTE " Enter 2 : Sprite          : 99 (1.5) Liters. ", 0ah, 0dh, 0
+
+
+
 reMsg   BYTE " Your Order has been Canceled... ", 0ah, 0dh, 0
 
 dishes  BYTE " Enter the Quantity:  ", 0
@@ -125,25 +139,13 @@ exitMsg BYTE "    We are always glad to serve our Customers... ", 0ah, 0dh, 0
 
 haltMsg BYTE " Press Enter to continue... ", 0
 
-;Qasim Variables
 
-dealRep  DWORD 0													  ; To store the number of deal 
-
-dealQuantity DWORD 0												  ; TO store the quantity of dishes added in 
 
 dealItem BYTE " Please Select your FREE item... ", 0ah, 0dh, 0
 
 dealAdded BYTE " Your Free item has been Added in the order Successfuly... ", 0ah, 0dh, 0
 
 continueOrder BYTE " Would you like to order Something More... ", 0ah, 0dh, 0
-
-regularDrinks   BYTE " Enter 1 : Coca Cola       : 49 Regular. ", 0ah, 0dh
-				BYTE " Enter 2 : Sprite          : 49 Regular. ", 0ah, 0dh
-				BYTE " Enter 3 : Pineapple Juice : 69 per Glass. ", 0ah, 0dh
-				BYTE " Enter 4 : Mint Margarita  : 64 per Glass. ", 0ah, 0dh, 0
-
-drinks1_5		BYTE " Enter 1 : Coca Cola       : 99 (1.5) Liters. ", 0ah, 0dh
-			    BYTE " Enter 2 : Sprite          : 99 (1.5) Liters. ", 0ah, 0dh, 0
 
 
 
@@ -156,9 +158,9 @@ dealChineseMenu PROTO , noOfDishes:DWORD						; Function to print Chinese menu b
 
 dealFastFoodMenu PROTO , noOfDishes:DWORD						; Function to print Fast Food menu based on deals
 
-setEcx2 PROTO, dealQuantity1:DWORD								; To set the value of ecx
+setEcx2 PROTO, dealQuan1:DWORD								; To set the value of ecx
 
-setEcx3 PROTO, dealQuantity2:DWORD								; To set the value of ecx
+setEcx3 PROTO, dealQuan2:DWORD								; To set the value of ecx
 
 dealDrinks1_5 PROTO , noOfDrinks:DWORD							; Function to 1.5 liters Drink menu based on deals
 
@@ -269,10 +271,7 @@ dealsOffers PROC
 				 cmp eax,4
 				 je d4
 
-				 cmp eax,5
-				 je d5
-
-				 cmp eax, 6
+				 cmp eax, 5
 		         je  _exit
 
 				 call error
@@ -327,7 +326,7 @@ dealsOffers PROC
 				 call writeString
 				 call crlf
 
-				 mov edx, offset regularDrinks    							;printing the free desert item menu
+				 mov edx, offset regDrink    							;printing the free desert item menu
 				 call writeString
 				 call crlf
 				 call readInt
@@ -348,7 +347,7 @@ dealsOffers PROC
 				call writeString
 				call crlf
 
-				mov edx, offset regularDrinks    							;printing the free desert item menu
+				mov edx, offset regDrink    							;printing the free desert item menu
 				call writeString
 				call crlf
 				call readInt
@@ -359,9 +358,6 @@ dealsOffers PROC
 				call crlf
 				jmp _exit
 
-
-			 ;d5:
-			 
 			 
 			 _exit:
 
@@ -1112,8 +1108,6 @@ error PROC
 	   RET
 error ENDP
 
-; Qasim CODE
-
 ;-------------------------------------------------------------------
 ;| Print Dealed Oriental Menu with Prices for customers to order... |
 ;| Updates: Bill ...                                                |
@@ -1125,8 +1119,7 @@ dealOrientalMenu PROC , noOfDishes:DWORD
 
 			  mov ecx, noOfDishes
 
-			  op:                                                 ; Option Tag...
-			     				 
+			  op:                                                 ; Option Tag...				 
 				 call crlf
 
 		         mov edx, OFFSET oriental
@@ -1155,6 +1148,7 @@ dealOrientalMenu PROC , noOfDishes:DWORD
 				 je  _exit
 
 		         call error                                           ; calling error Proc...
+
 		         again:
 					LOOP op
 
@@ -1552,9 +1546,9 @@ dealDrinks1_5 ENDP
 
 
 
-setEcx2 PROC uses eax, dealQuantity1:DWORD
+setEcx2 PROC uses eax, dealQuan1:DWORD
 	    
-		mov eax, dealQuantity1
+		mov eax, dealQuan1
 		cmp eax, 2
 		jge setECX
 				   
@@ -1572,9 +1566,9 @@ setEcx2 ENDP
 ;| Updates: Bill ...                                                |
 ;-------------------------------------------------------------------
 
-setEcx3 PROC uses eax, dealQuantity2:DWORD
+setEcx3 PROC uses eax, dealQuan2:DWORD
 	    
-		mov eax, dealQuantity2
+		mov eax, dealQuan2
 		cmp eax, 3
 		jge setECX
 				   
