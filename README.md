@@ -2,7 +2,34 @@
 
 This is a basic restaurants billing system in Assembly Language as part of my lab project.
 
-It is consisted of Starter Menu that gives following options:
+It has a starter Starter Menu for Admin [Owner] and customer:
+
+- Admin
+- Customer
+- Exit program
+
+## Admin
+
+It should `provide its password to continue`.
+Old password is collected from a password file.
+
+Once enters it has following Menu:
+
+- To Print Sale
+- To Change Password
+- To Exit
+
+### Print Sale
+
+It prints the whole file of sales to show the owner.
+
+### Change Password
+
+It again asks for `old password` before asking `new password`. Once old password is checked then users enter the new password and it is stored in the password file. Then the program is moved to Main Menu.
+
+## Customer
+
+It's Starter Menu gives following options:
 
 - To see Menu and Prices
 - To see Deals and Offers
@@ -10,7 +37,7 @@ It is consisted of Starter Menu that gives following options:
 - To Reset the Bill [Cancel the order]
 - To Exit [Terminate Program]
 
-## Menu and Prices
+### Menu and Prices
 
 It only prints the complete Menu with prices to help our customers in selection.
 
@@ -19,11 +46,11 @@ It only prints the complete Menu with prices to help our customers in selection.
 
 ## Place an Order
 
-It Places the order of customer by showing different dishes as follow:
+It Places the order of customer by showing different dishes and their prices as follow:
 
 - Oriental
 
-   + Chicken Quorma
+  + Chicken Quorma
    + Pullao
    + Chicken Briyani
    + Chicken Karahi
