@@ -10,7 +10,7 @@ It has a starter Starter Menu for Admin [Owner] and customer:
 
 ## Admin
 
-It should `provide its password to continue`.
+He should `provide his password to continue`.
 Old password is collected from a password file.
 
 Once enters it has following Menu:
