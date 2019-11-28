@@ -7,9 +7,20 @@ cPrice   DWORD 169, 149, 99, 79                                       ; To store
 fPrice   DWORD 149, 99, 79, 49                                        ; To store the prices of Fast Food...
 dePrice  DWORD 799, 699, 99, 69                                       ; To store the prices of Dessert...
 drPrice  DWORD 99, 99, 49 ,49, 69, 64, 89, 49                         ; To store the prices of Drinks...
+bool     DWORD ?                                                      ; To store the result of Check... 
+filePass BYTE  15 DUP(?)                                              ; To store the Password from File...
+inPass   BYTE  15 DUP(?)                                              ; To store the Input Password...
 
-welcome  BYTE " *** Welcome To Restaurant Transylvania *** ", 0       ; Welcome note...
-                 
+welcome  BYTE " *** Welcome To Restaurant Transylvania *** ", 0ah, 0dh, 0 ; Welcome note...
+
+id       BYTE " Enter 1 : For Admin ", 0ah, 0dh
+         BYTE " Enter 2 : For Customers ", 0ah, 0dh
+	     BYTE " Enter 3 : To Exit ", 0ah, 0dh, 0
+
+choice   BYTE " Enter 1 : To Print Sale ", 0ah, 0dh
+         BYTE " Enter 2 : To Reset Password ", 0ah, 0dh
+	     BYTE " Enter 3 : To Exit ", 0ah, 0dh, 0
+
 options  BYTE " Enter 1 : To see our Menu and Prices.", 0ah, 0dh
          BYTE " Enter 2 : To see our Deals and Offers.", 0ah, 0dh
 		 BYTE " Enter 3 : To Place an Order.", 0ah, 0dh
@@ -104,19 +115,25 @@ drinks   BYTE " *** Drinks *** ", 0ah, 0dh
 	     BYTE " Enter 8 : Tea             : 49 per Cup. ", 0ah, 0dh
          BYTE " Enter 9 : To Exit. ", 0ah, 0dh , 0
 
-reMsg   BYTE " Your Order has been Canceled... ", 0ah, 0dh, 0
+passWord BYTE " Enter Current Password less than 16 Characters : ", 0
 
-dishes BYTE " Enter the Quantity:  ", 0
+newPass  BYTE " Enter New Password less than 16 Characters : ", 0
 
-caption BYTE "Error", 0
+wrongPas BYTE " Password is incorrect or Input is Invalid. ", 0ah, 0dh, 0
 
-errMsg  BYTE " Please follow instructions correctly... ", 0
+confirm  BYTE " New Password is Set. ", 0ah, 0dh, 0
 
-billMsg BYTE  "    Total Bill:   Rs ", 0
+reMsg    BYTE " Your Order has been Canceled... ", 0ah, 0dh, 0
 
-exitMsg BYTE "     We are always glad to serve our Customers... ", 0ah, 0dh, 0
+dishes   BYTE " Enter the Quantity:  ", 0
 
-haltMsg BYTE " Press Enter to continue... ", 0
+caption  BYTE "Error", 0
+
+errMsg   BYTE " Please follow instructions correctly... ", 0
+
+billMsg  BYTE  "    Total Bill:   Rs ", 0
+
+exitMsg  BYTE "     Glad to have you Here... ", 0ah, 0dh, 0
 
 .CODE
 main PROC
@@ -125,59 +142,202 @@ main PROC
 	 mov edx, OFFSET welcome                                     ; Printing Welcome...
 	 call writeString
 
-	 call crlf
-	 call crlf
+     op:
+	    call crlf
 
-     op:                                                         ; Option Tag...  
-		mov edx, OFFSET options                                  ; Printing options...
-	    call writeString
+	    mov edx, OFFSET id                                        ; Printing Id...
+		call writeString
 
 		call crlf
 		call readInt
 
-	    cmp eax, 1
-		je  pm
+		cmp eax, 1
+		je ad
+
 		cmp eax, 2
-		je  do
+		je cu
+
 		cmp eax, 3
-		je  cm
-		cmp eax, 4
-		je  rb
-		cmp eax, 5
 		je  _exit
 
-		call error                                                  ; calling error Proc...
+		call error                                                 ; calling error Proc...
 		jmp  op
 
-		pm:                                                         ; Price Menu Tag...
-		   call printMenu
-		   call halt
-		   jmp  op
-
-        do:                                                          ; Deals and Offers Tag...
-	       call dealsOffers
+		ad:                                                        ; Admin Tag...
+		   call admin
 		   jmp op
 
-        cm:                                                          ; Choice Menu Tag...
-	       call choiceMenu
+		cu:
+		   call customer
 		   jmp op
 
-        rb:                                                          ; Reset Bill Tag...
-	       call resetBill
-		   call halt
-		   jmp op
-
-     _exit:                                                          ; Exit Tag
-		   call printBill
+	 _exit:
+		   mov edx, OFFSET exitMsg                                 ; Printing Exit Note/Msg...
+	       call writeString
 
 	       exit
-
 main ENDP
 
 ;-------------------------------------------------------------------
+;| For admin only...                                                |
+;| Uses: It deals with the admin and print whole file...            |
+;| Note: It only read bill in file...                               |
+;-------------------------------------------------------------------
+
+admin PROC
+       PUSHAD
+	   PUSHFD
+
+	   call crlf
+
+	   ;TODO: Opening a file and taking input from it for pass word
+
+		call writeString
+
+	    mov edx, OFFSET inPass                                     ; Point to the Destination...
+        mov ecx, SIZEOF inPass                                     ; Specify max characters...
+		call readString
+
+		call check
+
+		cmp bool, 0                                                ; Check store result in bool...
+		je wrong
+
+		ok:
+		   call crlf
+	       mov edx, OFFSET choice
+		   call writeString
+
+		   call crlf
+		   call readInt
+
+		   cmp eax, 1
+		   je  pb
+	   	   cmp eax, 2
+		   je  rp
+		   cmp eax, 3
+		   je  _exit
+
+		   call error                                              ; calling error Proc...
+		   jmp ok
+
+		   pb:                                                     ; Print Bill Tag...
+			  ;TODO: Print the whole bills
+			  jmp ok
+			 
+		   rp:                                                     ; Reset Password Tag...
+		      call crlf
+		      mov edx, OFFSET passWord                             ; Taking old Password again...
+		      call writeString
+
+		      mov edx, OFFSET inPass
+              mov ecx, SIZEOF inPass
+		      call readString
+
+		      call check                                           ; Rechecking Pass before Changing...
+
+		      cmp bool, 0
+		      je wrong
+
+			  mov edx, OFFSET newPass
+		      call writeString
+
+			  mov edx, OFFSET inPass
+              mov ecx, SIZEOF inPass
+		      call readString                                     ; Taking new Password again...
+
+			  cmp ecx, 15                                         ; To check our limit...
+			  jg wrong
+
+			  ; TODO: write new password in file in file....
+
+			  call crlf
+			  mov edx, OFFSET confirm
+		      call writeString
+
+			  jmp _exit
+
+ wrong:
+       call crlf
+       mov edx, OFFSET wrongPas                                       ; When Password is wrong...
+	   call writeString
+
+ _exit:
+	   POPFD
+	   POPAD
+
+	   RET
+admin ENDP
+
+;-------------------------------------------------------------------
+;| For customers only...                                            |
+;| Uses: It deals with the customers and take order...              |
+;| Note: It only write bill in file with (False) customer name...   |
+;-------------------------------------------------------------------
+
+customer PROC
+          PUSHAD
+		  PUSHFD
+		       
+		  call crlf
+
+	      op:                                                         ; Option Tag...  
+		     mov edx, OFFSET options                                  ; Printing options...
+	         call writeString
+
+			 call crlf
+			 call readInt
+
+			 cmp eax, 1
+			 je  pm
+			 cmp eax, 2
+			 je  do
+			 cmp eax, 3
+			 je  cm
+			 cmp eax, 4
+			 je  rb
+			 cmp eax, 5
+			 je  _exit
+
+			 call error                                                  ; calling error Proc...
+			 jmp  op
+
+			 pm:                                                         ; Price Menu Tag...
+				call printMenu
+
+			    call crlf
+				call WaitMsg                                             ; Call Wait Massage...
+				call crlf
+
+				jmp  op
+
+			 do:                                                          ; Deals and Offers Tag...
+				call dealsOffers
+				jmp op
+
+			 cm:                                                          ; Choice Menu Tag...
+				call choiceMenu
+				jmp op
+
+			 rb:                                                          ; Reset Bill Tag...
+				call resetBill
+				call crlf
+				jmp op
+
+    _exit:                                                                ; Exit Tag
+		  call printBill
+		  call crlf
+
+		  POPFD
+		  POPAD
+
+		  RET
+customer ENDP
+
+;-------------------------------------------------------------------
 ;| Print Menu with Prices for customers...                          |
-;| Uses:   pMenu string to print...                                 |
-;| Note: push then pop regs and flags in stack to make them const   |
+;| Uses: pMenu string to print...                                   |
+;| Note: push then pop regs and flags in stack to make them const...|
 ;-------------------------------------------------------------------
 
 printMenu PROC
@@ -198,7 +358,7 @@ printMenu ENDP
 ;-------------------------------------------------------------------
 ;| Print Deals and Offers with Prices for customers...              |
 ;| Uses:   deals string to print...                                 |
-;| update: bill according to selected Deals and Offers              |
+;| update: bill according to selected Deals and Offers..            |
 ;-------------------------------------------------------------------
 
 dealsOffers PROC
@@ -891,11 +1051,6 @@ printBill PROC
 		   mov eax, bill
 		   call writeInt
 
-		   call halt
-
-		   mov edx, OFFSET exitMsg                                 ; Printing Exit Note/Msg...
-	       call writeString
-
 		   POPFD
 		   POPAD
 
@@ -903,28 +1058,45 @@ printBill PROC
 printBill ENDP
 
 ;-------------------------------------------------------------------
-;| Uses: As system pause...                                         |
+;| Check the password...                                            |
+;| Uses: bool variable to represent result..                        |
+;| bool = 1 means True && bool = 0 means False...                   |
 ;-------------------------------------------------------------------
 
-halt PROC
-      PUSHAD
-	  PUSHFD
+check PROC
+       PUSHAD
+	   PUSHFD
 
-	  call crlf
-	  call crlf
+	   ;cmp ecx, 15                                                 ; Our Limit is of 15 Characters...
+	   ;jg notEqual
+;
+	                            ;; lea: Load Effective Address is like combination of move and OFFSET...
+	   ;lea si, filePass                                            ; ds:si points to File Password String...
+       ;lea di, inPass                                              ; ds:di points to Input Password String...
+       ;dec di                                                      ; Just Dec so can Inc Later...
+;
+       ;lab1:
+            ;inc di                                                 ; Inc to get next Character...
+            ;lodsb                                                  ; Load AL with next char from filePass...
+                                                                   ;; note: lodsb inc si automatically...
+            ;cmp [di], al                                           ; Compare characters...
+            ;jne notEqual                                           ; Jump out of loop if not equal...
+ ;
+            ;cmp al, 0                                              ; They are the same, but end of string?
+            ;jne lab1                                               ; No - so go round loop again
+;
+            ;mov bool, 1
+	        ;jmp _exit                                              ; To save from executing notEqual Tag...
+;
+       ;notEqual:
+	            ;mov bool, 0
 
-      mov edx, OFFSET haltMsg
-	  call writeString
+ _exit:
+	   POPFD
+	   POPAD
 
-	  call readInt
-	  call crlf
-	  call crlf
-
-	  POPFD
-	  POPAD
-
-	  RET
-halt ENDP
+	   RET
+check ENDP
 
 ;-------------------------------------------------------------------
 ;| Shows an Error Box to customers...                               |
