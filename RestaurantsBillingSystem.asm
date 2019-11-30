@@ -10,6 +10,7 @@ dePrice  DWORD 799, 699, 99, 69                                       ; To store
 drPrice  DWORD 99, 99, 49 ,49, 69, 64, 89, 49                         ; To store the prices of Drinks...
 bool     DWORD ?                                                      ; To store the result of Check... 
 byteRead DWORD ?                                                      ; To store read Bytes from File...
+fHandle  DWORD ?                                                      ; To store File Handle...
 passFile BYTE  15 DUP(?)                                              ; To store the Password from File...
 userPass BYTE  15 DUP(?)                                              ; To store the Input Password...
 
@@ -118,7 +119,8 @@ drinks   BYTE " *** Drinks *** ", 0ah, 0dh
          BYTE " Enter 9 : To Exit. ", 0ah, 0dh , 0
 
 passFileName BYTE "Password.txt", 0
-saleFileName BYTE "Sales.txt",0
+saleFileName BYTE "Sales.txt", 0
+
 passWord BYTE " Enter Current Password less than 16 Characters : ", 0
 newPass  BYTE " Enter New Password less than 16 Characters : ", 0
 wrongPas BYTE " Password is incorrect or Input is Invalid. ", 0ah, 0dh, 0
@@ -189,7 +191,7 @@ admin PROC
 	   mov ecx, 15                                                ; Max buffer....
 	   call ReadFromFile
 
-	   jc error                                           ; If file does not open Carry will be set...
+	   jc err                                            ; If file does not open Carry will be set...
 
 	   mov byteRead, ecx                                          ; No of bytes read from file...
 
@@ -265,7 +267,7 @@ admin PROC
 	   call writeString
 	   jmp _exit
 
-error:                                                                ; File Opening Error block... 
+err:                                                                ; File Opening Error block... 
 	  call WriteWindowsMsg
 
  _exit:
@@ -1135,10 +1137,11 @@ readPassword PROC
 			  PUSHAD
 			  PUSHFD
 			  
-			  mov edx, OFFSET filename
+			  mov edx, OFFSET passFileName
 			  call openInputFile
+			  mov fHandle, eax
 
-			  mov eax,fileHandle
+			  mov eax, fHandle
 			  call  closeFile
 
 			  POPFD
