@@ -1138,7 +1138,7 @@ readPassword PROC
 			  PUSHFD
 			  
 			  mov edx, OFFSET passFileName
-			  call openInputFile
+			  call CreateOutputFile 
 			  mov fHandle, eax
 
 			  mov eax, fHandle
