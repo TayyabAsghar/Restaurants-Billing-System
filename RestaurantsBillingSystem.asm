@@ -1,6 +1,7 @@
 INCLUDE Irvine32.inc
 
 .DATA
+BUFFER_SIZE = 5000
 bill     DWORD 0                                                      ; To store the bill...
 oPrice   DWORD 169, 149, 99, 89, 69, 69, 10, 5                        ; To store the prices of Oriental...
 cPrice   DWORD 169, 149, 99, 79                                       ; To store the prices of Chinese...
@@ -8,8 +9,9 @@ fPrice   DWORD 149, 99, 79, 49                                        ; To store
 dePrice  DWORD 799, 699, 99, 69                                       ; To store the prices of Dessert...
 drPrice  DWORD 99, 99, 49 ,49, 69, 64, 89, 49                         ; To store the prices of Drinks...
 bool     DWORD ?                                                      ; To store the result of Check... 
-filePass BYTE  15 DUP(?)                                              ; To store the Password from File...
-inPass   BYTE  15 DUP(?)                                              ; To store the Input Password...
+byteRead DWORD ?                                                      ; To store read Bytes from File...
+passFile BYTE  15 DUP(?)                                              ; To store the Password from File...
+userPass BYTE  15 DUP(?)                                              ; To store the Input Password...
 
 welcome  BYTE " *** Welcome To Restaurant Transylvania *** ", 0ah, 0dh, 0 ; Welcome note...
 
@@ -115,25 +117,18 @@ drinks   BYTE " *** Drinks *** ", 0ah, 0dh
 	     BYTE " Enter 8 : Tea             : 49 per Cup. ", 0ah, 0dh
          BYTE " Enter 9 : To Exit. ", 0ah, 0dh , 0
 
+passFileName BYTE "Password.txt", 0
+saleFileName BYTE "Sales.txt",0
 passWord BYTE " Enter Current Password less than 16 Characters : ", 0
-
 newPass  BYTE " Enter New Password less than 16 Characters : ", 0
-
 wrongPas BYTE " Password is incorrect or Input is Invalid. ", 0ah, 0dh, 0
-
 confirm  BYTE " New Password is Set. ", 0ah, 0dh, 0
-
 reMsg    BYTE " Your Order has been Canceled... ", 0ah, 0dh, 0
-
 dishes   BYTE " Enter the Quantity:  ", 0
-
-caption  BYTE "Error", 0
-
+caption  BYTE " Error ", 0
 errMsg   BYTE " Please follow instructions correctly... ", 0
-
-billMsg  BYTE  "    Total Bill:   Rs ", 0
-
-exitMsg  BYTE "     Glad to have you Here... ", 0ah, 0dh, 0
+billMsg  BYTE "    Total Bill:   Rs ", 0
+exitMsg  BYTE "    Glad to have you Here... ", 0ah, 0dh, 0
 
 .CODE
 main PROC
@@ -190,77 +185,88 @@ admin PROC
 
 	   call crlf
 
-	   ;TODO: Opening a file and taking input from it for pass word
+	   mov edx, OFFSET passFile                                   ; Storage string...
+	   mov ecx, 15                                                ; Max buffer....
+	   call ReadFromFile
 
-		call writeString
+	   jc error                                           ; If file does not open Carry will be set...
 
-	    mov edx, OFFSET inPass                                     ; Point to the Destination...
-        mov ecx, SIZEOF inPass                                     ; Specify max characters...
-		call readString
+	   mov byteRead, ecx                                          ; No of bytes read from file...
 
-		call check
+	   mov edx, OFFSET passWord 
+	   call writeString
 
-		cmp bool, 0                                                ; Check store result in bool...
-		je wrong
+	   mov edx, OFFSET userPass                                   ; Point to the Destination...
+       mov ecx, SIZEOF userPass                                   ; Specify max characters...
+	   call readString                                            ; Take input from user...
 
-		ok:
-		   call crlf
-	       mov edx, OFFSET choice
-		   call writeString
+	   call check                                                 ; Check both strings are equal...
 
-		   call crlf
-		   call readInt
+	   cmp bool, 0                                                ; Check stores result in bool...
+	   je wrong
 
-		   cmp eax, 1
-		   je  pb
-	   	   cmp eax, 2
-		   je  rp
-		   cmp eax, 3
-		   je  _exit
+	   ok:
+		  call crlf
+	      mov edx, OFFSET choice
+		  call writeString
 
-		   call error                                              ; calling error Proc...
-		   jmp ok
+		  call crlf
+		  call readInt
 
-		   pb:                                                     ; Print Bill Tag...
+		  cmp eax, 1
+		  je  pb
+	   	  cmp eax, 2
+		  je  rp
+		  cmp eax, 3
+		  je  _exit
+
+		  call error                                              ; calling error Proc...
+		  jmp ok
+
+		  pb:                                                     ; Print Bill Tag...
 			  ;TODO: Print the whole bills
-			  jmp ok
+			 jmp ok
 			 
-		   rp:                                                     ; Reset Password Tag...
-		      call crlf
-		      mov edx, OFFSET passWord                             ; Taking old Password again...
-		      call writeString
+		  rp:                                                     ; Reset Password Tag...
+		     call crlf
+		     mov edx, OFFSET passWord                             ; Asking for old Password again...
+		     call writeString
 
-		      mov edx, OFFSET inPass
-              mov ecx, SIZEOF inPass
-		      call readString
+		     mov edx, OFFSET userPass
+             mov ecx, SIZEOF userPass
+		     call readString
 
-		      call check                                           ; Rechecking Pass before Changing...
+		     call check                                           ; Rechecking Pass before Changing...
 
-		      cmp bool, 0
-		      je wrong
+		     cmp bool, 0
+		     je wrong
 
-			  mov edx, OFFSET newPass
-		      call writeString
+			 mov edx, OFFSET newPass
+		     call writeString
 
-			  mov edx, OFFSET inPass
-              mov ecx, SIZEOF inPass
-		      call readString                                     ; Taking new Password again...
+			 mov edx, OFFSET userPass
+             mov ecx, SIZEOF userPass
+		     call readString                                     ; Taking new Password again...
 
-			  cmp ecx, 15                                         ; To check our limit...
-			  jg wrong
+			 cmp ecx, 15                                         ; To check our limit...
+			 jg wrong
 
 			  ; TODO: write new password in file in file....
 
-			  call crlf
-			  mov edx, OFFSET confirm
-		      call writeString
+			 call crlf
+			 mov edx, OFFSET confirm
+		     call writeString
 
-			  jmp _exit
+			 jmp _exit
 
- wrong:
+ wrong:                                                               ; Wrong Password block...
        call crlf
        mov edx, OFFSET wrongPas                                       ; When Password is wrong...
 	   call writeString
+	   jmp _exit
+
+error:                                                                ; File Opening Error block... 
+	  call WriteWindowsMsg
 
  _exit:
 	   POPFD
@@ -1036,7 +1042,7 @@ resetBill PROC
 resetBill ENDP
 
 ;-------------------------------------------------------------------
-;| Uses:   print the bill...                                        |
+;| Uses: print the bill...                                        |
 ;-------------------------------------------------------------------
 
 printBill PROC
@@ -1071,13 +1077,13 @@ check PROC
 	   ;jg notEqual
 ;
 	                            ;; lea: Load Effective Address is like combination of move and OFFSET...
-	   ;lea si, filePass                                            ; ds:si points to File Password String...
-       ;lea di, inPass                                              ; ds:di points to Input Password String...
+	   ;lea si, passFile                                            ; ds:si points to File Password String...
+       ;lea di, userPass                                            ; ds:di points to Input Password String...
        ;dec di                                                      ; Just Dec so can Inc Later...
 ;
        ;lab1:
             ;inc di                                                 ; Inc to get next Character...
-            ;lodsb                                                  ; Load AL with next char from filePass...
+            ;lodsb                                                  ; Load AL with next char from passFile...
                                                                    ;; note: lodsb inc si automatically...
             ;cmp [di], al                                           ; Compare characters...
             ;jne notEqual                                           ; Jump out of loop if not equal...
@@ -1112,12 +1118,33 @@ error PROC
 
        mov ebx,OFFSET caption
 	   mov edx,OFFSET errMsg
-	   call MsgBox
+	   call msgBox
 
 	   POPFD
 	   POPAD
 
 	   RET
 error ENDP
+
+;-------------------------------------------------------------------
+;| Read password from Password File...                               |
+;| Uses: passFile string to store password...                        |
+;-------------------------------------------------------------------
+
+readPassword PROC
+			  PUSHAD
+			  PUSHFD
+			  
+			  mov edx, OFFSET filename
+			  call openInputFile
+
+			  mov eax,fileHandle
+			  call  closeFile
+
+			  POPFD
+	          POPAD
+
+			  RET
+readPassword ENDP
 
 END main
