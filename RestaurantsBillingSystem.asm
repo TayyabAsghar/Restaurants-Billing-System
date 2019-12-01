@@ -9,7 +9,8 @@ dePrice  DWORD 799, 699, 99, 69                                       ; To store
 drPrice  DWORD 99, 99, 49 ,49, 69, 64, 89, 49                         ; To store the prices of Drinks...
 
 dealRep  DWORD 0													  ; To store the number of deal 
-dealQuan DWORD 0												  ; TO store the quantity of dishes added in 
+dealQuan DWORD 0													  ; TO store the quantity of dishes added in 
+mockBill DWORD 0													  ; To store the previous bill incase of any loss
 
 welcome  BYTE " *** Welcome To Restaurant Transylvania *** ", 0       ; Welcome note...
                  
@@ -55,13 +56,13 @@ pMenu    BYTE " Restaurant Transylvania proudly present our Menu ... ", 0ah, 0dh
 		 BYTE "		Tea             : 49 per Cup. ", 0
 
 deals    BYTE " *** Deals and Offers *** ", 0ah, 0dh                         ; Deals and Offers...
-		 BYTE " * You will Get 10% Discount on any order above RS 1,999. * " , 0ah, 0dh
+		 BYTE " * You will Get 5% Discount on any order above RS 1,999. * " , 0ah, 0dh
 		 BYTE " For any Deal enter the related number..." , 0ah, 0dh
 		 BYTE " Deal 1 : Buy any 3 or more Oriental Dishes and get 1 Dessert free. " , 0ah, 0dh
 		 BYTE " Deal 2 : Buy any 2 or more Chinese Dishes and get 1 Drink free. " , 0ah, 0dh
 		 BYTE " Deal 3 : Buy any 2 or more Fast Foods and get 1 Regular Drink free. " , 0ah, 0dh
 		 BYTE " Deal 4 : Buy any 2 or more '1.5' Liters Drink and get 1 Regular Drink free. " , 0ah, 0dh
-		 BYTE "      5 : To Exit... ", 0ah, 0dh, 0
+		 BYTE "      5 : Exit Deal Menu. ", 0ah, 0dh, 0
 		 
 cMenu    BYTE " *** Menu *** ", 0ah, 0dh, 0ah, 0dh                            ; Choice Menu...
          BYTE " Enter 1 : For Oriental.", 0ah, 0dh
@@ -118,10 +119,11 @@ regDrink BYTE " Enter 1 : Coca Cola       : 49 Regular. ", 0ah, 0dh
 		 BYTE " Enter 2 : Sprite          : 49 Regular. ", 0ah, 0dh
 		 BYTE " Enter 3 : Pineapple Juice : 69 per Glass. ", 0ah, 0dh
 		 BYTE " Enter 4 : Mint Margarita  : 64 per Glass. ", 0ah, 0dh
-		 BYTE " Enter 9 : To Exit. ", 0ah, 0dh , 0
+		 BYTE " Enter 5 : To Exit. ", 0ah, 0dh , 0
 
 drinks1_5 BYTE " Enter 1 : Coca Cola       : 99 (1.5) Liters. ", 0ah, 0dh
-		  BYTE " Enter 2 : Sprite          : 99 (1.5) Liters. ", 0ah, 0dh, 0
+		  BYTE " Enter 2 : Sprite          : 99 (1.5) Liters. ", 0ah, 0dh
+		  BYTE " Enter 3 : To Exit. ", 0ah, 0dh, 0
 
 
 
@@ -146,6 +148,10 @@ dealItem BYTE " Please Select your FREE item... ", 0ah, 0dh, 0
 dealAdded BYTE " Your Free item has been Added in the order Successfuly... ", 0ah, 0dh, 0
 
 continueOrder BYTE " Would you like to order Something More... ", 0ah, 0dh, 0
+
+dealCancel BYTE " You have canceled the deal... ", 0ah, 0dh, 0
+
+discountPrice BYTE "    On Order higher than Rs 1999, Your 5% Discounted Bill is     Rs : ", 0
 
 
 
@@ -280,61 +286,19 @@ dealsOffers PROC
 			 d1: 
 				 mov dealRep,3										;calling deal oriental function to add exact 3 dishes
 			     invoke dealOrientalMenu, dealRep	
-				 
-				 call crlf											;printing message to add a deal item in the order
-				 mov edx, offset dealItem
-				 call writeString
-				 call crlf
-
-				 mov edx, offset dessert							;printing the free desert item menu
-				 call writeString
-				 call crlf
-				 call readInt
-				 
-				 call crlf											;prining success message
-				 mov edx, offset dealAdded
-				 call writeString
-				 call crlf
+				
 				 jmp _exit
 			 
 			  d2:
 				 mov dealRep,2										;calling deal chinese function to add exact 2 dishes
 			     invoke dealChineseMenu, dealRep	
 				 
-				 call crlf											;printing message to add a deal item in the order
-				 mov edx, offset dealItem
-				 call writeString
-				 call crlf
-
-				 mov edx, offset drinks    							;printing the free desert item menu
-				 call writeString
-				 call crlf
-				 call readInt
-				 
-				 call crlf											;prining success message
-				 mov edx, offset dealAdded
-				 call writeString
-				 call crlf
 				 jmp _exit
 				 	 
 			 d3:
 			     mov dealRep,2										;calling deal fast food function to add exact 2 dishes
 			     invoke dealFastFoodMenu, dealRep	
 				 
-				 call crlf											;printing message to add a deal item in the order
-				 mov edx, offset dealItem
-				 call writeString
-				 call crlf
-
-				 mov edx, offset regDrink    							;printing the free desert item menu
-				 call writeString
-				 call crlf
-				 call readInt
-				 
-				 call crlf											;prining success message
-				 mov edx, offset dealAdded
-				 call writeString
-				 call crlf
 				 jmp _exit
 	
 
@@ -342,22 +306,7 @@ dealsOffers PROC
 				mov dealRep, 2
 				invoke dealDrinks1_5, dealRep
 
-				call crlf
-				mov edx, offset dealItem
-				call writeString
-				call crlf
-
-				mov edx, offset regDrink    							;printing the free desert item menu
-				call writeString
-				call crlf
-				call readInt
-				 
-				call crlf											;prining success message
-				mov edx, offset dealAdded
-				call writeString
-				call crlf
 				jmp _exit
-
 			 
 			 _exit:
 
@@ -370,8 +319,6 @@ dealsOffers PROC
 			 RET
 
 dealsOffers ENDP
-
-
 
 
 ;-------------------------------------------------------------------
@@ -1051,6 +998,11 @@ printBill PROC
 		   mov eax, bill
 		   call writeInt
 
+		   call discount5
+
+		   mov eax, bill
+		   call writeInt
+
 		   call halt
 
 		   mov edx, OFFSET exitMsg                                 ; Printing Exit Note/Msg...
@@ -1117,6 +1069,9 @@ dealOrientalMenu PROC , noOfDishes:DWORD
 			  PUSHAD
 			  PUSHFD
 
+			  mov eax, bill		
+			  mov mockBill, eax								      ; Stores the copy of bill				
+
 			  mov ecx, noOfDishes
 
 			  op:                                                 ; Option Tag...				 
@@ -1145,10 +1100,10 @@ dealOrientalMenu PROC , noOfDishes:DWORD
 				 cmp eax, 8
 				 je  rt
 				 cmp eax, 9
-				 je  _exit
+				 je  cancelDeal
 
 		         call error                                           ; calling error Proc...
-
+				 inc ecx											  ; increments ecx after 1 iteration is lost in error
 		         again:
 					LOOP op
 
@@ -1273,7 +1228,46 @@ dealOrientalMenu PROC , noOfDishes:DWORD
 				    mov bill, eax
 
 		            jmp  again
+
+		 cancelDeal:
+				 mov eax, mockBill									   ; canceled the order and restored the bill
+				 mov bill, eax
+				 mov edx, offset dealCancel
+				 call writeString
+				 call crlf
+				 jmp finalExit
+
 	    _exit:                                                          ; Exit Tag
+
+				 call crlf											;printing message to add a deal item in the order
+				 mov edx, offset dealItem
+				 call writeString
+				 call crlf
+
+				 mov edx, offset dessert							;printing the free desert item menu
+				 call writeString
+				 call crlf
+				 call readInt
+				 
+				 cmp eax,5											; error handling for free item
+				 je cancelDeal
+				 cmp eax,5
+				 jg selectCorrect
+				 cmp eax,0
+				 jle selectCorrect
+				 
+				 call crlf											;prining success message
+				 mov edx, offset dealAdded
+				 call writeString
+				 call crlf
+				 jmp finalExit
+
+			selectCorrect:
+				 call error
+				 jmp _exit
+
+		finalExit:
+
 			  POPFD
 			  POPAD
 
@@ -1288,6 +1282,9 @@ dealOrientalMenu ENDP
 dealChineseMenu PROC, noOfDishes:DWORD
 			 PUSHAD
 			 PUSHFD
+
+			 mov eax, bill		
+			 mov mockBill, eax								      ; Stores the copy of bill		
 
 			 mov ecx, noOfDishes
 			 
@@ -1310,10 +1307,12 @@ dealChineseMenu PROC, noOfDishes:DWORD
 		        cmp eax, 4
 		        je  sh 
 		        cmp eax, 5
-				je  _exit
+				je  cancelDeal
 
 
 		        call error                                            ; calling error Proc...
+				inc ecx											  ; increments ecx after 1 iteration is lost in error
+
 				again:
 					LOOP  op
 				jmp _exit
@@ -1377,11 +1376,46 @@ dealChineseMenu PROC, noOfDishes:DWORD
 				   mov bill, eax
 
 		           jmp  again
-	   _exit:                                                          ; Exit Tag
+	  
+	  cancelDeal:
+				 mov eax, mockBill									   ; canceled the order and restored the bill
+				 mov bill, eax
+				 mov edx, offset dealCancel
+				 call writeString
+				 call crlf
+				 jmp finalExit
+	  
+	  _exit:                                                          ; Exit Tag
+				call crlf											;printing message to add a deal item in the order
+				mov edx, offset dealItem
+				call writeString
+				call crlf
 
+				mov edx, offset drinks    							;printing the free desert item menu
+				call writeString
+				call crlf
+				call readInt
+				 
+				cmp eax,9											; error handling for free item
+				je cancelDeal
+				cmp eax,9
+				jg selectCorrect
+				cmp eax,0
+				jle selectCorrect
+
+				call crlf											;prining success message
+				mov edx, offset dealAdded
+				call writeString
+				call crlf
+		
+		selectCorrect:
+				 call error
+				 jmp _exit
 			 
-			 POPFD
-			 POPAD
+		finalExit:
+
+				 POPFD
+				 POPAD
 
 			 RET
 dealChineseMenu ENDP
@@ -1394,6 +1428,9 @@ dealChineseMenu ENDP
 dealFastFoodMenu PROC, noOfDishes:DWORD
 			  PUSHAD
 			  PUSHFD
+
+			  mov eax, bill		
+			  mov mockBill, eax								      ; Stores the copy of bill	
 
 			  mov ecx, noOfDishes
 
@@ -1415,10 +1452,11 @@ dealFastFoodMenu PROC, noOfDishes:DWORD
 		         cmp eax, 4
 		         je  ff
 		         cmp eax, 5
-				 je  _exit
-
+				 je  cancelDeal
 
 		         call error                                           ; calling error Proc...
+				 inc ecx											  ; increments ecx after 1 iteration is lost in error
+
 				 again:
 				     LOOP op
 				 jmp _exit
@@ -1482,7 +1520,44 @@ dealFastFoodMenu PROC, noOfDishes:DWORD
 				    mov bill, eax
 
 		            jmp  again
+
+		cancelDeal:
+				   mov eax, mockBill									   ; canceled the order and restored the bill
+				   mov bill, eax
+				   mov edx, offset dealCancel
+				   call writeString
+				   call crlf
+				   jmp finalExit
+
 	    _exit:                                                          ; Exit Tag
+				   call crlf											;printing message to add a deal item in the order
+				   mov edx, offset dealItem
+				   call writeString
+				   call crlf
+	
+				   mov edx, offset regDrink    							;printing the free desert item menu
+				   call writeString
+				   call crlf
+				   call readInt
+				   
+				   cmp eax,5											; error handling for free item
+			       je cancelDeal
+				   cmp eax,5
+				   jg selectCorrect
+				   cmp eax,0
+				   jle selectCorrect
+
+				   call crlf											;prining success message
+				   mov edx, offset dealAdded
+				   call writeString
+				   call crlf
+		
+		selectCorrect:
+				 call error
+				 jmp _exit
+
+		finalExit:
+
 			  POPFD
 			  POPAD
 
@@ -1494,6 +1569,9 @@ dealDrinks1_5 PROC , noOfDrinks:DWORD
 	
 	PUSHAD
 	PUSHFD
+		
+		mov eax, bill		
+		mov mockBill, eax								      ; Stores the copy of bill	
 
 		mov ecx, noOfDrinks
 
@@ -1511,7 +1589,12 @@ dealDrinks1_5 PROC , noOfDrinks:DWORD
 			cmp eax, 2
 			je drink
 
+			cmp eax, 3
+			je cancelDeal
+
 			call error
+			inc ecx											  ; increments ecx after 1 iteration is lost in error
+
 			again:
 				LOOP op
 
@@ -1534,7 +1617,42 @@ dealDrinks1_5 PROC , noOfDrinks:DWORD
 				
 				jmp again
 
+			cancelDeal:
+				   mov eax, mockBill									   ; canceled the order and restored the bill
+				   mov bill, eax
+				   mov edx, offset dealCancel
+				   call writeString
+				   call crlf
+				   jmp finalExit
+
 			_exit:
+					call crlf
+					mov edx, offset dealItem
+					call writeString
+					call crlf
+	
+					mov edx, offset regDrink    							;printing the free desert item menu
+					call writeString
+					call crlf
+					call readInt
+					
+					cmp eax,5											; error handling for free item
+			        je cancelDeal
+				    cmp eax,5
+				    jg selectCorrect
+				    cmp eax,0
+				    jle selectCorrect
+
+				    call crlf											;prining success message
+				    mov edx, offset dealAdded
+				    call writeString
+				    call crlf
+		
+		selectCorrect:
+				 call error
+				 jmp _exit
+			
+			finalExit:
 
 				POPFD
 				POPAD
@@ -1580,6 +1698,38 @@ setEcx3 PROC uses eax, dealQuan2:DWORD
 		ignore:
 		RET
 setEcx3 ENDP
+
+discount5 PROC
+		PUSHAD
+		PUSHFD
+
+		mov eax, bill
+		cmp eax, 1999
+		jg disc
+		jmp _exit
+
+		disc:
+			mov ebx, 20
+			mul ebx
+			mov edx, 0
+			mov ecx, 100
+			div ecx
+			mov mockBill, eax
+
+			mov eax, bill
+			sub eax, mockBill
+			mov bill, eax
+
+			call crlf
+			mov edx, offset discountPrice
+			call writeString
+
+	_exit:
+		POPFD
+		POPAD
+
+	RET
+discount5 ENDP
 
 END main
 
