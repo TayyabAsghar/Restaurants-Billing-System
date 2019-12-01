@@ -14,6 +14,7 @@ byteRead DWORD ?                                                  ; To store rea
 fHandle  DWORD ?                                                  ; To store File Handle...
 passFile BYTE  PASSWORD_SIZE DUP(?)                               ; To store the Password from File...
 userPass BYTE  PASSWORD_SIZE DUP(?)                               ; To store the Input Password...
+saleFile BYTE  BUFFER_SIZE DUP(?)
 
 welcome  BYTE " *** Welcome To Restaurant Transylvania *** ", 0ah, 0dh, 0 ; Welcome note...
 
@@ -64,7 +65,7 @@ pMenu    BYTE " Restaurant Transylvania proudly present our Menu ... ", 0ah, 0dh
          BYTE "		Pineapple Juice : 69 per Glass. ", 0ah, 0dh
          BYTE "		Mint Margarita  : 64 per Glass. ", 0ah, 0dh
 		 BYTE "		Coffee          : 89 per Cup. ", 0ah, 0dh
-		 BYTE "		Tea             : 49 per Cup. ", 0
+		 BYTE "		Tea             : 49 per Cup. ", 0ah, 0dh, 0
 
 deals    BYTE " *** Deals and Offers *** ", 0ah, 0dh, 0               ; TODO.......
 
@@ -126,7 +127,7 @@ passWord BYTE " Enter Current Password less than 16 Characters : ", 0
 newPass  BYTE " Enter New Password less than 16 Characters : ", 0
 wrongPas BYTE " Password is incorrect or Input is Invalid. ", 0ah, 0dh, 0
 confirm  BYTE " New Password is Set. ", 0ah, 0dh, 0
-reMsg    BYTE " Your Order has been Canceled... ", 0ah, 0dh, 0
+reMsg    BYTE " Your Order has been Canceled... ", 0ah, 0dh, 0        ; Reset Bill Message...
 dishes   BYTE " Enter the Quantity:  ", 0
 caption  BYTE " Error ", 0
 errMsg   BYTE " Please follow instructions correctly... ", 0
@@ -190,6 +191,9 @@ admin PROC
 
 	   call readPassword                                          ; To read Password from file...
 
+	   cmp bool, 0
+	   je _exit                               ; Bool will be 0 if something was wrong in readPassword...
+	   
 	   mov edx, OFFSET passWord 
 	   call writeString
 
@@ -221,7 +225,11 @@ admin PROC
 		  jmp ok
 
 		  pb:                                                     ; Print Bill Tag...
-			  ;TODO: Print the whole bills
+			 call readSales                                       ; To read Sales from file...
+
+			 mov edx, OFFSET saleFile
+			 call writeString
+
 			 jmp ok
 			 
 		  rp:                                                     ; Reset Password Tag...
@@ -269,6 +277,123 @@ admin PROC
 admin ENDP
 
 ;-------------------------------------------------------------------
+;| Read sales from Sales File...                                    |
+;| Uses: saleFile string to store sales...                          |
+;-------------------------------------------------------------------
+
+readSales PROC
+			  PUSHAD
+			  PUSHFD
+
+			  mov edx, OFFSET passFileName
+			  call openInputFile                                  ; Opening the File...
+			  mov fHandle, eax                                    ; Just for safety...      
+
+	          mov edx, OFFSET passFile                            ; Storage string...
+	          mov ecx, PASSWORD_SIZE                              ; Max buffer....
+	          call ReadFromFile
+
+	          jc err                                  ; If file does not open Carry will be set...
+
+			  mov byteRead, ecx                                   ; No of bytes read from file...
+			  
+			  mov eax, fHandle                                    ; Moving Handel in eax...
+			  call  closeFile
+
+			  mov bool, 1                                         ; If everything is OK.
+			  jmp _exit
+ 
+			  err:                                                ; File Opening Error block... 
+	              call WriteWindowsMsg
+				  mov bool, 0                                     ; if does not open
+
+	    _exit:
+		      POPFD
+	          POPAD
+
+			  RET
+readSales ENDP
+
+;-------------------------------------------------------------------
+;| Read password from Password File...                               |
+;| Uses: passFile string to store password...                        |
+;-------------------------------------------------------------------
+
+readPassword PROC
+			  PUSHAD
+			  PUSHFD
+
+			  mov edx, OFFSET passFileName
+			  call openInputFile                                  ; Opening the File...
+			  mov fHandle, eax                                    ; Just for safety...      
+
+	          mov edx, OFFSET passFile                            ; Storage string...
+	          mov ecx, PASSWORD_SIZE                              ; Max buffer....
+	          call ReadFromFile
+
+	          jc err                                  ; If file does not open Carry will be set...
+
+			  mov byteRead, ecx                                   ; No of bytes read from file...
+			  
+			  mov eax, fHandle                                    ; Moving Handel in eax...
+			  call  closeFile
+
+			  mov bool, 1                                         ; If everything is OK.
+			  jmp _exit
+ 
+			  err:                                                ; File Opening Error block... 
+	              call WriteWindowsMsg
+				  mov bool, 0                                     ; if does not open
+
+	    _exit:
+		      POPFD
+	          POPAD
+
+			  RET
+readPassword ENDP
+
+;-------------------------------------------------------------------
+;| Check the password...                                            |
+;| Uses: bool variable to represent result..                        |
+;| bool = 1 means True && bool = 0 means False...                   |
+;-------------------------------------------------------------------
+
+check PROC
+       PUSHAD
+	   PUSHFD
+
+	   ;cmp ecx, byteRead                                      ; 
+	   ;jg notEqual
+;
+	                            ;; lea: Load Effective Address is like combination of move and OFFSET...
+	   ;lea si, passFile                                            ; ds:si points to File Password String...
+       ;lea di, userPass                                            ; ds:di points to Input Password String...
+       ;dec di                                                      ; Just Dec so can Inc Later...
+;
+       ;lab1:
+            ;inc di                                                 ; Inc to get next Character...
+            ;lodsb                                                  ; Load AL with next char from passFile...
+                                                                   ;; note: lodsb inc si automatically...
+            ;cmp [di], al                                           ; Compare characters...
+            ;jne notEqual                                           ; Jump out of loop if not equal...
+ ;
+            ;cmp al, 0                                              ; They are the same, but end of string?
+            ;jne lab1                                               ; No - so go round loop again
+;
+            ;mov bool, 1
+	        ;jmp _exit                                              ; To save from executing notEqual Tag...
+;
+       ;notEqual:
+	            ;mov bool, 0
+
+ _exit:
+	   POPFD
+	   POPAD
+
+	   RET
+check ENDP
+
+;-------------------------------------------------------------------
 ;| For customers only...                                            |
 ;| Uses: It deals with the customers and take order...              |
 ;| Note: It only write bill in file with (False) customer name...   |
@@ -277,11 +402,11 @@ admin ENDP
 customer PROC
           PUSHAD
 		  PUSHFD
-		       
-		  call crlf
 
 	      op:                                                     ; Option Tag...  
-		     mov edx, OFFSET options                              ; Printing options...
+		     call crlf
+			 
+			 mov edx, OFFSET options                              ; Printing options...
 	         call writeString
 
 			 call crlf
@@ -320,7 +445,6 @@ customer PROC
 
 			 rb:                                                  ; Reset Bill Tag...
 				call resetBill
-				call crlf
 				jmp op
 
     _exit:                                                        ; Exit Tag
@@ -1062,47 +1186,6 @@ printBill PROC
 printBill ENDP
 
 ;-------------------------------------------------------------------
-;| Check the password...                                            |
-;| Uses: bool variable to represent result..                        |
-;| bool = 1 means True && bool = 0 means False...                   |
-;-------------------------------------------------------------------
-
-check PROC
-       PUSHAD
-	   PUSHFD
-
-	   ;cmp ecx, PASSWORD_SIZE                                      ; Our Limit is of 15 Characters...
-	   ;jg notEqual
-;
-	                            ;; lea: Load Effective Address is like combination of move and OFFSET...
-	   ;lea si, passFile                                            ; ds:si points to File Password String...
-       ;lea di, userPass                                            ; ds:di points to Input Password String...
-       ;dec di                                                      ; Just Dec so can Inc Later...
-;
-       ;lab1:
-            ;inc di                                                 ; Inc to get next Character...
-            ;lodsb                                                  ; Load AL with next char from passFile...
-                                                                   ;; note: lodsb inc si automatically...
-            ;cmp [di], al                                           ; Compare characters...
-            ;jne notEqual                                           ; Jump out of loop if not equal...
- ;
-            ;cmp al, 0                                              ; They are the same, but end of string?
-            ;jne lab1                                               ; No - so go round loop again
-;
-            ;mov bool, 1
-	        ;jmp _exit                                              ; To save from executing notEqual Tag...
-;
-       ;notEqual:
-	            ;mov bool, 0
-
- _exit:
-	   POPFD
-	   POPAD
-
-	   RET
-check ENDP
-
-;-------------------------------------------------------------------
 ;| Shows an Error Box to customers...                               |
 ;| Uses:  2 strings for an input   box...                           |
 ;| Advan: It also works as a pause...                               |
@@ -1114,8 +1197,8 @@ error PROC
 
 	   call crlf
 
-       mov ebx,OFFSET caption
-	   mov edx,OFFSET errMsg
+       mov ebx, OFFSET caption
+	   mov edx, OFFSET errMsg
 	   call msgBox
 
 	   POPFD
@@ -1123,39 +1206,5 @@ error PROC
 
 	   RET
 error ENDP
-
-;-------------------------------------------------------------------
-;| Read password from Password File...                               |
-;| Uses: passFile string to store password...                        |
-;-------------------------------------------------------------------
-
-readPassword PROC
-			  PUSHAD
-			  PUSHFD
-
-			  mov edx, OFFSET passFileName
-			  ;call CreateOutputFile
-			  call OpenInputFile
-			  
-			  mov fHandle, eax                                           
-
-	          mov edx, OFFSET passFile                            ; Storage string...
-	          mov ecx, PASSWORD_SIZE                              ; Max buffer....
-	          call ReadFromFile
-
-	   ;jc err                                            ; If file does not open Carry will be set...
-;
-	   ;mov byteRead, ecx                                          ; No of bytes read from file...
-	   ;
-;err:                                                                ; File Opening Error block... 
-	  ;call WriteWindowsMsg
-			  ;mov eax, fHandle
-			  ;call  closeFile
-
-			  POPFD
-	          POPAD
-
-			  RET
-readPassword ENDP
 
 END main
