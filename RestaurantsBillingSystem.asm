@@ -122,7 +122,6 @@ drinks   BYTE " *** Drinks *** ", 0ah, 0dh
 
 passFileName BYTE "Password.txt", 0
 saleFileName BYTE "Sales.txt", 0
-
 passWord BYTE " Enter Current Password less than 16 Characters : ", 0
 newPass  BYTE " Enter New Password less than 16 Characters : ", 0
 wrongPas BYTE " Password is incorrect or Input is Invalid. ", 0ah, 0dh, 0
@@ -230,6 +229,10 @@ admin PROC
 			 mov edx, OFFSET saleFile
 			 call writeString
 
+			 call crlf
+			 call waitMsg
+			 call crlf
+
 			 jmp ok
 			 
 		  rp:                                                     ; Reset Password Tag...
@@ -279,24 +282,23 @@ admin ENDP
 ;-------------------------------------------------------------------
 ;| Read sales from Sales File...                                    |
 ;| Uses: saleFile string to store sales...                          |
+;| booL = 1 (operation succeeded) && bool = 0 (operation failed)    |
 ;-------------------------------------------------------------------
 
 readSales PROC
 			  PUSHAD
 			  PUSHFD
 
-			  mov edx, OFFSET passFileName
+			  mov edx, OFFSET saleFileName
 			  call openInputFile                                  ; Opening the File...
 			  mov fHandle, eax                                    ; Just for safety...      
 
-	          mov edx, OFFSET passFile                            ; Storage string...
-	          mov ecx, PASSWORD_SIZE                              ; Max buffer....
+	          mov edx, OFFSET saleFile                            ; Storage string...
+	          mov ecx, BUFFER_SIZE                                ; Max buffer....
 	          call ReadFromFile
 
 	          jc err                                  ; If file does not open Carry will be set...
 
-			  mov byteRead, ecx                                   ; No of bytes read from file...
-			  
 			  mov eax, fHandle                                    ; Moving Handel in eax...
 			  call  closeFile
 
@@ -315,8 +317,9 @@ readSales PROC
 readSales ENDP
 
 ;-------------------------------------------------------------------
-;| Read password from Password File...                               |
-;| Uses: passFile string to store password...                        |
+;| Read password from Password File...                              |
+;| Uses: passFile string to store password...                       |
+;| booL = 1 (operation succeeded) && bool = 0 (operation failed)    |
 ;-------------------------------------------------------------------
 
 readPassword PROC
@@ -427,10 +430,13 @@ customer PROC
 			 jmp  op
 
 			 pm:                                                  ; Price Menu Tag...
-				call printMenu
+			    call crlf
+
+		        mov edx, OFFSET pMenu
+	            call writeString
 
 			    call crlf
-				call WaitMsg                                      ; Call Wait Massage...
+				call waitMsg                                      ; Call Wait Massage...
 				call crlf
 
 				jmp  op
@@ -457,26 +463,6 @@ customer PROC
 		  RET
 customer ENDP
 
-;-------------------------------------------------------------------
-;| Print Menu with Prices for customers...                          |
-;| Uses: pMenu string to print...                                   |
-;| Note: push then pop regs and flags in stack to make them const...|
-;-------------------------------------------------------------------
-
-printMenu PROC
-           PUSHAD                                                 ; Pushing all 32-bit registers...
-		   PUSHFD                                                 ; Pushing all flags...
-
-		   call crlf
-
-		   mov edx, OFFSET pMenu
-	       call writeString
-
-		   POPFD                                                  ; Popping flags in reverse order...
-		   POPAD                                                  ; Popping regs in reverse order...
-
-		   RET
-printMenu ENDP
 
 ;-------------------------------------------------------------------
 ;| Print Deals and Offers with Prices for customers...              |
