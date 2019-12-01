@@ -463,7 +463,6 @@ customer PROC
 		  RET
 customer ENDP
 
-
 ;-------------------------------------------------------------------
 ;| Print Deals and Offers with Prices for customers...              |
 ;| Uses:   deals string to print...                                 |
