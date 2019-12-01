@@ -225,10 +225,12 @@ admin PROC
 
 		  pb:                                                     ; Print Bill Tag...
 			 call readSales                                       ; To read Sales from file...
+			 call crlf
 
 			 mov edx, OFFSET saleFile
 			 call writeString
 
+			 call crlf
 			 call crlf
 			 call waitMsg
 			 call crlf
@@ -259,7 +261,7 @@ admin PROC
 			 cmp ecx, PASSWORD_SIZE                              ; To check our limit...
 			 jg wrong
 
-			  ; TODO: write new password in file in file....
+			 call writePassword
 
 			 call crlf
 			 mov edx, OFFSET confirm
@@ -354,6 +356,45 @@ readPassword PROC
 
 			  RET
 readPassword ENDP
+
+;-------------------------------------------------------------------
+;| Read password from Password File...                              |
+;| Uses: passFile string to store password...                       |
+;| booL = 1 (operation succeeded) && bool = 0 (operation failed)    |
+;-------------------------------------------------------------------
+
+writePassword PROC
+			  PUSHAD
+			  PUSHFD
+
+			  mov edx, OFFSET passFileName
+			  call openInputFile                                  ; Opening the File...
+			  mov fHandle, eax                                    ; Just for safety...      
+
+	          mov edx, OFFSET userPass                            ; Storage string...
+	          mov ecx, PASSWORD_SIZE                              ; Max buffer....
+	          call WriteToFile
+			  call WriteWindowsMsg
+			  cmp eax, 0
+	          jl err                                  ; If file does not eax will be less than 0...
+			  
+			  mov eax, fHandle                                    ; Moving Handel in eax...
+			  call  closeFile
+			  call WriteWindowsMsg
+			  mov bool, 1                                         ; If everything is OK.
+			  jmp _exit
+ 
+			  err:                                                ; File Opening Error block... 
+	              call WriteWindowsMsg
+				  mov bool, 0                                     ; if does not open
+
+	    _exit:
+		      POPFD
+	          POPAD
+
+			  RET
+writePassword ENDP
+
 
 ;-------------------------------------------------------------------
 ;| Check the password...                                            |
