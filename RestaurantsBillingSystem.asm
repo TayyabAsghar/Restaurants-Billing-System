@@ -11,6 +11,7 @@ drPrice  DWORD 99, 99, 49 ,49, 69, 64, 89, 49                         ; To store
 dealRep  DWORD 0													  ; To store the number of deal 
 dealQuan DWORD 0													  ; TO store the quantity of dishes added in 
 mockBill DWORD 0													  ; To store the previous bill incase of any loss
+balance  DWORD 0													  ; To store the balance of the customer
 
 welcome  BYTE " *** Welcome To Restaurant Transylvania *** ", 0       ; Welcome note...
                  
@@ -151,7 +152,15 @@ continueOrder BYTE " Would you like to order Something More... ", 0ah, 0dh, 0
 
 dealCancel BYTE " You have canceled the deal... ", 0ah, 0dh, 0
 
-discountPrice BYTE "    On Order higher than Rs 1999, Your 5% Discounted Bill is     Rs : ", 0
+discountPrice BYTE "    On Order higher than Rs 1999, Your 5% Discounted Bill is Rs : ", 0
+
+service BYTE " *** We hope to serve you the Best *** ", 0ah, 0dh, 0
+
+balanceMsg BYTE "    Balance is :  ", 0
+
+amount BYTE "    Please Pay the Bill , Enter amount :  ", 0
+
+payBill BYTE "    Please Pay the complete Bill , Enter amount :  " , 0
 
 
 
@@ -177,9 +186,12 @@ main PROC
 	 call writeString
 
 	 call crlf
-	 call crlf
 
      op:                                                         ; Option Tag...  
+		call crlf
+		mov edx, offset service
+		call writeString
+		call crlf
 		mov edx, OFFSET options                                  ; Printing options...
 	    call writeString
 
@@ -261,7 +273,6 @@ dealsOffers PROC
 				 mov edx, OFFSET deals
 				 call writeString 
 				 call crlf 
-				 call crlf
 
 				 call readInt
 
@@ -312,7 +323,6 @@ dealsOffers PROC
 
 			 mov edx, offset continueOrder
 			 call writeString
-			 call crlf
 			 			 
 		     POPFD
 		     POPAD
@@ -1000,8 +1010,28 @@ printBill PROC
 
 		   call discount5
 
-		   mov eax, bill
-		   call writeInt
+		   ;call crlf 
+		   ;mov edx, offset amount
+		   ;call writeString
+		   ;call readInt
+		   ;mov mockBill, eax
+		;billy:
+		   ;cmp eax, bill
+		   ;jge printBalance
+
+		   ;mov edx, offset payBill
+		   ;call writeString
+		   ;call readInt
+		   ;jmp billy
+
+		;printBalance:
+		   ;call crlf
+		   ;mov edx, offset balanceMsg
+		   ;call writeString
+		   ;sub eax,bill
+		   ;call writeInt
+
+		   
 
 		   call halt
 
@@ -1407,6 +1437,8 @@ dealChineseMenu PROC, noOfDishes:DWORD
 				mov edx, offset dealAdded
 				call writeString
 				call crlf
+				jmp finalExit
+
 		
 		selectCorrect:
 				 call error
@@ -1551,6 +1583,7 @@ dealFastFoodMenu PROC, noOfDishes:DWORD
 				   mov edx, offset dealAdded
 				   call writeString
 				   call crlf
+				   jmp finalExit
 		
 		selectCorrect:
 				 call error
@@ -1647,6 +1680,7 @@ dealDrinks1_5 PROC , noOfDrinks:DWORD
 				    mov edx, offset dealAdded
 				    call writeString
 				    call crlf
+					jmp finalExit
 		
 		selectCorrect:
 				 call error
@@ -1723,6 +1757,8 @@ discount5 PROC
 			call crlf
 			mov edx, offset discountPrice
 			call writeString
+
+			call writeInt												; Printing Bill
 
 	_exit:
 		POPFD
