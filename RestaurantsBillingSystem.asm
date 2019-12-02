@@ -1,26 +1,6 @@
 INCLUDE Irvine32.inc
 
 .DATA
-<<<<<<< HEAD
-bill     DWORD 0                                                      ; To store the bill...
-oPrice   DWORD 169, 149, 99, 89, 69, 69, 10, 5                        ; To store the prices of Oriental...
-cPrice   DWORD 169, 149, 99, 79                                       ; To store the prices of Chinese...
-fPrice   DWORD 149, 99, 79, 49                                        ; To store the prices of Fast Food...
-dePrice  DWORD 799, 699, 99, 69                                       ; To store the prices of Dessert...
-drPrice  DWORD 99, 99, 49 ,49, 69, 64, 89, 49                         ; To store the prices of Drinks...
-
-dealRep  DWORD 0													  ; To store the number of deal 
-dealQuan DWORD 0													  ; TO store the quantity of dishes added in 
-mockBill DWORD 0													  ; To store the previous bill incase of any loss
-balance  DWORD 0													  ; To store the balance of the customer
-
-welcome  BYTE " *** Welcome To Restaurant Transylvania *** ", 0       ; Welcome note...
-                 
-bool     DWORD ?                                                       ; To store the result of Check... 
-filePass BYTE  15 DUP(?)                                              ; To store the Password from File...
-inPass   BYTE  15 DUP(?)                                              ; To store the Input Password...
-=======
-
 BUFFER_SIZE = 5000
 PASSWORD_SIZE = 15
 oPrice   DWORD 169, 149, 99, 89, 69, 69, 10, 5                    ; To store the prices of Oriental...
@@ -37,7 +17,8 @@ dealRep  DWORD ?
 passFile BYTE  PASSWORD_SIZE DUP(?)                               ; To store the Password from File...
 userPass BYTE  PASSWORD_SIZE DUP(?)                               ; To store the Input Password...
 saleFile BYTE  BUFFER_SIZE DUP(?)
->>>>>>> a835508e0940bad4e6e466b439eec76dceeb7028
+
+welcome  BYTE " *** Welcome To Resturant Transylvania *** ", 0ah, 0dh, 0
 
 id       BYTE " Enter 1 : For Admin ", 0ah, 0dh
          BYTE " Enter 2 : For Customers ", 0ah, 0dh
@@ -68,11 +49,7 @@ pMenu    BYTE " Restaurant Transylvania proudly present our Menu ... ", 0ah, 0dh
          BYTE "		Chicken Manchurian with rice : 169 per Plate ", 0ah, 0dh
          BYTE "		Egg Fried Rice               : 149 per Plate ", 0ah, 0dh
          BYTE "		Chicken Macaroni             :  99 per Plate ", 0ah, 0dh
-<<<<<<< HEAD
-         BYTE "		Chicken cuisine              :  79 per Plate ", 0ah, 0dh, 0
-=======
-         BYTE "		Chicken cuisine              :  79 per Plate ", 0ah, 0dh, 0ah, 0dh
->>>>>>> a835508e0940bad4e6e466b439eec76dceeb7028
+         BYTE "		Chicken Cuisine              :  79 per Plate ", 0ah, 0dh, 0ah, 0dh
          BYTE " *** Fast Food *** ", 0ah, 0dh
          BYTE "		Chicken Pizza    : 149 per Pizza. ", 0ah, 0dh
          BYTE "		Zinger Burger    :  99 per Piece. ", 0ah, 0dh
@@ -91,15 +68,9 @@ pMenu    BYTE " Restaurant Transylvania proudly present our Menu ... ", 0ah, 0dh
          BYTE "		Pineapple Juice : 69 per Glass. ", 0ah, 0dh
          BYTE "		Mint Margarita  : 64 per Glass. ", 0ah, 0dh
 		 BYTE "		Coffee          : 89 per Cup. ", 0ah, 0dh
-<<<<<<< HEAD
-		 BYTE "		Tea             : 49 per Cup. ", 0
-
-deals    BYTE " *** Deals and Offers *** ", 0ah, 0dh                         ; Deals and Offers...
-=======
 		 BYTE "		Tea             : 49 per Cup. ", 0ah, 0dh, 0
 
 deals    BYTE " *** Deals and Offers *** ", 0ah, 0dh              ; Deals and Offers...
->>>>>>> a835508e0940bad4e6e466b439eec76dceeb7028
 		 BYTE " * You will Get 5% Discount on any order above RS 1,999. * " , 0ah, 0dh
 		 BYTE " For any Deal enter the related number..." , 0ah, 0dh
 		 BYTE " Deal 1 : Buy any 3 or more Oriental Dishes and get 1 Dessert free. " , 0ah, 0dh
@@ -108,9 +79,6 @@ deals    BYTE " *** Deals and Offers *** ", 0ah, 0dh              ; Deals and Of
 		 BYTE " Deal 4 : Buy any 2 or more '1.5' Liters Drink and get 1 Regular Drink free. " , 0ah, 0dh
 		 BYTE "      5 : Exit Deal Menu. ", 0ah, 0dh, 0
 		 
-<<<<<<< HEAD
-cMenu    BYTE " *** Menu *** ", 0ah, 0dh, 0ah, 0dh                            ; Choice Menu...
-=======
 regDrink BYTE " Enter 1 : Coca Cola       : 49 Regular. ", 0ah, 0dh
 		 BYTE " Enter 2 : Sprite          : 49 Regular. ", 0ah, 0dh
 		 BYTE " Enter 3 : Pineapple Juice : 69 per Glass. ", 0ah, 0dh
@@ -122,7 +90,6 @@ drinks1_5 BYTE " Enter 1 : Coca Cola       : 99 (1.5) Liters. ", 0ah, 0dh
 		 BYTE " Enter 3 : To Exit. ", 0ah, 0dh, 0
 
 cMenu    BYTE " *** Menu *** ", 0ah, 0dh, 0ah, 0dh                ; Choice Menu...
->>>>>>> a835508e0940bad4e6e466b439eec76dceeb7028
          BYTE " Enter 1 : For Oriental.", 0ah, 0dh
 		 BYTE " Enter 2 : For Chinese.", 0ah, 0dh
 		 BYTE " Enter 3 : For Fast Food.", 0ah, 0dh
@@ -173,143 +140,12 @@ drinks   BYTE " *** Drinks *** ", 0ah, 0dh
 	     BYTE " Enter 8 : Tea             : 49 per Cup. ", 0ah, 0dh
          BYTE " Enter 9 : To Exit. ", 0ah, 0dh , 0
 
-<<<<<<< HEAD
-regDrink BYTE " Enter 1 : Coca Cola       : 49 Regular. ", 0ah, 0dh
-		 BYTE " Enter 2 : Sprite          : 49 Regular. ", 0ah, 0dh
-		 BYTE " Enter 3 : Pineapple Juice : 69 per Glass. ", 0ah, 0dh
-		 BYTE " Enter 4 : Mint Margarita  : 64 per Glass. ", 0ah, 0dh
-		 BYTE " Enter 5 : To Exit. ", 0ah, 0dh , 0
-
-drinks1_5 BYTE " Enter 1 : Coca Cola       : 99 (1.5) Liters. ", 0ah, 0dh
-		  BYTE " Enter 2 : Sprite          : 99 (1.5) Liters. ", 0ah, 0dh
-		  BYTE " Enter 3 : To Exit. ", 0ah, 0dh, 0
-
-
-
-reMsg   BYTE " Your Order has been Canceled... ", 0ah, 0dh, 0
-
-dishes  BYTE " Enter the Quantity:  ", 0
-
-caption BYTE "Error", 0
-
-errMsg  BYTE " Please follow instructions correctly... ", 0
-
-billMsg BYTE "    Total Bill:   Rs ", 0
-
-exitMsg BYTE "    We are always glad to serve our Customers... ", 0ah, 0dh, 0
-
-haltMsg BYTE " Press Enter to continue... ", 0
-
-=======
 passFileName BYTE "Password.txt", 0
 saleFileName BYTE "Sales.txt", 0
->>>>>>> a835508e0940bad4e6e466b439eec76dceeb7028
 passWord BYTE " Enter Current Password less than 16 Characters : ", 0
 newPass  BYTE " Enter New Password less than 16 Characters : ", 0
 wrongPas BYTE " Password is incorrect or Input is Invalid. ", 0ah, 0dh, 0
 confirm  BYTE " New Password is Set. ", 0ah, 0dh, 0
-<<<<<<< HEAD
-
-
-
-dealItem BYTE " Please Select your FREE item... ", 0ah, 0dh, 0
-
-dealAdded BYTE " Your Free item has been Added in the order Successfuly... ", 0ah, 0dh, 0
-
-continueOrder BYTE " Would you like to order Something More... ", 0ah, 0dh, 0
-
-dealCancel BYTE " You have canceled the deal... ", 0ah, 0dh, 0
-
-discountPrice BYTE "    On Order higher than Rs 1999, Your 5% Discounted Bill is Rs : ", 0
-
-service BYTE " *** We hope to serve you the Best *** ", 0ah, 0dh, 0
-
-balanceMsg BYTE "    Balance is :  ", 0
-
-amount BYTE "    Please Pay the Bill , Enter amount :  ", 0
-
-payBill BYTE "    Please Pay the complete Bill , Enter amount :  " , 0
-
-
-
-
-
-
-.CODE
-
-dealOrientalMenu PROTO , noOfDishes:DWORD						; Function to print Oriental menu based on deals
-
-dealChineseMenu PROTO , noOfDishes:DWORD						; Function to print Chinese menu based on deals
-
-dealFastFoodMenu PROTO , noOfDishes:DWORD						; Function to print Fast Food menu based on deals
-
-setEcx2 PROTO, dealQuan1:DWORD								; To set the value of ecx
-
-setEcx3 PROTO, dealQuan2:DWORD								; To set the value of ecx
-
-dealDrinks1_5 PROTO , noOfDrinks:DWORD							; Function to 1.5 liters Drink menu based on deals
-
-;main PROC
-     ;call crlf
-;
-	 ;mov edx, OFFSET welcome                                     ; Printing Welcome...
-	 ;call writeString
-;
-	 ;call crlf
-;
-     ;op:                                                         ; Option Tag...  
-		;call crlf
-		;mov edx, offset service
-		;call writeString
-		;call crlf
-		;mov edx, OFFSET options                                  ; Printing options...
-	    ;call writeString
-;
-		;call crlf
-		;call readInt
-;
-	    ;cmp eax, 1
-		;je  pm
-		;cmp eax, 2
-		;je  do
-		;cmp eax, 3
-		;je  cm
-		;cmp eax, 4
-		;je  rb
-		;cmp eax, 5
-		;je  _exit
-;
-		;call error                                                  ; calling error Proc...
-		;jmp  op
-;
-		;pm:                                                         ; Price Menu Tag...
-		   ;call printMenu
-		   ;call halt
-		   ;jmp  op
-;
-        ;do:                                                          ; Deals and Offers Tag...
-	       ;call dealsOffers
-		   ;jmp op
-;
-        ;cm:                                                          ; Choice Menu Tag...
-	       ;call choiceMenu
-		   ;jmp op
-;
-        ;rb:                                                          ; Reset Bill Tag...
-	       ;call resetBill
-		   ;call halt
-		   ;jmp op
-;
-     ;_exit:                                                          ; Exit Tag
-		   ;call printBill
-;
-	       ;exit
-;
-;main ENDP
-
-
-
-=======
 reMsg    BYTE " Your Order has been Canceled... ", 0ah, 0dh, 0    ; Reset Bill Message...
 dishes   BYTE " Enter the Quantity:  ", 0
 caption  BYTE " Error ", 0
@@ -336,7 +172,6 @@ setEcx2 PROTO, dealQuan1:DWORD								      ; To set the value of ecx
 setEcx3 PROTO, dealQuan2:DWORD							 	      ; To set the value of ecx
 dealDrinks1_5 PROTO , noOfDrinks:DWORD							  ; To 1.5 liters Drink Menu on deals
 
->>>>>>> a835508e0940bad4e6e466b439eec76dceeb7028
 main PROC
      call crlf
 
@@ -1540,39 +1375,6 @@ printBill PROC
 
 	       RET
 printBill ENDP
-
-;-------------------------------------------------------------------
-;| Check the password...                                            |
-;| Uses: bool variable to represent result..                        |
-;| bool = 1 means True && bool = 0 means False...                   |
-;-------------------------------------------------------------------
-
-
-<<<<<<< HEAD
-	   ;cmp ecx, 15                                                 ; Our Limit is of 15 Characters...
-	   ;jg notEqual
-;
-	                            ;; lea: Load Effective Address is like combination of move and OFFSET...
-	   ;lea si, filePass                                            ; ds:si points to File Password String...
-       ;lea di, inPass                                              ; ds:di points to Input Password String...
-       ;dec di                                                      ; Just Dec so can Inc Later...
-;
-       ;lab1:
-            ;inc di                                                 ; Inc to get next Character...
-            ;lodsb                                                  ; Load AL with next char from filePass...
-                                                                   ;; note: lodsb inc si automatically...
-            ;cmp [dl], al                                           ; Compare characters...
-            ;jne notEqual                                           ; Jump out of loop if not equal...
- ;
-            ;cmp al, 0                                              ; They are the same, but end of string?
-            ;jne lab1                                               ; No - so go round loop again
-;
-            ;mov bool, 1
-	        ;jmp _exit                                              ; To save from executing notEqual Tag...
-;
-       ;notEqual:
-	            ;mov bool, 0
-
 
 ;-------------------------------------------------------------------
 ;| Shows an Error Box to customers...                               |
