@@ -15,7 +15,7 @@ balance  DWORD 0													  ; To store the balance of the customer
 
 welcome  BYTE " *** Welcome To Restaurant Transylvania *** ", 0       ; Welcome note...
                  
-bool     DWORD ?                                                      ; To store the result of Check... 
+bool     DWORD ?                                                       ; To store the result of Check... 
 filePass BYTE  15 DUP(?)                                              ; To store the Password from File...
 inPass   BYTE  15 DUP(?)                                              ; To store the Input Password...
 
@@ -154,6 +154,14 @@ exitMsg BYTE "    We are always glad to serve our Customers... ", 0ah, 0dh, 0
 
 haltMsg BYTE " Press Enter to continue... ", 0
 
+passWord BYTE " Enter Current Password less than 16 Characters : ", 0
+
+newPass  BYTE " Enter New Password less than 16 Characters : ", 0
+
+wrongPas BYTE " Password is incorrect or Input is Invalid. ", 0ah, 0dh, 0
+
+confirm  BYTE " New Password is Set. ", 0ah, 0dh, 0
+
 
 
 dealItem BYTE " Please Select your FREE item... ", 0ah, 0dh, 0
@@ -177,6 +185,8 @@ payBill BYTE "    Please Pay the complete Bill , Enter amount :  " , 0
 
 
 
+
+
 .CODE
 
 dealOrientalMenu PROTO , noOfDishes:DWORD						; Function to print Oriental menu based on deals
@@ -191,90 +201,66 @@ setEcx3 PROTO, dealQuan2:DWORD								; To set the value of ecx
 
 dealDrinks1_5 PROTO , noOfDrinks:DWORD							; Function to 1.5 liters Drink menu based on deals
 
-main PROC
-     call crlf
+;main PROC
+     ;call crlf
+;
+	 ;mov edx, OFFSET welcome                                     ; Printing Welcome...
+	 ;call writeString
+;
+	 ;call crlf
+;
+     ;op:                                                         ; Option Tag...  
+		;call crlf
+		;mov edx, offset service
+		;call writeString
+		;call crlf
+		;mov edx, OFFSET options                                  ; Printing options...
+	    ;call writeString
+;
+		;call crlf
+		;call readInt
+;
+	    ;cmp eax, 1
+		;je  pm
+		;cmp eax, 2
+		;je  do
+		;cmp eax, 3
+		;je  cm
+		;cmp eax, 4
+		;je  rb
+		;cmp eax, 5
+		;je  _exit
+;
+		;call error                                                  ; calling error Proc...
+		;jmp  op
+;
+		;pm:                                                         ; Price Menu Tag...
+		   ;call printMenu
+		   ;call halt
+		   ;jmp  op
+;
+        ;do:                                                          ; Deals and Offers Tag...
+	       ;call dealsOffers
+		   ;jmp op
+;
+        ;cm:                                                          ; Choice Menu Tag...
+	       ;call choiceMenu
+		   ;jmp op
+;
+        ;rb:                                                          ; Reset Bill Tag...
+	       ;call resetBill
+		   ;call halt
+		   ;jmp op
+;
+     ;_exit:                                                          ; Exit Tag
+		   ;call printBill
+;
+	       ;exit
+;
+;main ENDP
 
-	 mov edx, OFFSET welcome                                     ; Printing Welcome...
-	 call writeString
 
-	 call crlf
 
-     op:                                                         ; Option Tag...  
-		call crlf
-		mov edx, offset service
-		call writeString
-		call crlf
-		mov edx, OFFSET options                                  ; Printing options...
-	    call writeString
-
-		call crlf
-		call readInt
-
-	    cmp eax, 1
-		je  pm
-		cmp eax, 2
-		je  do
-		cmp eax, 3
-		je  cm
-		cmp eax, 4
-		je  rb
-		cmp eax, 5
-		je  _exit
-
-		call error                                                  ; calling error Proc...
-		jmp  op
-
-		pm:                                                         ; Price Menu Tag...
-		   call printMenu
-		   call halt
-		   jmp  op
-
-        do:                                                          ; Deals and Offers Tag...
-	       call dealsOffers
-		   jmp op
-
-        cm:                                                          ; Choice Menu Tag...
-	       call choiceMenu
-		   jmp op
-
-        rb:                                                          ; Reset Bill Tag...
-	       call resetBill
-		   call halt
-		   jmp op
-
-     _exit:                                                          ; Exit Tag
-		   call printBill
-
-	       exit
-
-main ENDP
-
-;-------------------------------------------------------------------
-;| Print Menu with Prices for customers...                          |
-;| Uses:   pMenu string to print...                                 |
-;| Note: push then pop regs and flags in stack to make them const   |
-=======
-passWord BYTE " Enter Current Password less than 16 Characters : ", 0
-
-newPass  BYTE " Enter New Password less than 16 Characters : ", 0
-
-wrongPas BYTE " Password is incorrect or Input is Invalid. ", 0ah, 0dh, 0
-
-confirm  BYTE " New Password is Set. ", 0ah, 0dh, 0
-
-reMsg    BYTE " Your Order has been Canceled... ", 0ah, 0dh, 0
-
-dishes   BYTE " Enter the Quantity:  ", 0
-
-caption  BYTE "Error", 0
-
-errMsg   BYTE " Please follow instructions correctly... ", 0
-
-billMsg  BYTE  "    Total Bill:   Rs ", 0
-
-exitMsg  BYTE "     Glad to have you Here... ", 0ah, 0dh, 0
-
-.CODE
 main PROC
      call crlf
 
@@ -1364,7 +1350,6 @@ error PROC
 	   RET
 error ENDP
 
-<<<<<<< HEAD
 ;-------------------------------------------------------------------
 ;| Print Dealed Oriental Menu with Prices for customers to order... |
 ;| Updates: Bill ...                                                |
