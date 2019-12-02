@@ -42,7 +42,21 @@ It's Starter Menu gives following options:
 It only prints the complete Menu with prices to help our customers in selection.
 
 ### Deals and Offers
-<!-- TODO  -->
+
+It tells about Deals and Offers with following Menu:
+
+- You will Get 5% Discount on any order above RS 1,999
+- Deal 1 : Buy any 3 or more Oriental Dishes and get 1 Dessert free
+- Deal 2 : Buy any 2 or more Chinese Dishes and get 1 Drink free
+- Deal 3 : Buy any 2 or more Fast Foods and get 1 Regular Drink free
+- Deal 4 : Buy any 2 or more '1.5' Liters Drink and get 1 Regular Drink free
+- 5 : Exit Deal Menu
+
+Each deal is ended by a Free Menu.
+
+- Coca Cola (1.5) Liters
+- Sprite (1.5) Liters
+- To Exit
 
 ### Place an Order
 
@@ -51,45 +65,45 @@ It Places the order of customer by showing different dishes and their prices as 
 - Oriental
 
   + Chicken Quorma
-   + Pullao
-   + Chicken Briyani
-   + Chicken Karahi
-   + Chicken Tikka
-   + Murgh Haleem
-   + Naan
-   + Roti
+  + Pullao
+  + Chicken Briyani
+  + Chicken Karahi
+  + Chicken Tikka
+  + Murgh Haleem
+  + Naan
+  + Roti
 
 - Chinese
 
-   + Chicken Manchurian with rice
-   + Egg Fried Rice
-   + Chicken Macaroni
-   + Chicken Shashlik
+  + Chicken Manchurian with rice
+  + Egg Fried Rice
+  + Chicken Macaroni
+  + Chicken Cuisine
 
 - Fast Food
 
-   + Chicken Pizza
-   + Zinger Burger
-   + Chicken Shawarma
-   + French Fries
+  + Chicken Pizza
+  + Zinger Burger
+  + Chicken Shawarma
+  + French Fries
 
 - Dessert
 
-   + Pineapple Cake
-   + Chocolate Cake
-   + Custard
-   + Ice-cream 
+  + Pineapple Cake
+  + Chocolate Cake
+  + Custard
+  + Ice-cream
 
 - Drinks
 
-   + Coca Cola
-   + Sprite
-   + Coca Cola [Regular]
-   + Sprite [Regular]
-   + Pineapple Juice
-   + Mint Margarita
-   + Coffee
-   + Tea
+  + Coca Cola
+  + Sprite
+  + Coca Cola [Regular]
+  + Sprite [Regular]
+  + Pineapple Juice
+  + Mint Margarita
+  + Coffee
+  + Tea
 
 After selecting the dish the program asks for quantity and generates a bill for customers.
 

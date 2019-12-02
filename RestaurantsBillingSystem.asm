@@ -50,7 +50,7 @@ pMenu    BYTE " Restaurant Transylvania proudly present our Menu ... ", 0ah, 0dh
          BYTE "		Chicken Manchurian with rice : 169 per Plate ", 0ah, 0dh
          BYTE "		Egg Fried Rice               : 149 per Plate ", 0ah, 0dh
          BYTE "		Chicken Macaroni             :  99 per Plate ", 0ah, 0dh
-         BYTE "		Chicken cuisine              :  79 per Plate ", 0ah, 0dh, 0ah, 0dh
+         BYTE "		Chicken Cuisine              :  79 per Plate ", 0ah, 0dh, 0ah, 0dh
          BYTE " *** Fast Food *** ", 0ah, 0dh
          BYTE "		Chicken Pizza    : 149 per Pizza. ", 0ah, 0dh
          BYTE "		Zinger Burger    :  99 per Piece. ", 0ah, 0dh
@@ -113,7 +113,7 @@ chinese  Byte " *** Chinese *** ", 0ah, 0dh
          BYTE " Enter 1 : Chicken Manchurian with rice : 169 per Dish ", 0ah, 0dh
          BYTE " Enter 2 : Egg Fried Rice               : 149 per Dish ", 0ah, 0dh
          BYTE " Enter 3 : Chicken Macaroni             :  99 per Dish ", 0ah, 0dh
-         BYTE " Enter 4 : Chicken Shashlik             :  79 per Dish ", 0ah, 0dh
+         BYTE " Enter 4 : Chicken Cuisine              :  79 per Dish ", 0ah, 0dh
 		 BYTE " Enter 5 : To Exit. ", 0ah, 0dh, 0
 
 fastFood BYTE " *** Fast Food *** ", 0ah, 0dh
