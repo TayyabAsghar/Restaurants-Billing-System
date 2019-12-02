@@ -10,7 +10,7 @@ It has a starter Starter Menu for Admin [Owner] and customer:
 
 ## Admin
 
-It should `provide its password to continue`.
+He should `provide his password to continue`.
 Old password is collected from a password file.
 
 Once enters it has following Menu:
@@ -41,10 +41,10 @@ It's Starter Menu gives following options:
 
 It only prints the complete Menu with prices to help our customers in selection.
 
-## Deals and Offers
+### Deals and Offers
 <!-- TODO  -->
 
-## Place an Order
+### Place an Order
 
 It Places the order of customer by showing different dishes and their prices as follow:
 
@@ -93,6 +93,6 @@ It Places the order of customer by showing different dishes and their prices as 
 
 After selecting the dish the program asks for quantity and generates a bill for customers.
 
-## Reset the Bill [Cancel the order]
+### Reset the Bill [Cancel the order]
 
 It clears the bill and cancel the whole order.
