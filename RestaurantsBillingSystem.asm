@@ -404,10 +404,12 @@ customer PROC
           PUSHAD
 		  PUSHFD
 		       
-		  call crlf
-
 	      op:                                                         ; Option Tag...  
-		     mov edx, OFFSET options                                  ; Printing options...
+		    call crlf
+		    mov edx, offset service
+			call writeString
+			call crlf
+			mov edx, OFFSET options                                  ; Printing options...
 	         call writeString
 
 			 call crlf
@@ -492,7 +494,7 @@ dealsOffers PROC
 
 			 deal:
 				 call crlf
-
+				 
 				 mov edx, OFFSET deals
 				 call writeString 
 				 call crlf 
@@ -1309,7 +1311,7 @@ check PROC
             ;inc di                                                 ; Inc to get next Character...
             ;lodsb                                                  ; Load AL with next char from filePass...
                                                                    ;; note: lodsb inc si automatically...
-            ;cmp [di], al                                           ; Compare characters...
+            ;cmp [dl], al                                           ; Compare characters...
             ;jne notEqual                                           ; Jump out of loop if not equal...
  ;
             ;cmp al, 0                                              ; They are the same, but end of string?
@@ -1999,7 +2001,7 @@ discount5 PROC
 		jmp _exit
 
 		disc:
-			mov ebx, 20
+			mov ebx, 5
 			mul ebx
 			mov edx, 0
 			mov ecx, 100
@@ -2024,4 +2026,3 @@ discount5 PROC
 discount5 ENDP
 
 END main
-
