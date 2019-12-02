@@ -15,6 +15,18 @@ balance  DWORD 0													  ; To store the balance of the customer
 
 welcome  BYTE " *** Welcome To Restaurant Transylvania *** ", 0       ; Welcome note...
                  
+bool     DWORD ?                                                      ; To store the result of Check... 
+filePass BYTE  15 DUP(?)                                              ; To store the Password from File...
+inPass   BYTE  15 DUP(?)                                              ; To store the Input Password...
+
+id       BYTE " Enter 1 : For Admin ", 0ah, 0dh
+         BYTE " Enter 2 : For Customers ", 0ah, 0dh
+	     BYTE " Enter 3 : To Exit ", 0ah, 0dh, 0
+
+choice   BYTE " Enter 1 : To Print Sale ", 0ah, 0dh
+         BYTE " Enter 2 : To Reset Password ", 0ah, 0dh
+	     BYTE " Enter 3 : To Exit ", 0ah, 0dh, 0
+
 options  BYTE " Enter 1 : To see our Menu and Prices.", 0ah, 0dh
          BYTE " Enter 2 : To see our Deals and Offers.", 0ah, 0dh
 		 BYTE " Enter 3 : To Place an Order.", 0ah, 0dh
@@ -35,7 +47,7 @@ pMenu    BYTE " Restaurant Transylvania proudly present our Menu ... ", 0ah, 0dh
          BYTE "		Chicken Manchurian with rice : 169 per Plate ", 0ah, 0dh
          BYTE "		Egg Fried Rice               : 149 per Plate ", 0ah, 0dh
          BYTE "		Chicken Macaroni             :  99 per Plate ", 0ah, 0dh
-         BYTE "		Chicken cuisine              :  79 per Plate ", 0ah, 0dh, 0ah, 0dh
+         BYTE "		Chicken cuisine              :  79 per Plate ", 0ah, 0dh, 0
          BYTE " *** Fast Food *** ", 0ah, 0dh
          BYTE "		Chicken Pizza    : 149 per Pizza. ", 0ah, 0dh
          BYTE "		Zinger Burger    :  99 per Piece. ", 0ah, 0dh
@@ -88,7 +100,7 @@ chinese  Byte " *** Chinese *** ", 0ah, 0dh
          BYTE " Enter 1 : Chicken Manchurian with rice : 169 per Dish ", 0ah, 0dh
          BYTE " Enter 2 : Egg Fried Rice               : 149 per Dish ", 0ah, 0dh
          BYTE " Enter 3 : Chicken Macaroni             :  99 per Dish ", 0ah, 0dh
-         BYTE " Enter 4 : Chicken Shashlik             :  79 per Dish ", 0ah, 0dh
+         BYTE " Enter 4 : Chicken Cuisine              :  79 per Dish ", 0ah, 0dh
 		 BYTE " Enter 5 : To Exit. ", 0ah, 0dh, 0
 
 fastFood BYTE " *** Fast Food *** ", 0ah, 0dh
@@ -241,6 +253,230 @@ main ENDP
 ;| Print Menu with Prices for customers...                          |
 ;| Uses:   pMenu string to print...                                 |
 ;| Note: push then pop regs and flags in stack to make them const   |
+=======
+passWord BYTE " Enter Current Password less than 16 Characters : ", 0
+
+newPass  BYTE " Enter New Password less than 16 Characters : ", 0
+
+wrongPas BYTE " Password is incorrect or Input is Invalid. ", 0ah, 0dh, 0
+
+confirm  BYTE " New Password is Set. ", 0ah, 0dh, 0
+
+reMsg    BYTE " Your Order has been Canceled... ", 0ah, 0dh, 0
+
+dishes   BYTE " Enter the Quantity:  ", 0
+
+caption  BYTE "Error", 0
+
+errMsg   BYTE " Please follow instructions correctly... ", 0
+
+billMsg  BYTE  "    Total Bill:   Rs ", 0
+
+exitMsg  BYTE "     Glad to have you Here... ", 0ah, 0dh, 0
+
+.CODE
+main PROC
+     call crlf
+
+	 mov edx, OFFSET welcome                                     ; Printing Welcome...
+	 call writeString
+
+     op:
+	    call crlf
+
+	    mov edx, OFFSET id                                        ; Printing Id...
+		call writeString
+
+		call crlf
+		call readInt
+
+		cmp eax, 1
+		je ad
+
+		cmp eax, 2
+		je cu
+
+		cmp eax, 3
+		je  _exit
+
+		call error                                                 ; calling error Proc...
+		jmp  op
+
+		ad:                                                        ; Admin Tag...
+		   call admin
+		   jmp op
+
+		cu:
+		   call customer
+		   jmp op
+
+	 _exit:
+		   mov edx, OFFSET exitMsg                                 ; Printing Exit Note/Msg...
+	       call writeString
+
+	       exit
+main ENDP
+
+;-------------------------------------------------------------------
+;| For admin only...                                                |
+;| Uses: It deals with the admin and print whole file...            |
+;| Note: It only read bill in file...                               |
+;-------------------------------------------------------------------
+
+admin PROC
+       PUSHAD
+	   PUSHFD
+
+	   call crlf
+
+	   ;TODO: Opening a file and taking input from it for pass word
+
+		call writeString
+
+	    mov edx, OFFSET inPass                                     ; Point to the Destination...
+        mov ecx, SIZEOF inPass                                     ; Specify max characters...
+		call readString
+
+		call check
+
+		cmp bool, 0                                                ; Check store result in bool...
+		je wrong
+
+		ok:
+		   call crlf
+	       mov edx, OFFSET choice
+		   call writeString
+
+		   call crlf
+		   call readInt
+
+		   cmp eax, 1
+		   je  pb
+	   	   cmp eax, 2
+		   je  rp
+		   cmp eax, 3
+		   je  _exit
+
+		   call error                                              ; calling error Proc...
+		   jmp ok
+
+		   pb:                                                     ; Print Bill Tag...
+			  ;TODO: Print the whole bills
+			  jmp ok
+			 
+		   rp:                                                     ; Reset Password Tag...
+		      call crlf
+		      mov edx, OFFSET passWord                             ; Taking old Password again...
+		      call writeString
+
+		      mov edx, OFFSET inPass
+              mov ecx, SIZEOF inPass
+		      call readString
+
+		      call check                                           ; Rechecking Pass before Changing...
+
+		      cmp bool, 0
+		      je wrong
+
+			  mov edx, OFFSET newPass
+		      call writeString
+
+			  mov edx, OFFSET inPass
+              mov ecx, SIZEOF inPass
+		      call readString                                     ; Taking new Password again...
+
+			  cmp ecx, 15                                         ; To check our limit...
+			  jg wrong
+
+			  ; TODO: write new password in file in file....
+
+			  call crlf
+			  mov edx, OFFSET confirm
+		      call writeString
+
+			  jmp _exit
+
+ wrong:
+       call crlf
+       mov edx, OFFSET wrongPas                                       ; When Password is wrong...
+	   call writeString
+
+ _exit:
+	   POPFD
+	   POPAD
+
+	   RET
+admin ENDP
+
+;-------------------------------------------------------------------
+;| For customers only...                                            |
+;| Uses: It deals with the customers and take order...              |
+;| Note: It only write bill in file with (False) customer name...   |
+;-------------------------------------------------------------------
+
+customer PROC
+          PUSHAD
+		  PUSHFD
+		       
+		  call crlf
+
+	      op:                                                         ; Option Tag...  
+		     mov edx, OFFSET options                                  ; Printing options...
+	         call writeString
+
+			 call crlf
+			 call readInt
+
+			 cmp eax, 1
+			 je  pm
+			 cmp eax, 2
+			 je  do
+			 cmp eax, 3
+			 je  cm
+			 cmp eax, 4
+			 je  rb
+			 cmp eax, 5
+			 je  _exit
+
+			 call error                                                  ; calling error Proc...
+			 jmp  op
+
+			 pm:                                                         ; Price Menu Tag...
+				call printMenu
+
+			    call crlf
+				call WaitMsg                                             ; Call Wait Massage...
+				call crlf
+
+				jmp  op
+
+			 do:                                                          ; Deals and Offers Tag...
+				call dealsOffers
+				jmp op
+
+			 cm:                                                          ; Choice Menu Tag...
+				call choiceMenu
+				jmp op
+
+			 rb:                                                          ; Reset Bill Tag...
+				call resetBill
+				call crlf
+				jmp op
+
+    _exit:                                                                ; Exit Tag
+		  call printBill
+		  call crlf
+
+		  POPFD
+		  POPAD
+
+		  RET
+customer ENDP
+
+;-------------------------------------------------------------------
+;| Print Menu with Prices for customers...                          |
+;| Uses: pMenu string to print...                                   |
+;| Note: push then pop regs and flags in stack to make them const...|   
 ;-------------------------------------------------------------------
 
 printMenu PROC
@@ -253,20 +489,21 @@ printMenu PROC
 	       call writeString
 
 		   POPFD                                                     ; Popping flags in reverse order...
-		   POPAD                                                     ; Popping regs in reverse order...
+		   POPAD 
+
 		   RET
 printMenu ENDP
 
 ;-------------------------------------------------------------------
 ;| Print Deals and Offers with Prices for customers...              |
 ;| Uses:   deals string to print...                                 |
-;| update: bill according to selected Deals and Offers              |
+;| update: bill according to selected Deals and Offers..
 ;-------------------------------------------------------------------
 
 dealsOffers PROC
              PUSHAD
 		     PUSHFD
-		
+
 			 deal:
 				 call crlf
 
@@ -330,7 +567,6 @@ dealsOffers PROC
 
 dealsOffers ENDP
 
-
 ;-------------------------------------------------------------------
 ;| Print Menu with Prices for customers to order...                 |
 ;| Uses:   pMenu string to print...                                 |
@@ -342,9 +578,7 @@ choiceMenu PROC
 
 			 op:                                                  ; Option Tag...
 			    
-				
 				call crlf
-
 		        mov edx, OFFSET cMenu
 	            call writeString
 
@@ -399,12 +633,14 @@ choiceMenu ENDP
 ;| Updates: Bill ...                                                |
 ;-------------------------------------------------------------------
 
+
 OrientalMenu PROC 
+
 			  PUSHAD
 			  PUSHFD
 
 			  op:                                                  ; Option Tag...
-			     	 
+	 
 				 call crlf
 		         mov edx, OFFSET oriental
 	             call writeString
@@ -1031,8 +1267,6 @@ printBill PROC
 		   ;sub eax,bill
 		   ;call writeInt
 
-		   
-
 		   call halt
 
 		   mov edx, OFFSET exitMsg                                 ; Printing Exit Note/Msg...
@@ -1068,6 +1302,46 @@ halt PROC
 	  RET
 halt ENDP
 
+;| Check the password...                                            |
+;| Uses: bool variable to represent result..                        |
+;| bool = 1 means True && bool = 0 means False...                   |
+;-------------------------------------------------------------------
+
+check PROC
+       PUSHAD
+	   PUSHFD
+
+	   ;cmp ecx, 15                                                 ; Our Limit is of 15 Characters...
+	   ;jg notEqual
+;
+	                            ;; lea: Load Effective Address is like combination of move and OFFSET...
+	   ;lea si, filePass                                            ; ds:si points to File Password String...
+       ;lea di, inPass                                              ; ds:di points to Input Password String...
+       ;dec di                                                      ; Just Dec so can Inc Later...
+;
+       ;lab1:
+            ;inc di                                                 ; Inc to get next Character...
+            ;lodsb                                                  ; Load AL with next char from filePass...
+                                                                   ;; note: lodsb inc si automatically...
+            ;cmp [di], al                                           ; Compare characters...
+            ;jne notEqual                                           ; Jump out of loop if not equal...
+ ;
+            ;cmp al, 0                                              ; They are the same, but end of string?
+            ;jne lab1                                               ; No - so go round loop again
+;
+            ;mov bool, 1
+	        ;jmp _exit                                              ; To save from executing notEqual Tag...
+;
+       ;notEqual:
+	            ;mov bool, 0
+
+ _exit:
+	   POPFD
+	   POPAD
+
+	   RET
+check ENDP
+
 ;-------------------------------------------------------------------
 ;| Shows an Error Box to customers...                               |
 ;| Uses:  2 strings for an input   box...                           |
@@ -1090,6 +1364,7 @@ error PROC
 	   RET
 error ENDP
 
+<<<<<<< HEAD
 ;-------------------------------------------------------------------
 ;| Print Dealed Oriental Menu with Prices for customers to order... |
 ;| Updates: Bill ...                                                |
@@ -1686,16 +1961,12 @@ dealDrinks1_5 PROC , noOfDrinks:DWORD
 				 call error
 				 jmp _exit
 			
-			finalExit:
-
+		finalExit:
 				POPFD
 				POPAD
-
-				RET
+			RET
 
 dealDrinks1_5 ENDP
-			
-
 
 
 setEcx2 PROC uses eax, dealQuan1:DWORD
@@ -1768,5 +2039,4 @@ discount5 PROC
 discount5 ENDP
 
 END main
-
 
