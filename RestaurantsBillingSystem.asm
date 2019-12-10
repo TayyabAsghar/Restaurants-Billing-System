@@ -2,8 +2,9 @@ INCLUDE Irvine32.inc
 
 .DATA
 
-BUFFER_SIZE = 5000
-PASSWORD_SIZE = 15
+BUFFER_SIZE   = 5000
+PASSWORD_SIZE = 15                                                ; Max Pass User can Set....
+INPUT_SIZE    = 17                                                ; Max User can give as Input...
 oPrice   DWORD 169, 149, 99, 89, 69, 69, 10, 5                    ; To store the prices of Oriental...
 cPrice   DWORD 169, 149, 99, 79                                   ; To store the prices of Chinese...
 fPrice   DWORD 149, 99, 79, 49                                    ; To store the prices of Fast Food...
@@ -13,10 +14,11 @@ bill     DWORD ?                                                  ; To store the
 bool     DWORD ?                                                  ; To store the result of Check... 
 byteRead DWORD ?                                                  ; To store read Bytes from File...
 fHandle  DWORD ?                                                  ; To store File Handle...
-mockBill DWORD ?
-dealRep  DWORD ?
+mockBill DWORD ?                                                  ; To store copy of Bill...
+dealRep  DWORD ?                                                  ; To store Deal Repetition...
+bytWrite DWORD ?
 passFile BYTE  PASSWORD_SIZE DUP(?)                               ; To store the Password from File...
-userPass BYTE  PASSWORD_SIZE DUP(?)                               ; To store the Input Password...
+userPass BYTE  INPUT_SIZE DUP(?)                                  ; To store the Input Password...
 saleFile BYTE  BUFFER_SIZE DUP(?)
 
 welcome  BYTE " *** Welcome To Restaurant Transylvania *** ", 0ah, 0dh, 0 ; Welcome note...
@@ -149,29 +151,27 @@ wrongPas BYTE " Password is incorrect or Input is Invalid. ", 0ah, 0dh, 0
 confirm  BYTE " New Password is Set. ", 0ah, 0dh, 0
 reMsg    BYTE " Your Order has been Canceled... ", 0ah, 0dh, 0    ; Reset Bill Message...
 dishes   BYTE " Enter the Quantity:  ", 0
+dealItem BYTE " Please Select your FREE item... ", 0ah, 0dh, 0
 caption  BYTE " Error ", 0
 errMsg   BYTE " Please follow instructions correctly... ", 0
 billMsg  BYTE "    Total Bill:   Rs ", 0
+totalDis BYTE "    5% Discount on Bill more than Rs 1999:  RS ", 0
+paybill  BYTE "    Bill After Discount:  Rs ", 0
 exitMsg  BYTE "    Glad to have you Here... ", 0ah, 0dh, 0
+service  BYTE " *** We hope to serve you the Best *** ", 0ah, 0dh, 0
 
-dealItem BYTE " Please Select your FREE item... ", 0ah, 0dh, 0
 dealAdded BYTE " Your Free item has been Added in the order Successful... ", 0ah, 0dh, 0
 continueOrder BYTE " Would you like to order Something More... ", 0ah, 0dh, 0
 dealCancel BYTE " You have canceled the deal... ", 0ah, 0dh, 0
-discountPrice BYTE "    On Order higher than Rs 1999, Your 5% Discounted Bill is Rs : ", 0
-service BYTE " *** We hope to serve you the Best *** ", 0ah, 0dh, 0
-balanceMsg BYTE "    Balance is :  ", 0
-amount BYTE "    Please Pay the Bill , Enter amount :  ", 0
-payBill BYTE "    Please Pay the complete Bill , Enter amount :  " , 0
 
 .CODE
-
-dealOrientalMenu PROTO , noOfDishes:DWORD						  ; To print Oriental Menu on deals
-dealChineseMenu PROTO , noOfDishes:DWORD						  ; To print Chinese Menu on deals
-dealFastFoodMenu PROTO , noOfDishes:DWORD						  ; To print Fast Food Menu on deals
-setEcx2 PROTO, dealQuan1:DWORD								      ; To set the value of ecx
-setEcx3 PROTO, dealQuan2:DWORD							 	      ; To set the value of ecx
-dealDrinks1_5 PROTO , noOfDrinks:DWORD							  ; To 1.5 liters Drink Menu on deals
+inputPass        PROTO, passString :PTR BYTE					  ; To print Oriental Menu on deals
+dealOrientalMenu PROTO, noOfDishes :DWORD						  ; To print Oriental Menu on deals
+dealChineseMenu  PROTO, noOfDishes :DWORD						  ; To print Chinese Menu on deals
+dealFastFoodMenu PROTO, noOfDishes :DWORD						  ; To print Fast Food Menu on deals
+setEcx2          PROTO, dealQuan1  :DWORD					      ; To set the value of ecx
+setEcx3          PROTO, dealQuan2  :DWORD						  ; To set the value of ecx
+dealDrinks1_5    PROTO , noOfDrinks:DWORD						  ; To 1.5 liters Drink Menu on deals
 
 main PROC
      call crlf
@@ -227,17 +227,12 @@ admin PROC
 
 	   call crlf
 
-	   call readPassword                                          ; To read Password from file...
+	   call readPasswordFile                                      ; To read Password from file...
 
 	   cmp bool, 0
-	   je _exit                               ; Bool will be 0 if something was wrong in readPassword...
+	   je _exit                               ; Bool will be 0 if something was wrong in readPasswordFile...
 	   
-	   mov edx, OFFSET passWord 
-	   call writeString
-
-	   mov edx, OFFSET userPass                                   ; Point to the Destination...
-       mov ecx, SIZEOF userPass                                   ; Specify max characters...
-	   call readString                                            ; Take input from user...
+	   INVOKE inputPass, ADDR passWord                            ; Take input from user...
 
 	   call check                                                 ; Check both strings are equal...
 
@@ -263,11 +258,11 @@ admin PROC
 		  jmp ok
 
 		  pb:                                                     ; Print Bill Tag...
-			 call readSales                                       ; To read Sales from file...
+			 call readSalesFile                                   ; To read Sales from file...
 			 call crlf
 
 			 mov edx, OFFSET saleFile
-			 call writeString
+			 call writeString                                     ; Printing Sales...
 
 			 call crlf
 			 call crlf
@@ -278,26 +273,19 @@ admin PROC
 			 
 		  rp:                                                     ; Reset Password Tag...
 		     call crlf
-		     mov edx, OFFSET passWord                             ; Asking for old Password again...
-		     call writeString
 
-		     mov edx, OFFSET userPass
-             mov ecx, SIZEOF userPass
-		     call readString
+		     INVOKE inputPass, ADDR passWord                      ; Asking for old Password again...               
 
 		     call check                                           ; Rechecking Pass before Changing...
 
 		     cmp bool, 0
 		     je wrong
 
-			 mov edx, OFFSET newPass
-		     call writeString
+             INVOKE inputPass, ADDR newPass                       ; Taking new Password again...
 
-			 mov edx, OFFSET userPass
-             mov ecx, SIZEOF userPass
-		     call readString                                      ; Taking new Password again...
-
-			 cmp ecx, PASSWORD_SIZE                               ; To check our limit...
+			 mov eax, byteRead
+			 call writeint
+			 cmp eax, PASSWORD_SIZE                               ; To check our limit...
 			 jg wrong
 
 			 call writePassword
@@ -326,36 +314,73 @@ admin ENDP
 ;| booL = 1 (operation succeeded) && bool = 0 (operation failed)    |
 ;-------------------------------------------------------------------
 
-readSales PROC
-			  PUSHAD
-			  PUSHFD
+readSalesFile PROC
+		       PUSHAD
+		       PUSHFD
 
-			  mov edx, OFFSET saleFileName
-			  call openInputFile                                  ; Opening the File...
-			  mov fHandle, eax                                    ; Just for safety...      
+		       INVOKE CreateFile,
+                      ADDR saleFileName,
+                      GENERIC_READ,
+                      DO_NOT_SHARE,
+                      NULL,
+                      OPEN_EXISTING,
+                      FILE_ATTRIBUTE_NORMAL,
+                      0
 
-	          mov edx, OFFSET saleFile                            ; Storage string...
-	          mov ecx, BUFFER_SIZE                                ; Max buffer....
-	          call ReadFromFile
+		       cmp eax, INVALID_HANDLE_VALUE                      ; Checking if handle is valid...
+		       je err
 
-	          jc err                                  ; If file does not open Carry will be set...
+		       mov fHandle, eax                                   ; Just for safety storing Handle...      
 
-			  mov eax, fHandle                                    ; Moving Handel in eax...
-			  call  closeFile
+	           mov edx, OFFSET saleFile                           ; Storage string...
+	           mov ecx, BUFFER_SIZE                               ; Max buffer....
+	           call ReadFromFile
 
-			  mov bool, 1                                         ; If everything is OK.
-			  jmp _exit
+	           jc err                                  ; If file is not Read Carry will be set...
+
+		       INVOKE CloseHandle, fHandle                        ; Calling CloseHandle function...
+              
+		       cmp eax, 0                                         ; Non-Zero eax means Close File...
+               je err
+
+		       mov bool, 1                                        ; If everything is OK.
+		       jmp _exit
  
-			  err:                                                ; File Opening Error block... 
-	              call WriteWindowsMsg
-				  mov bool, 0                                     ; if does not open
+		       err:                                               ; File Opening Error block... 
+	               call WriteWindowsMsg
+			       mov bool, 0                                    ; If does not open
 
-	    _exit:
-		      POPFD
-	          POPAD
+	     _exit:
+		       POPFD
+	           POPAD
 
-			  RET
-readSales ENDP
+		       RET
+readSalesFile ENDP
+
+;-------------------------------------------------------------------
+;| Read password from User...                                       |
+;| Uses: passFile string to Password...                             |
+;-------------------------------------------------------------------
+
+inputPass PROC passString :PTR BYTE	
+		   PUSHAD
+		   PUSHFD
+
+		   mov edx, passString 
+	       call writeString
+
+	       mov edx, OFFSET userPass                               ; Point to the Destination...
+           mov ecx, INPUT_SIZE                                    ; Specify max characters...
+	       call readString                                        ; Take input from user...
+
+           mov byteRead, eax                                      ; Bytes user write...
+
+	 _exit:
+		   POPFD
+	       POPAD
+
+		   RET
+inputPass ENDP
 
 ;-------------------------------------------------------------------
 ;| Read password from Password File...                              |
@@ -363,38 +388,50 @@ readSales ENDP
 ;| booL = 1 (operation succeeded) && bool = 0 (operation failed)    |
 ;-------------------------------------------------------------------
 
-readPassword PROC
-			  PUSHAD
-			  PUSHFD
+readPasswordFile PROC
+			      PUSHAD
+			      PUSHFD
 
-			  mov edx, OFFSET passFileName
-			  call openInputFile                                  ; Opening the File...
-			  mov fHandle, eax                                    ; Just for safety...      
+			      INVOKE CreateFile,
+                         ADDR passFileName,
+                         GENERIC_READ,
+                         DO_NOT_SHARE,
+                         NULL,
+                         OPEN_EXISTING,
+                         FILE_ATTRIBUTE_NORMAL,
+                         0
 
-	          mov edx, OFFSET passFile                            ; Storage string...
-	          mov ecx, PASSWORD_SIZE                              ; Max buffer....
-	          call ReadFromFile
+			      cmp eax, INVALID_HANDLE_VALUE                   ; Checking if handle is valid...
+			      je err
 
-	          jc err                                  ; If file does not open Carry will be set...
+			      mov fHandle, eax                                ; Just for safety...      
 
-			  mov byteRead, ecx                                   ; No of bytes read from file...
+	              mov edx, OFFSET passFile                        ; Storage string...
+	              mov ecx, PASSWORD_SIZE                          ; Max buffer....
+	              call ReadFromFile
+
+	              jc err                                  ; If file is not Read Carry will be set...
+
+			      mov byteRead, ecx                               ; No of bytes read from file...
 			  
-			  mov eax, fHandle                                    ; Moving Handel in eax...
-			  call  closeFile
+			      INVOKE CloseHandle, fHandle                     ; Calling CloseHandle function...
+              
+			      cmp eax, 0                                      ; Non-Zero eax means Close File...
+                  je err
 
-			  mov bool, 1                                         ; If everything is OK.
-			  jmp _exit
+			      mov bool, 1                                     ; If everything is OK.
+			      jmp _exit
  
-			  err:                                                ; File Opening Error block... 
-	              call WriteWindowsMsg
-				  mov bool, 0                                     ; if does not open
+			      err:                                            ; File Opening Error block... 
+	                  call WriteWindowsMsg
+				      mov bool, 0                                 ; if does not open
 
-	    _exit:
-		      POPFD
-	          POPAD
+	        _exit:
+		          POPFD
+	              POPAD
 
-			  RET
-readPassword ENDP
+			      RET
+readPasswordFile ENDP
 
 ;-------------------------------------------------------------------
 ;| Read password from Password File...                              |
@@ -403,38 +440,45 @@ readPassword ENDP
 ;-------------------------------------------------------------------
 
 writePassword PROC
-			  PUSHAD
-			  PUSHFD
+			   PUSHAD
+			   PUSHFD
 
-			  mov edx, OFFSET passFileName
-			  call openInputFile                                  ; Opening the File...
-			  mov fHandle, eax                                    ; Just for safety...      
-			  call writeint
-	          mov edx, OFFSET userPass                            ; Storage string...
-	          mov ecx, PASSWORD_SIZE                              ; Max buffer....
-	          call WriteToFile
-			  call writeint
+			   INVOKE CreateFile,
+                      ADDR passFileName,
+                      GENERIC_WRITE,
+                      DO_NOT_SHARE,
+                      NULL,
+                      OPEN_ALWAYS,
+                      FILE_ATTRIBUTE_NORMAL,
+                      0
 
-			  cmp eax, 0
-	          jle err                                             ; If file open eax will be nonzero...
-			  
-			  mov eax, fHandle                                    ; Moving Handel in eax...
-			  call  closeFile
-			 ; call WriteWindowsMsg
-			  mov bool, 1                                         ; If everything is OK.
-			  jmp _exit
+               cmp eax, INVALID_HANDLE_VALUE                      ; Checking if handle is valid...
+			   je err
+
+               mov fHandle, eax                                   ; Copy handle to variable...
+              
+			   INVOKE WriteFile,
+                      fHandle,
+                      ADDR   userPass,
+                      SIZEOF userPass,
+                      ADDR   bytWrite,
+                      0
+
+               INVOKE CloseHandle, fHandle
+
+			   mov bool, 1                                        ; If everything is OK.
+			   jmp _exit
  
-			  err:                                                ; File Opening Error block... 
-	              call WriteWindowsMsg
-				  mov bool, 0                                     ; if does not open
+			   err:                                               ; File Opening Error block... 
+	               call WriteWindowsMsg
+				   mov bool, 0                                    ; if does not open
 
-	    _exit:
-		      POPFD
-	          POPAD
+	     _exit:
+		       POPFD
+	           POPAD
 
-			  RET
+			   RET
 writePassword ENDP
-
 
 ;-------------------------------------------------------------------
 ;| Check the password...                                            |
@@ -1335,11 +1379,22 @@ printBill PROC
 
 		   call crlf
 
-		   mov edx, offset discountPrice
+		   mov edx, offset totalDis
+		   call writeString
+
+		   mov eax, mockbill
+		   call writeInt                                           ; Print Total Discount...
+
+		   call crlf
+
+		   mov edx, offset paybill
 		   call writeString
 
 		   mov eax, bill
-		   call writeInt										   ; Printing Bill
+		   call writeInt										   ; Printing Payable Bill...
+
+		   call crlf
+		   call crlf
 
 		   mov edx, OFFSET exitMsg                                 ; Printing Exit Note/Msg...
 	       call writeString
@@ -1382,7 +1437,7 @@ dealOrientalMenu PROC , noOfDishes:DWORD
 			  PUSHFD
 
 			  mov eax, bill		
-			  mov mockBill, eax								      ; Stores the copy of bill				
+			  mov mockBill, eax								      ; Stores the copy of bill
 
 			  mov ecx, noOfDishes
 
@@ -1596,7 +1651,7 @@ dealChineseMenu PROC, noOfDishes:DWORD
 			 PUSHFD
 
 			 mov eax, bill		
-			 mov mockBill, eax								      ; Stores the copy of bill		
+			 mov mockBill, eax								      ; Stores the copy of bill
 
 			 mov ecx, noOfDishes
 			 
