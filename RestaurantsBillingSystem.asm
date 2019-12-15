@@ -21,7 +21,8 @@ passFile BYTE  PASSWORD_SIZE DUP(?)                               ; To store the
 userPass BYTE  INPUT_SIZE DUP(?)                                  ; To store the Input Password...
 saleFile BYTE  BUFFER_SIZE DUP(?)
 
-welcome  BYTE " *** Welcome To Restaurant Transylvania *** ", 0ah, 0dh, 0 ; Welcome note...
+welcome  BYTE "                       "
+         BYTE " *** Welcome To Restaurant Transylvania *** ", 0ah, 0dh, 0 ; Welcome note...
 
 id       BYTE " Enter 1 : For Admin ", 0ah, 0dh
          BYTE " Enter 2 : For Customers ", 0ah, 0dh
@@ -147,17 +148,21 @@ passFileName BYTE "Password.txt", 0
 saleFileName BYTE "Sales.txt", 0
 passWord BYTE " Enter Current Password less than 16 Characters : ", 0
 newPass  BYTE " Enter New Password less than 16 Characters : ", 0
-wrongPas BYTE " Password is incorrect or Input is Invalid. ", 0ah, 0dh, 0
+wrongPas BYTE "  ------------------------------------------ ", 0ah, 0dh
+         BYTE " |Password is incorrect or Input is Invalid.|", 0ah, 0dh
+		 BYTE "  ------------------------------------------ ", 0ah, 0dh, 0
 confirm  BYTE " New Password is Set. ", 0ah, 0dh, 0
 reMsg    BYTE " Your Order has been Canceled... ", 0ah, 0dh, 0    ; Reset Bill Message...
 dishes   BYTE " Enter the Quantity:  ", 0
 dealItem BYTE " Please Select your FREE item... ", 0ah, 0dh, 0
 caption  BYTE " Error ", 0
 errMsg   BYTE " Please follow instructions correctly... ", 0
-billMsg  BYTE "    Total Bill:   Rs ", 0
-totalDis BYTE "    5% Discount on Bill more than Rs 1999:  RS ", 0
-paybill  BYTE "    Bill After Discount:  Rs ", 0
-exitMsg  BYTE "    Glad to have you Here... ", 0ah, 0dh, 0
+billMsg  BYTE "    |Gross Bill:   Rs ", 0
+totalDis BYTE "    |5% Discount on Bill more than Rs 1999:  RS ", 0
+paybill  BYTE "    |Bill After Discount:  Rs ", 0
+exitMsg  BYTE "    ~~~~~~~~~~~~~~~~~~~~~~~~~ ", 0ah, 0dh
+         BYTE "   |Glad to have you Here... |", 0ah, 0dh
+		 BYTE "    ~~~~~~~~~~~~~~~~~~~~~~~~~ ", 0ah, 0dh, 0
 service  BYTE " *** We hope to serve you the Best *** ", 0ah, 0dh, 0
 
 dealAdded BYTE " Your Free item has been Added in the order Successful... ", 0ah, 0dh, 0
@@ -279,14 +284,13 @@ admin PROC
 		     call check                                           ; Rechecking Pass before Changing...
 
 		     cmp bool, 0
-		     je wrong
+		     je wrongReset
 
              INVOKE inputPass, ADDR newPass                       ; Taking new Password again...
 
 			 mov eax, byteRead
-			 call writeint
 			 cmp eax, PASSWORD_SIZE                               ; To check our limit...
-			 jg wrong
+			 jg wrongReset
 
 			 call writePassword
 
@@ -295,6 +299,13 @@ admin PROC
 		     call writeString
 
 			 jmp _exit
+
+ wrongReset:
+            call crlf
+            mov edx, OFFSET wrongPas                              ; Wrong Password Message...
+	        call writeString
+            
+			jmp ok
 
  wrong:                                                           ; Wrong Password block...
        call crlf
@@ -490,29 +501,30 @@ check PROC
        PUSHAD
 	   PUSHFD
 
-	   ;cmp ecx, byteRead
-	   ;jg notEqual
-;
-	                            ;; lea: Load Effective Address is like combination of move and OFFSET...
-	   ;lea si, passFile                                           ; ds:si points to File Password String...
-       ;lea di, userPass                                           ; ds:di points to Input Password String...
-       ;dec di                                                     ; Just Dec so can Inc Later...
-;
-       ;lab1:
-            ;inc di                                                ; Inc to get next Character...
-            ;lodsb                                                 ; Load AL with next char from passFile...
-                                                                  ;; note: lodsb inc si automatically...
-            ;cmp [di], al                                          ; Compare characters...
-            ;jne notEqual                                          ; Jump out of loop if not equal...
- ;
-            ;cmp al, 0                                             ; They are the same, but end of string?
-            ;jne lab1                                              ; No - so go round loop again
-;
-            ;mov bool, 1
-	        ;jmp _exit                                             ; To save from executing notEqual Tag...
-;
-       ;notEqual:
-	            ;mov bool, 0
+	   mov eax, byteread
+	   cmp eax, PASSWORD_SIZE
+	   jg notEqual
+
+	                            ; lea: load effective address is like combination of move and offset...
+	   lea esi, passfile                                          ; ds:si points to file password string...
+       lea edi, userpass                                          ; ds:di points to input password string...
+
+       lab:
+            mov bl, [edi]                                         ; Moving to bl... 
+			inc di                                                ; inc to get next character...
+            lodsb                                                 ; load al with next char from passFile...
+                                                                  ; note: lodsb inc si automatically...
+            cmp al, bl                                            ; compare characters...
+            jne notEqual                                          ; jump out of loop if not equal...
+ 
+            cmp al, 0                                             ; they are the same, but end of string?
+            jne lab                                               ; no - so go round loop again
+
+            mov bool, 1
+	        jmp _exit                                             ; to save from executing notEqual tag...
+
+       notEqual:
+	            mov bool, 0
 
  _exit:
 	   POPFD
