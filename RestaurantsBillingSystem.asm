@@ -5,6 +5,7 @@ INCLUDE Irvine32.inc
 BUFFER_SIZE   = 5000
 PASSWORD_SIZE = 15                                                ; Max Pass User can Set....
 INPUT_SIZE    = 17                                                ; Max User can give as Input...
+SALE_SIZE     = 20                                                ; Max Sale Digits to be written to file...
 oPrice   DWORD 169, 149, 99, 89, 69, 69, 10, 5                    ; To store the prices of Oriental...
 cPrice   DWORD 169, 149, 99, 79                                   ; To store the prices of Chinese...
 fPrice   DWORD 149, 99, 79, 49                                    ; To store the prices of Fast Food...
@@ -20,6 +21,7 @@ bytWrite DWORD ?
 passFile BYTE  PASSWORD_SIZE DUP(?)                               ; To store the Password from File...
 userPass BYTE  INPUT_SIZE DUP(?)                                  ; To store the Input Password...
 saleFile BYTE  BUFFER_SIZE DUP(?)
+mockPayingBill DWORD 2 DUP(?)
 
 welcome  BYTE "                       "
          BYTE " *** Welcome To Restaurant Transylvania *** ", 0ah, 0dh, 0 ; Welcome note...
@@ -41,7 +43,7 @@ options  BYTE " Enter 1 : To see our Menu and Prices.", 0ah, 0dh
 		                                                          ; Price Menu...
 pMenu    BYTE " Restaurant Transylvania proudly present our Menu ... ", 0ah, 0dh, 0ah, 0dh
          BYTE " *** Oriental *** ", 0ah, 0dh
-         BYTE "                Chicken Quorma   : 169 per Dish. ", 0ah, 0dh
+         BYTE "     Chicken Quorma   : 169 per Dish. ", 0ah, 0dh
          BYTE "		Pullao           : 149 per Dish. ", 0ah, 0dh
 	     BYTE "		Chicken Briyani  :  99 per Dish. ", 0ah, 0dh
          BYTE "		Chicken Karahi   :  89 per Dish. ", 0ah, 0dh
@@ -168,6 +170,7 @@ service  BYTE " *** We hope to serve you the Best *** ", 0ah, 0dh, 0
 dealAdded BYTE " Your Free item has been Added in the order Successful... ", 0ah, 0dh, 0
 continueOrder BYTE " Would you like to order Something More... ", 0ah, 0dh, 0
 dealCancel BYTE " You have canceled the deal... ", 0ah, 0dh, 0
+nameSale BYTE " Sale : ", 0
 
 .CODE
 inputPass        PROTO, passString :PTR BYTE					  ; To print Oriental Menu on deals
@@ -347,7 +350,7 @@ readSalesFile PROC
 	           mov ecx, BUFFER_SIZE                               ; Max buffer....
 	           call ReadFromFile
 
-	           jc err                                  ; If file is not Read Carry will be set...
+	           jc err											  ; If file is not Read Carry will be set...
 
 		       INVOKE CloseHandle, fHandle                        ; Calling CloseHandle function...
               
@@ -467,7 +470,9 @@ writePassword PROC
 			   je err
 
                mov fHandle, eax                                   ; Copy handle to variable...
-              
+				
+			   
+
 			   INVOKE WriteFile,
                       fHandle,
                       ADDR   userPass,
@@ -490,6 +495,56 @@ writePassword PROC
 
 			   RET
 writePassword ENDP
+
+;-------------------------------------------------------------------
+;| Read Sales to Sales File...                                      |
+;| Uses: passFile string to store password...                       |
+;| booL = 1 (operation succeeded) && bool = 0 (operation failed)    |
+;-------------------------------------------------------------------
+
+writeSales PROC
+	PUSHAD
+	PUSHFD
+		
+		INVOKE CreateFile,
+			ADDR saleFileName,
+			GENERIC_WRITE,
+			DO_NOT_SHARE,
+			NULL,
+			OPEN_ALWAYS,
+			FILE_ATTRIBUTE_NORMAL,
+			0
+
+		mov fHandle,eax
+		cmp eax, INVALID_HANDLE_VALUE                   ; Checking if handle is valid...
+		
+		INVOKE WriteFile,
+			fHandle,
+			ADDR nameSale,
+			SIZEOF nameSale,
+			ADDR bytWrite,
+			0
+			
+
+		mov eax, bill
+		mov mockPayingBill, eax
+		mov edx, OFFSET	 mockPayingBill
+		mov ecx, SALE_SIZE
+		call WriteToFile
+		INVOKE CloseHandle, fHandle                               ; if does not open
+
+	
+
+	POPFD
+	POPAD
+
+	RET
+	
+writeSales ENDP
+
+
+
+
 
 ;-------------------------------------------------------------------
 ;| Check the password...                                            |
@@ -597,6 +652,8 @@ customer PROC
 
     _exit:                                                        ; Exit Tag
 		  call printBill
+		  call WriteSales
+		  mov bill, 0
 		  call crlf
 
 		  POPFD
@@ -1413,6 +1470,7 @@ printBill PROC
 
 		   POPFD
 		   POPAD
+
 
 	       RET
 printBill ENDP
