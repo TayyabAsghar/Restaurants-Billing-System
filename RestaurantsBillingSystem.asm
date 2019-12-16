@@ -408,7 +408,7 @@ writePassword PROC
 			  mov edx, OFFSET passFileName
 			  call openInputFile                                  ; Opening the File...
 			  mov fHandle, eax                                    ; Just for safety...      
-			  call writeint
+			  call writeint 
 	          mov edx, OFFSET userPass                            ; Storage string...
 	          mov ecx, PASSWORD_SIZE                              ; Max buffer....
 	          call WriteToFile
@@ -1368,7 +1368,7 @@ printBill PROC
 
 		   mov edx, OFFSET exitMsg                                 ; Printing Exit Note/Msg...
 	       call writeString
-
+		   call crlf
 
 		   POPFD
 		   POPAD
