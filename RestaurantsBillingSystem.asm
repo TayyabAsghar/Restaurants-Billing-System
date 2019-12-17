@@ -5,6 +5,7 @@ INCLUDE Irvine32.inc
 BUFFER_SIZE   = 5000
 PASSWORD_SIZE = 15                                                ; Max Pass User can Set....
 INPUT_SIZE    = 17                                                ; Max User can give as Input...
+SALE_SIZE     = 20                                                ; Max Sale Digits to be written to file...
 oPrice   DWORD 169, 149, 99, 89, 69, 69, 10, 5                    ; To store the prices of Oriental...
 cPrice   DWORD 169, 149, 99, 79                                   ; To store the prices of Chinese...
 fPrice   DWORD 149, 99, 79, 49                                    ; To store the prices of Fast Food...
@@ -20,6 +21,7 @@ bytWrite DWORD ?
 passFile BYTE  PASSWORD_SIZE DUP(?)                               ; To store the Password from File...
 userPass BYTE  INPUT_SIZE DUP(?)                                  ; To store the Input Password...
 saleFile BYTE  BUFFER_SIZE DUP(?)
+mockSaleBill BYTE ?
 
 welcome  BYTE "                       "
          BYTE " *** Welcome To Restaurant Transylvania *** ", 0ah, 0dh, 0 ; Welcome note...
@@ -28,11 +30,17 @@ id       BYTE " Enter 1 : For Admin ", 0ah, 0dh
          BYTE " Enter 2 : For Customers ", 0ah, 0dh
 	     BYTE " Enter 3 : To Exit ", 0ah, 0dh, 0
 
-choice   BYTE " Enter 1 : To Print Sale ", 0ah, 0dh
+choice   BYTE "                        ---------------------  ", 0ah, 0dh
+         BYTE "                        ------  ADMIN  ------ ", 0ah, 0dh
+         BYTE "                        ---------------------  ", 0ah, 0dh, 0ah, 0dh
+         BYTE " Enter 1 : To Print Sale ", 0ah, 0dh
          BYTE " Enter 2 : To Reset Password ", 0ah, 0dh
 	     BYTE " Enter 3 : To Exit ", 0ah, 0dh, 0
 
-options  BYTE " Enter 1 : To see our Menu and Prices.", 0ah, 0dh
+options  BYTE "                        ----------------------  ", 0ah, 0dh
+         BYTE "                        -----  Customer  ----- ", 0ah, 0dh
+         BYTE "                        ---------------------- ", 0ah, 0dh, 0ah, 0dh
+         BYTE " Enter 1 : To see our Menu and Prices.", 0ah, 0dh
          BYTE " Enter 2 : To see our Deals and Offers.", 0ah, 0dh
 		 BYTE " Enter 3 : To Place an Order.", 0ah, 0dh
 		 BYTE " Enter 4 : To Reset the Bill [Cancel the order].", 0ah, 0dh
@@ -41,7 +49,7 @@ options  BYTE " Enter 1 : To see our Menu and Prices.", 0ah, 0dh
 		                                                          ; Price Menu...
 pMenu    BYTE " Restaurant Transylvania proudly present our Menu ... ", 0ah, 0dh, 0ah, 0dh
          BYTE " *** Oriental *** ", 0ah, 0dh
-         BYTE "                Chicken Quorma   : 169 per Dish. ", 0ah, 0dh
+         BYTE "     Chicken Quorma   : 169 per Dish. ", 0ah, 0dh
          BYTE "		Pullao           : 149 per Dish. ", 0ah, 0dh
          BYTE "		Chicken Karahi   :  89 per Dish. ", 0ah, 0dh
          BYTE "		Chicken Tikka    :  69 per Dish. ", 0ah, 0dh
@@ -162,11 +170,12 @@ paybill  BYTE "    |Bill After Discount:  Rs ", 0
 exitMsg  BYTE "    ~~~~~~~~~~~~~~~~~~~~~~~~~ ", 0ah, 0dh
          BYTE "   |Glad to have you Here... |", 0ah, 0dh
 		 BYTE "    ~~~~~~~~~~~~~~~~~~~~~~~~~ ", 0ah, 0dh, 0
-service  BYTE " *** We hope to serve you the Best *** ", 0ah, 0dh, 0
 
 dealAdded BYTE " Your Free item has been Added in the order Successful... ", 0ah, 0dh, 0
 continueOrder BYTE " Would you like to order Something More... ", 0ah, 0dh, 0
 dealCancel BYTE " You have canceled the deal... ", 0ah, 0dh, 0
+nameSale BYTE " Sale : ", 0
+newLine BYTE 0ah, 0dh
 
 .CODE
 inputPass        PROTO, passString :PTR BYTE					  ; To print Oriental Menu on deals
@@ -178,6 +187,9 @@ setEcx3          PROTO, dealQuan2  :DWORD						  ; To set the value of ecx
 dealDrinks1_5    PROTO , noOfDrinks:DWORD						  ; To 1.5 liters Drink Menu on deals
 
 main PROC
+     mov eax, white
+	 call setTextColor
+
      call crlf
 
 	 mov edx, OFFSET welcome                                      ; Printing Welcome...
@@ -191,6 +203,7 @@ main PROC
 
 		call crlf
 		call readInt
+		call clrscr
 
 		cmp eax, 1
 		je ad
@@ -300,16 +313,28 @@ admin PROC
 			 jmp _exit
 
  wrongReset:
-            call crlf
+            mov eax, red
+			call setTextColor
+            
+			call crlf
             mov edx, OFFSET wrongPas                              ; Wrong Password Message...
 	        call writeString
             
+			mov eax, white
+		    call setTextColor
+
 			jmp ok
 
  wrong:                                                           ; Wrong Password block...
-       call crlf
+       mov eax, red
+	   call setTextColor
+	   
+	   call crlf
        mov edx, OFFSET wrongPas                                   ; Wrong Password Message...
 	   call writeString
+
+	   mov eax, white
+	   call setTextColor
 
  _exit:
 	   POPFD
@@ -346,7 +371,7 @@ readSalesFile PROC
 	           mov ecx, BUFFER_SIZE                               ; Max buffer....
 	           call ReadFromFile
 
-	           jc err                                  ; If file is not Read Carry will be set...
+	           jc err											  ; If file is not Read Carry will be set...
 
 		       INVOKE CloseHandle, fHandle                        ; Calling CloseHandle function...
               
@@ -458,7 +483,7 @@ writePassword PROC
                       GENERIC_WRITE,
                       DO_NOT_SHARE,
                       NULL,
-                      OPEN_ALWAYS,
+                      OPEN_EXISTING,
                       FILE_ATTRIBUTE_NORMAL,
                       0
 
@@ -466,7 +491,9 @@ writePassword PROC
 			   je err
 
                mov fHandle, eax                                   ; Copy handle to variable...
-              
+				
+			   
+
 			   INVOKE WriteFile,
                       fHandle,
                       ADDR   userPass,
@@ -489,6 +516,79 @@ writePassword PROC
 
 			   RET
 writePassword ENDP
+
+;-------------------------------------------------------------------
+;| Read Sales to Sales File...                                      |
+;| Uses: passFile string to store password...                       |
+;| booL = 1 (operation succeeded) && bool = 0 (operation failed)    |
+;-------------------------------------------------------------------
+
+writeSales PROC
+	PUSHAD
+	PUSHFD
+			
+		INVOKE CreateFile,
+			ADDR saleFileName,
+			GENERIC_WRITE,
+			DO_NOT_SHARE,
+			NULL,
+			OPEN_EXISTING,
+			FILE_ATTRIBUTE_NORMAL,
+			0
+		
+		 cmp eax, INVALID_HANDLE_VALUE                      ; Checking if handle is valid...
+		 je err
+
+		mov fHandle,eax
+		INVOKE SetFilePointer,
+			fHandle,
+			0,
+			0,
+			FILE_END
+		
+		cmp eax, INVALID_HANDLE_VALUE                   ; Checking if handle is valid...
+		je err
+
+		INVOKE WriteFile,
+			fHandle,
+			ADDR nameSale,
+			SIZEOF nameSale,
+			ADDR bytWrite,
+			0
+			
+		
+		INVOKE WriteFile,
+			fHandle,
+			bill,
+			SIZEOF DWORD,
+			ADDR bytWrite,
+			0
+
+		INVOKE WriteFile,
+			fHandle,
+			ADDR newLine,
+			SIZEOF newLine,
+			ADDR bytWrite,
+			0
+
+
+		INVOKE CloseHandle, fHandle                               ; if does not open
+		jmp _exit
+	 err:                                               ; File Opening Error block... 
+	        call WriteWindowsMsg
+			mov bool, 0                                    ; if does not open
+
+	     _exit:
+				POPFD
+				POPAD
+
+	RET
+	
+writeSales ENDP
+
+
+
+
 
 ;-------------------------------------------------------------------
 ;| Check the password...                                            |
@@ -545,11 +645,6 @@ customer PROC
 	      op:                                                     ; Option Tag...  
 		     call crlf
 
-     		 mov edx, offset service                              ; Printing Service Massage...
-	     	 call writeString
-
-	     	 call crlf
-
 			 mov edx, OFFSET options                              ; Printing options...
 	         call writeString
 
@@ -596,6 +691,8 @@ customer PROC
 
     _exit:                                                        ; Exit Tag
 		  call printBill
+		  call WriteSales
+		  mov bill, 0
 		  call crlf
 
 		  POPFD
@@ -1412,6 +1509,7 @@ printBill PROC
 
 		   POPFD
 		   POPAD
+
 
 	       RET
 printBill ENDP
