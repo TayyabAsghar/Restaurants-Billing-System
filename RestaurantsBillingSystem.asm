@@ -47,31 +47,43 @@ options  BYTE "                        ----------------------  ", 0ah, 0dh
 		 BYTE " Enter 5 : To Exit.", 0ah, 0dh , 0
 
 		                                                          ; Price Menu...
-pMenu    BYTE " Restaurant Transylvania proudly present our Menu ... ", 0ah, 0dh, 0ah, 0dh
-         BYTE " *** Oriental *** ", 0ah, 0dh
-         BYTE "     Chicken Quorma   : 169 per Dish. ", 0ah, 0dh
+pMenu    BYTE "                     ------------------------- ", 0ah, 0dh
+         BYTE "                     -- Presenting our Menu -- ", 0ah, 0dh
+         BYTE "                     ------------------------- ", 0ah, 0dh, 0ah, 0dh
+         BYTE "   -------------- ", 0ah, 0dh
+         BYTE "   -- Oriental -- ", 0ah, 0dh
+         BYTE "   -------------- ", 0ah, 0dh
+         BYTE "                Chicken Quorma   : 169 per Dish. ", 0ah, 0dh
          BYTE "		Pullao           : 149 per Dish. ", 0ah, 0dh
          BYTE "		Chicken Karahi   :  89 per Dish. ", 0ah, 0dh
          BYTE "		Chicken Tikka    :  69 per Dish. ", 0ah, 0dh
          BYTE "		Murgh Haleem     :  69 per Dish. ", 0ah, 0dh
 	     BYTE "		Naan             :  10 per Piece. ", 0ah, 0dh
          BYTE "		Roti             :  05 per Piece. ", 0ah, 0dh, 0ah, 0dh
-		 BYTE " *** Chinese *** ", 0ah, 0dh
+		 BYTE "   ------------- ", 0ah, 0dh
+         BYTE "   -- Chinese -- ", 0ah, 0dh
+         BYTE "   ------------- ", 0ah, 0dh
          BYTE "		Chicken Manchurian with rice : 169 per Plate ", 0ah, 0dh
          BYTE "		Egg Fried Rice               : 149 per Plate ", 0ah, 0dh
          BYTE "		Chicken Macaroni             :  99 per Plate ", 0ah, 0dh
          BYTE "		Chicken Cuisine              :  79 per Plate ", 0ah, 0dh, 0ah, 0dh
-         BYTE " *** Fast Food *** ", 0ah, 0dh
+         BYTE "   --------------- ", 0ah, 0dh
+         BYTE "   -- Fast Food -- ", 0ah, 0dh
+         BYTE "   --------------- ", 0ah, 0dh
          BYTE "		Chicken Pizza    : 149 per Pizza. ", 0ah, 0dh
          BYTE "		Zinger Burger    :  99 per Piece. ", 0ah, 0dh
          BYTE "		Chicken Shawarma :  79 per Piece. ", 0ah, 0dh
          BYTE "		French Fries     :  49 per Packet. ", 0ah, 0dh,  0ah, 0dh
-         BYTE " *** Dessert *** ", 0ah, 0dh
+         BYTE "   ------------- ", 0ah, 0dh
+         BYTE "   -- Dessert -- ", 0ah, 0dh
+         BYTE "   ------------- ", 0ah, 0dh
          BYTE "		Pineapple Cake    : 799 per Pound. ", 0ah, 0dh
          BYTE "		Chocolate Cake    : 699 per Pound. ", 0ah, 0dh
          BYTE "		Custard           :  99 per Bowl. ", 0ah, 0dh
          BYTE "		Ice-cream         :  69 per Cup. ", 0ah, 0dh, 0ah, 0dh
-         BYTE " *** Drinks *** ",  0ah, 0dh
+         BYTE "   ------------ ", 0ah, 0dh
+         BYTE "   -- Drinks -- ", 0ah, 0dh
+         BYTE "   ------------ ", 0ah, 0dh
          BYTE "		Coca Cola       : 99 (1.5) Liters. ", 0ah, 0dh
          BYTE "		Sprite          : 99 (1.5) Liters. ", 0ah, 0dh
          BYTE "		Coca Cola       : 49 Regular. ", 0ah, 0dh
@@ -81,13 +93,15 @@ pMenu    BYTE " Restaurant Transylvania proudly present our Menu ... ", 0ah, 0dh
 		 BYTE "		Coffee          : 89 per Cup. ", 0ah, 0dh
 		 BYTE "		Tea             : 49 per Cup. ", 0ah, 0dh, 0
 
-deals    BYTE " *** Deals and Offers *** ", 0ah, 0dh              ; Deals and Offers...
-		 BYTE " * You will Get 5% Discount on any order above RS 1,999. * " , 0ah, 0dh
-		 BYTE " For any Deal enter the related number..." , 0ah, 0dh
-		 BYTE " Deal 1 : Buy any 3 or more Oriental Dishes and get 1 Dessert free. " , 0ah, 0dh
-		 BYTE " Deal 2 : Buy any 2 or more Chinese Dishes and get 1 Drink free. " , 0ah, 0dh
-		 BYTE " Deal 3 : Buy any 2 or more Fast Foods and get 1 Regular Drink free. " , 0ah, 0dh
-		 BYTE " Deal 4 : Buy any 2 or more '1.5' Liters Drink and get 1 Regular Drink free. " , 0ah, 0dh
+deals    BYTE "                        ---------------------- ", 0ah, 0dh
+         BYTE "                        -- Deals and Offers -- ", 0ah, 0dh
+         BYTE "                        ---------------------- ", 0ah, 0dh
+		 BYTE " * You will Get 5% Discount on any order above RS 1,999. * ", 0ah, 0dh, 0ah, 0dh
+		 BYTE " For any Deal enter the related number...", 0ah, 0dh
+		 BYTE " Deal 1 : Buy any 3 or more Oriental Dishes and get 1 Dessert free. ", 0ah, 0dh
+		 BYTE " Deal 2 : Buy any 2 or more Chinese Dishes and get 1 Drink free. ", 0ah, 0dh
+		 BYTE " Deal 3 : Buy any 2 or more Fast Foods and get 1 Regular Drink free. ", 0ah, 0dh
+		 BYTE " Deal 4 : Buy any 2 or more '1.5' Liters Drink and get 1 Regular Drink free. ", 0ah, 0dh
 		 BYTE "      5 : Exit Deal Menu. ", 0ah, 0dh, 0
 		 
 regDrink BYTE " Enter 1 : Coca Cola       : 49 Regular. ", 0ah, 0dh
@@ -100,7 +114,9 @@ drinks1_5 BYTE " Enter 1 : Coca Cola       : 99 (1.5) Liters. ", 0ah, 0dh
 		 BYTE " Enter 2 : Sprite          : 99 (1.5) Liters. ", 0ah, 0dh
 		 BYTE " Enter 3 : To Exit. ", 0ah, 0dh, 0
 
-cMenu    BYTE " *** Menu *** ", 0ah, 0dh, 0ah, 0dh                ; Choice Menu...
+cMenu    BYTE " ---------- ", 0ah, 0dh
+         BYTE " -- Menu -- ", 0ah, 0dh                            ; Choice Menu...
+         BYTE " ---------- ", 0ah, 0dh
          BYTE " Enter 1 : For Oriental.", 0ah, 0dh
 		 BYTE " Enter 2 : For Chinese.", 0ah, 0dh
 		 BYTE " Enter 3 : For Fast Food.", 0ah, 0dh
@@ -108,7 +124,9 @@ cMenu    BYTE " *** Menu *** ", 0ah, 0dh, 0ah, 0dh                ; Choice Menu.
 		 BYTE " Enter 5 : For Drinks.", 0ah, 0dh
 		 BYTE " Enter 6 : To Exit.", 0ah, 0dh, 0
 
-oriental BYTE " *** Oriental *** ", 0ah, 0dh
+oriental BYTE " -------------- ", 0ah, 0dh
+         BYTE " -- Oriental -- ", 0ah, 0dh
+         BYTE " -------------- ", 0ah, 0dh
          BYTE " Enter 1 : Chicken Quorma   : 169 per Dish. ", 0ah, 0dh
          BYTE " Enter 2 : Pullao           : 149 per Dish. ", 0ah, 0dh
 	     BYTE " Enter 3 : Chicken Briyani  :  99 per Dish. ", 0ah, 0dh
@@ -119,28 +137,36 @@ oriental BYTE " *** Oriental *** ", 0ah, 0dh
          BYTE " Enter 8 : Roti             :  05 per Piece. ", 0ah, 0dh
 		 BYTE " Enter 9 : To Exit. ", 0ah, 0dh, 0
 
-chinese  Byte " *** Chinese *** ", 0ah, 0dh
+chinese  BYTE " ------------- ", 0ah, 0dh
+         BYTE " -- Chinese -- ", 0ah, 0dh
+         BYTE " ------------- ", 0ah, 0dh
          BYTE " Enter 1 : Chicken Manchurian with rice : 169 per Dish ", 0ah, 0dh
          BYTE " Enter 2 : Egg Fried Rice               : 149 per Dish ", 0ah, 0dh
          BYTE " Enter 3 : Chicken Macaroni             :  99 per Dish ", 0ah, 0dh
          BYTE " Enter 4 : Chicken Cuisine              :  79 per Dish ", 0ah, 0dh
 		 BYTE " Enter 5 : To Exit. ", 0ah, 0dh, 0
 
-fastFood BYTE " *** Fast Food *** ", 0ah, 0dh
+fastFood BYTE " --------------- ", 0ah, 0dh
+         BYTE " -- Fast Food -- ", 0ah, 0dh
+         BYTE " --------------- ", 0ah, 0dh
          BYTE " Enter 1 : Chicken Pizza    : 149 per Pizza. ", 0ah, 0dh
          BYTE " Enter 2 : Zinger Burger    :  99 per Piece. ", 0ah, 0dh
          BYTE " Enter 3 : Chicken Shawarma :  79 per Piece. ", 0ah, 0dh
          BYTE " Enter 4 : French Fries     :  49 per Packet. ", 0ah, 0dh
 		 BYTE " Enter 5 : To Exit. ", 0ah, 0dh, 0
 
-dessert  BYTE " *** Dessert *** ", 0ah, 0dh
+dessert  BYTE " ------------- ", 0ah, 0dh
+         BYTE " -- Dessert -- ", 0ah, 0dh
+         BYTE " ------------- ", 0ah, 0dh
          BYTE " Enter 1 : Pineapple Cake    : 799 per Pound. ", 0ah, 0dh
          BYTE " Enter 2 : Chocolate Cake    : 699 per Pound. ", 0ah, 0dh
          BYTE " Enter 3 : Custard           :  99 per Bowl. ", 0ah, 0dh
          BYTE " Enter 4 : Ice-cream         :  69 per Cup. ", 0ah, 0dh
 		 BYTE " Enter 5 : To Exit. ", 0ah, 0dh, 0
 
-drinks   BYTE " *** Drinks *** ", 0ah, 0dh
+drinks   BYTE " ------------ ", 0ah, 0dh
+         BYTE " -- Drinks -- ", 0ah, 0dh
+         BYTE " ------------ ", 0ah, 0dh
 	     BYTE " Enter 1 : Coca Cola       : 99 (1.5) Liters. ", 0ah, 0dh
          BYTE " Enter 2 : Sprite          : 99 (1.5) Liters. ", 0ah, 0dh
          BYTE " Enter 3 : Coca Cola       : 49 Regular. ", 0ah, 0dh
