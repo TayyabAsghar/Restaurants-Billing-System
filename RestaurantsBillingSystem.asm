@@ -43,7 +43,6 @@ pMenu    BYTE " Restaurant Transylvania proudly present our Menu ... ", 0ah, 0dh
          BYTE " *** Oriental *** ", 0ah, 0dh
          BYTE "                Chicken Quorma   : 169 per Dish. ", 0ah, 0dh
          BYTE "		Pullao           : 149 per Dish. ", 0ah, 0dh
-	     BYTE "		Chicken Briyani  :  99 per Dish. ", 0ah, 0dh
          BYTE "		Chicken Karahi   :  89 per Dish. ", 0ah, 0dh
          BYTE "		Chicken Tikka    :  69 per Dish. ", 0ah, 0dh
          BYTE "		Murgh Haleem     :  69 per Dish. ", 0ah, 0dh
