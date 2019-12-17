@@ -30,11 +30,17 @@ id       BYTE " Enter 1 : For Admin ", 0ah, 0dh
          BYTE " Enter 2 : For Customers ", 0ah, 0dh
 	     BYTE " Enter 3 : To Exit ", 0ah, 0dh, 0
 
-choice   BYTE " Enter 1 : To Print Sale ", 0ah, 0dh
+choice   BYTE "                        ---------------------  ", 0ah, 0dh
+         BYTE "                        ------  ADMIN  ------ ", 0ah, 0dh
+         BYTE "                        ---------------------  ", 0ah, 0dh, 0ah, 0dh
+         BYTE " Enter 1 : To Print Sale ", 0ah, 0dh
          BYTE " Enter 2 : To Reset Password ", 0ah, 0dh
 	     BYTE " Enter 3 : To Exit ", 0ah, 0dh, 0
 
-options  BYTE " Enter 1 : To see our Menu and Prices.", 0ah, 0dh
+options  BYTE "                        ----------------------  ", 0ah, 0dh
+         BYTE "                        -----  Customer  ----- ", 0ah, 0dh
+         BYTE "                        ---------------------- ", 0ah, 0dh, 0ah, 0dh
+         BYTE " Enter 1 : To see our Menu and Prices.", 0ah, 0dh
          BYTE " Enter 2 : To see our Deals and Offers.", 0ah, 0dh
 		 BYTE " Enter 3 : To Place an Order.", 0ah, 0dh
 		 BYTE " Enter 4 : To Reset the Bill [Cancel the order].", 0ah, 0dh
@@ -165,7 +171,6 @@ paybill  BYTE "    |Bill After Discount:  Rs ", 0
 exitMsg  BYTE "    ~~~~~~~~~~~~~~~~~~~~~~~~~ ", 0ah, 0dh
          BYTE "   |Glad to have you Here... |", 0ah, 0dh
 		 BYTE "    ~~~~~~~~~~~~~~~~~~~~~~~~~ ", 0ah, 0dh, 0
-service  BYTE " *** We hope to serve you the Best *** ", 0ah, 0dh, 0
 
 dealAdded BYTE " Your Free item has been Added in the order Successful... ", 0ah, 0dh, 0
 continueOrder BYTE " Would you like to order Something More... ", 0ah, 0dh, 0
@@ -183,6 +188,9 @@ setEcx3          PROTO, dealQuan2  :DWORD						  ; To set the value of ecx
 dealDrinks1_5    PROTO , noOfDrinks:DWORD						  ; To 1.5 liters Drink Menu on deals
 
 main PROC
+     mov eax, white
+	 call setTextColor
+
      call crlf
 
 	 mov edx, OFFSET welcome                                      ; Printing Welcome...
@@ -196,6 +204,7 @@ main PROC
 
 		call crlf
 		call readInt
+		call clrscr
 
 		cmp eax, 1
 		je ad
@@ -305,16 +314,28 @@ admin PROC
 			 jmp _exit
 
  wrongReset:
-            call crlf
+            mov eax, red
+			call setTextColor
+            
+			call crlf
             mov edx, OFFSET wrongPas                              ; Wrong Password Message...
 	        call writeString
             
+			mov eax, white
+		    call setTextColor
+
 			jmp ok
 
  wrong:                                                           ; Wrong Password block...
-       call crlf
+       mov eax, red
+	   call setTextColor
+	   
+	   call crlf
        mov edx, OFFSET wrongPas                                   ; Wrong Password Message...
 	   call writeString
+
+	   mov eax, white
+	   call setTextColor
 
  _exit:
 	   POPFD
@@ -463,7 +484,7 @@ writePassword PROC
                       GENERIC_WRITE,
                       DO_NOT_SHARE,
                       NULL,
-                      OPEN_ALWAYS,
+                      OPEN_EXISTING,
                       FILE_ATTRIBUTE_NORMAL,
                       0
 
@@ -536,18 +557,13 @@ writeSales PROC
 			ADDR bytWrite,
 			0
 			
-    lea edx, bill
-	mov ecx, SIZEOF bill
-	mov eax, fHandle
-	call WriteToFile
 		
-		
-		;INVOKE WriteFile,
-			;fHandle,
-			;edx,
-			;SIZEOF DWORD,
-			;ADDR bytWrite,
-			;0
+		INVOKE WriteFile,
+			fHandle,
+			bill,
+			SIZEOF DWORD,
+			ADDR bytWrite,
+			0
 
 		INVOKE WriteFile,
 			fHandle,
@@ -629,11 +645,6 @@ customer PROC
 
 	      op:                                                     ; Option Tag...  
 		     call crlf
-
-     		 mov edx, offset service                              ; Printing Service Massage...
-	     	 call writeString
-
-	     	 call crlf
 
 			 mov edx, OFFSET options                              ; Printing options...
 	         call writeString
