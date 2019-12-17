@@ -178,6 +178,9 @@ dealCancel BYTE " You have canceled the deal... ", 0ah, 0dh, 0
 nameSale BYTE " Sale : ", 0
 newLine BYTE 0ah, 0dh
 
+divideIt DWORD 10
+convertedTobyte BYTE 10 DUP(?)
+
 .CODE
 inputPass        PROTO, passString :PTR BYTE					  ; To print Oriental Menu on deals
 dealOrientalMenu PROTO, noOfDishes :DWORD						  ; To print Oriental Menu on deals
@@ -557,7 +560,10 @@ writeSales PROC
 			ADDR bytWrite,
 			0
 			
-		
+		call crlf
+		call toByte
+		call crlf
+
 		INVOKE WriteFile,
 			fHandle,
 			bill,
@@ -588,7 +594,34 @@ writeSales PROC
 writeSales ENDP
 
 
+toByte PROC
+	PUSHAD
+	PUSHFD
+				
+		mov eax, bill
+		mov ecx, SIZEOF bill
+		mov mockBill, eax
+		dec ecx
 
+		L1:
+			mov eax, mockBill
+			div divideIt
+			call writeInt
+
+			mov esi,DWORD PTR convertedToByte
+			mov [esi], al
+			add esi,1
+		LOOP L1
+
+		mov edx, offset convertedToByte
+		call writeString
+
+	POPFD
+	POPAD
+
+	RET
+	
+toByte ENDP
 
 
 ;-------------------------------------------------------------------
