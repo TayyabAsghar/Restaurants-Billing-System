@@ -21,7 +21,7 @@ bytWrite DWORD ?
 passFile BYTE  PASSWORD_SIZE DUP(?)                               ; To store the Password from File...
 userPass BYTE  INPUT_SIZE DUP(?)                                  ; To store the Input Password...
 saleFile BYTE  BUFFER_SIZE DUP(?)
-mockPayingBill DWORD 2 DUP(?)
+mockSaleBill BYTE ?
 
 welcome  BYTE "                       "
          BYTE " *** Welcome To Restaurant Transylvania *** ", 0ah, 0dh, 0 ; Welcome note...
@@ -171,6 +171,7 @@ dealAdded BYTE " Your Free item has been Added in the order Successful... ", 0ah
 continueOrder BYTE " Would you like to order Something More... ", 0ah, 0dh, 0
 dealCancel BYTE " You have canceled the deal... ", 0ah, 0dh, 0
 nameSale BYTE " Sale : ", 0
+newLine BYTE 0ah, 0dh
 
 .CODE
 inputPass        PROTO, passString :PTR BYTE					  ; To print Oriental Menu on deals
@@ -505,19 +506,29 @@ writePassword ENDP
 writeSales PROC
 	PUSHAD
 	PUSHFD
-		
+			
 		INVOKE CreateFile,
 			ADDR saleFileName,
 			GENERIC_WRITE,
 			DO_NOT_SHARE,
 			NULL,
-			OPEN_ALWAYS,
+			OPEN_EXISTING,
 			FILE_ATTRIBUTE_NORMAL,
 			0
+		
+		 cmp eax, INVALID_HANDLE_VALUE                      ; Checking if handle is valid...
+		 je err
 
 		mov fHandle,eax
-		cmp eax, INVALID_HANDLE_VALUE                   ; Checking if handle is valid...
+		INVOKE SetFilePointer,
+			fHandle,
+			0,
+			0,
+			FILE_END
 		
+		cmp eax, INVALID_HANDLE_VALUE                   ; Checking if handle is valid...
+		je err
+
 		INVOKE WriteFile,
 			fHandle,
 			ADDR nameSale,
@@ -525,18 +536,36 @@ writeSales PROC
 			ADDR bytWrite,
 			0
 			
+    lea edx, bill
+	mov ecx, SIZEOF bill
+	mov eax, fHandle
+	call WriteToFile
+		
+		
+		;INVOKE WriteFile,
+			;fHandle,
+			;edx,
+			;SIZEOF DWORD,
+			;ADDR bytWrite,
+			;0
 
-		mov eax, bill
-		mov mockPayingBill, eax
-		mov edx, OFFSET	 mockPayingBill
-		mov ecx, SALE_SIZE
-		call WriteToFile
+		INVOKE WriteFile,
+			fHandle,
+			ADDR newLine,
+			SIZEOF newLine,
+			ADDR bytWrite,
+			0
+
+
 		INVOKE CloseHandle, fHandle                               ; if does not open
+		jmp _exit
+	 err:                                               ; File Opening Error block... 
+	        call WriteWindowsMsg
+			mov bool, 0                                    ; if does not open
 
-	
-
-	POPFD
-	POPAD
+	     _exit:
+				POPFD
+				POPAD
 
 	RET
 	
