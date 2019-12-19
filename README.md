@@ -1,4 +1,4 @@
-# RestaurantsBillingSystem
+# <u>RestaurantsBillingSystem</u>
 
 This is a basic restaurants billing system in Assembly Language as part of my lab project.
 
@@ -8,7 +8,7 @@ It has a starter Starter Menu for Admin [Owner] and customer:
 - Customer
 - Exit program
 
-## Admin
+## <u>Admin</u>
 
 He should `provide his password to continue`.
 Old password is collected from a password file.
@@ -19,15 +19,15 @@ Once enters it has following Menu:
 - To Change Password
 - To Exit
 
-### Print Sale
+### <u>Print Sale</u>
 
 It prints the whole file of sales to show the owner.
 
-### Change Password
+### <u>Change Password</u>
 
 It again asks for `old password` before asking `new password`. Once old password is checked then users enter the new password and it is stored in the password file. Then the program is moved to Main Menu.
 
-## Customer
+## <u>Customer</u>
 
 It's Starter Menu gives following options:
 
@@ -37,11 +37,11 @@ It's Starter Menu gives following options:
 - To Reset the Bill [Cancel the order]
 - To Exit [Terminate Program]
 
-### Menu and Prices
+### <u>Menu and Prices</u>
 
 It only prints the complete Menu with prices to help our customers in selection.
 
-### Deals and Offers
+### <u>Deals and Offers</u>
 
 It tells about Deals and Offers with following Menu:
 
@@ -58,7 +58,7 @@ Each deal is ended by a Free Menu.
 - Sprite (1.5) Liters
 - To Exit
 
-### Place an Order
+### <u>Place an Order</u>
 
 It Places the order of customer by showing different dishes and their prices as follow:
 
@@ -107,6 +107,6 @@ It Places the order of customer by showing different dishes and their prices as 
 
 After selecting the dish the program asks for quantity and generates a bill for customers.
 
-### Reset the Bill [Cancel the order]
+### <u>Reset the Bill [Cancel the order]</u>
 
 It clears the bill and cancel the whole order.

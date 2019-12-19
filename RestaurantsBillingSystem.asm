@@ -213,7 +213,7 @@ setEcx3          PROTO, dealQuan2  :DWORD						  ; To set the value of ecx
 dealDrinks1_5    PROTO , noOfDrinks:DWORD						  ; To 1.5 liters Drink Menu on deals
 
 main PROC
-     mov eax, white
+     mov eax, cyan
 	 call setTextColor
 
      call crlf
@@ -346,7 +346,7 @@ admin PROC
             mov edx, OFFSET wrongPas                              ; Wrong Password Message...
 	        call writeString
             
-			mov eax, white
+			mov eax, cyan
 		    call setTextColor
 
 			jmp ok
@@ -359,7 +359,7 @@ admin PROC
        mov edx, OFFSET wrongPas                                   ; Wrong Password Message...
 	   call writeString
 
-	   mov eax, white
+	   mov eax, cyan
 	   call setTextColor
 
  _exit:
@@ -517,8 +517,6 @@ writePassword PROC
 			   je err
 
                mov fHandle, eax                                   ; Copy handle to variable...
-				
-			   
 
 			   INVOKE WriteFile,
                       fHandle,
@@ -600,6 +598,7 @@ writeSales PROC
 
 		INVOKE CloseHandle, fHandle                               ; if does not open
 		jmp _exit
+	 
 	 err:                                               ; File Opening Error block... 
 	        call WriteWindowsMsg
 			mov bool, 0                                    ; if does not open
@@ -611,10 +610,6 @@ writeSales PROC
 	RET
 	
 writeSales ENDP
-
-
-
-
 
 ;-------------------------------------------------------------------
 ;| Check the password...                                            |
