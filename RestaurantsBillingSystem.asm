@@ -203,14 +203,14 @@ exitMsg  BYTE "    ~~~~~~~~~~~~~~~~~~~~~~~~~ ", 0ah, 0dh
 dealAdded BYTE " Your Free item has been Added in the order Successful... ", 0ah, 0dh, 0
 continueOrder BYTE " Would you like to order Something More... ", 0ah, 0dh, 0
 dealCancel BYTE " You have canceled the deal... ", 0ah, 0dh, 0
-nameSale BYTE " Sale : ", 0
 newLine BYTE 0ah, 0dh
 
 divideIt DWORD 10
-convertedTobyte BYTE 11 DUP(0)
+convertedTobyte BYTE 11 DUP(' ')
 digitCount DWORD 0
 remainder DWORD 0
-buff        db 11 dup(?) 
+buff        db 11 dup(?)
+nameSale BYTE " Sale : "
 
 .CODE
 inputPass        PROTO, passString :PTR BYTE					  ; To print Oriental Menu on deals

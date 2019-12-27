@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.16.27031.1	    12/27/19 11:54:48
+Microsoft (R) Macro Assembler Version 14.16.27031.1	    12/27/19 12:44:09
 RestaurantsBillingSystem.asm				     Page 1 - 1
 
 
@@ -1318,19 +1318,19 @@ RestaurantsBillingSystem.asm				     Page 1 - 1
 	   68 65 20 64 65
 	   61 6C 2E 2E 2E
 	   20 0A 0D 00
- 00002AC7 20 53 61 6C 65	nameSale BYTE " Sale : ", 0
-	   20 3A 20 00
- 00002AD0 0A 0D			newLine BYTE 0ah, 0dh
+ 00002AC7 0A 0D			newLine BYTE 0ah, 0dh
 
- 00002AD2 0000000A		divideIt DWORD 10
- 00002AD6  0000000B [		convertedTobyte BYTE 11 DUP(0)
+ 00002AC9 0000000A		divideIt DWORD 10
+ 00002ACD  0000000B [		convertedTobyte BYTE 11 DUP(' ')
+	    20
+	   ]
+ 00002AD8 00000000		digitCount DWORD 0
+ 00002ADC 00000000		remainder DWORD 0
+ 00002AE0  0000000B [		buff        db 11 dup(?)
 	    00
 	   ]
- 00002AE1 00000000		digitCount DWORD 0
- 00002AE5 00000000		remainder DWORD 0
- 00002AE9  0000000B [		buff        db 11 dup(?) 
-	    00
-	   ]
+ 00002AEB 20 53 61 6C 65	nameSale BYTE " Sale : "
+	   20 3A 20
 
  00000000			.CODE
 				inputPass        PROTO, passString :PTR BYTE					  ; To print Oriental Menu on deals
@@ -1782,14 +1782,14 @@ RestaurantsBillingSystem.asm				     Page 1 - 1
 							0
  0000033A  6A 00	   *	    push   +000000000h
  0000033C  68 00000088 R   *	    push   OFFSET bytWrite
- 00000341  6A 09	   *	    push   +000000009h
- 00000343  68 00002AC7 R   *	    push   OFFSET nameSale
+ 00000341  6A 08	   *	    push   +000000008h
+ 00000343  68 00002AEB R   *	    push   OFFSET nameSale
  00000348  FF 35 0000007C R *	    push   fHandle
  0000034E  E8 00000000 E   *	    call   WriteFile
 						
 
 						invoke NumbToStr,bill, ADDR convertedTobyte
- 00000353  68 00002AD6 R   *	    push   OFFSET convertedTobyte
+ 00000353  68 00002ACD R   *	    push   OFFSET convertedTobyte
  00000358  FF 35 00000070 R *	    push   bill
  0000035E  E8 00000051	   *	    call   NumbToStr
 						
@@ -1806,7 +1806,7 @@ RestaurantsBillingSystem.asm				     Page 1 - 1
  00000363  6A 00	   *	    push   +000000000h
  00000365  68 00000088 R   *	    push   OFFSET bytWrite
  0000036A  6A 0B	   *	    push   +00000000Bh
- 0000036C  68 00002AD6 R   *	    push   OFFSET convertedTobyte
+ 0000036C  68 00002ACD R   *	    push   OFFSET convertedTobyte
  00000371  FF 35 0000007C R *	    push   fHandle
  00000377  E8 00000000 E   *	    call   WriteFile
 
@@ -1819,7 +1819,7 @@ RestaurantsBillingSystem.asm				     Page 1 - 1
  0000037C  6A 00	   *	    push   +000000000h
  0000037E  68 00000088 R   *	    push   OFFSET bytWrite
  00000383  6A 02	   *	    push   +000000002h
- 00000385  68 00002AD0 R   *	    push   OFFSET newLine
+ 00000385  68 00002AC7 R   *	    push   OFFSET newLine
  0000038A  FF 35 0000007C R *	    push   fHandle
  00000390  E8 00000000 E   *	    call   WriteFile
 
@@ -3603,7 +3603,7 @@ RestaurantsBillingSystem.asm				     Page 1 - 1
  000012DA			setEcx3 ENDP
 
 				END main
-Microsoft (R) Macro Assembler Version 14.16.27031.1	    12/27/19 11:54:48
+Microsoft (R) Macro Assembler Version 14.16.27031.1	    12/27/19 12:44:09
 RestaurantsBillingSystem.asm				     Symbols 2 - 1
 
 
@@ -3697,7 +3697,7 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 00002AF4 Para	  Public  'DATA'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 00002AF3 Para	  Public  'DATA'	
 _TEXT  . . . . . . . . . . . . .	32 Bit	 000012DA Para	  Public  'CODE'	
 
 
@@ -4195,7 +4195,7 @@ black  . . . . . . . . . . . . .	Number	 00000000h
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 bool . . . . . . . . . . . . . .	DWord	 00000074 _DATA	
 brown  . . . . . . . . . . . . .	Number	 00000006h   
-buff . . . . . . . . . . . . . .	Byte	 00002AE9 _DATA	
+buff . . . . . . . . . . . . . .	Byte	 00002AE0 _DATA	
 bytWrite . . . . . . . . . . . .	DWord	 00000088 _DATA	
 byteRead . . . . . . . . . . . .	DWord	 00000078 _DATA	
 cMenu  . . . . . . . . . . . . .	Byte	 00002054 _DATA	
@@ -4205,7 +4205,7 @@ chinese  . . . . . . . . . . . .	Byte	 000022D2 _DATA
 choice . . . . . . . . . . . . .	Byte	 000014C3 _DATA	
 confirm  . . . . . . . . . . . .	Byte	 000028C8 _DATA	
 continueOrder  . . . . . . . . .	Byte	 00002A77 _DATA	
-convertedTobyte  . . . . . . . .	Byte	 00002AD6 _DATA	
+convertedTobyte  . . . . . . . .	Byte	 00002ACD _DATA	
 cyan . . . . . . . . . . . . . .	Number	 00000003h   
 dePrice  . . . . . . . . . . . .	DWord	 00000040 _DATA	
 dealAdded  . . . . . . . . . . .	Byte	 00002A3A _DATA	
@@ -4214,9 +4214,9 @@ dealItem . . . . . . . . . . . .	Byte	 0000291C _DATA
 dealRep  . . . . . . . . . . . .	DWord	 00000084 _DATA	
 deals  . . . . . . . . . . . . .	Byte	 00001CDD _DATA	
 dessert  . . . . . . . . . . . .	Byte	 0000250D _DATA	
-digitCount . . . . . . . . . . .	DWord	 00002AE1 _DATA	
+digitCount . . . . . . . . . . .	DWord	 00002AD8 _DATA	
 dishes . . . . . . . . . . . . .	Byte	 00002905 _DATA	
-divideIt . . . . . . . . . . . .	DWord	 00002AD2 _DATA	
+divideIt . . . . . . . . . . . .	DWord	 00002AC9 _DATA	
 drPrice  . . . . . . . . . . . .	DWord	 00000050 _DATA	
 drinks1_5  . . . . . . . . . . .	Byte	 00001FDD _DATA	
 drinks . . . . . . . . . . . . .	Byte	 00002614 _DATA	
@@ -4238,8 +4238,8 @@ lightRed . . . . . . . . . . . .	Number	 0000000Ch
 magenta  . . . . . . . . . . . .	Number	 00000005h   
 mockBill . . . . . . . . . . . .	DWord	 00000080 _DATA	
 mockSaleBill . . . . . . . . . .	Byte	 00001434 _DATA	
-nameSale . . . . . . . . . . . .	Byte	 00002AC7 _DATA	
-newLine  . . . . . . . . . . . .	Byte	 00002AD0 _DATA	
+nameSale . . . . . . . . . . . .	Byte	 00002AEB _DATA	
+newLine  . . . . . . . . . . . .	Byte	 00002AC7 _DATA	
 newPass  . . . . . . . . . . . .	Byte	 0000280B _DATA	
 oPrice . . . . . . . . . . . . .	DWord	 00000000 _DATA	
 options  . . . . . . . . . . . .	Byte	 000015A7 _DATA	
@@ -4252,7 +4252,7 @@ paybill  . . . . . . . . . . . .	Byte	 000029BA _DATA
 reMsg  . . . . . . . . . . . . .	Byte	 000028E1 _DATA	
 red  . . . . . . . . . . . . . .	Number	 00000004h   
 regDrink . . . . . . . . . . . .	Byte	 00001F16 _DATA	
-remainder  . . . . . . . . . . .	DWord	 00002AE5 _DATA	
+remainder  . . . . . . . . . . .	DWord	 00002ADC _DATA	
 saleFileName . . . . . . . . . .	Byte	 000027CE _DATA	
 saleFile . . . . . . . . . . . .	Byte	 000000AC _DATA	
 totalDis . . . . . . . . . . . .	Byte	 00002989 _DATA	
