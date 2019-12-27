@@ -1,8 +1,8 @@
-Microsoft (R) Macro Assembler Version 14.16.27031.1	    12/19/19 17:44:33
+Microsoft (R) Macro Assembler Version 14.16.27031.1	    12/27/19 11:54:48
 RestaurantsBillingSystem.asm				     Page 1 - 1
 
 
-				INCLUDE Irvine32.inc
+				Include Irvine32.inc
 			      C ; Include file for Irvine32.lib             (Irvine32.inc)
 			      C 
 			      C ;OPTION CASEMAP:NONE		; optional: make identifiers case-sensitive
@@ -20,6 +20,9 @@ RestaurantsBillingSystem.asm				     Page 1 - 1
 			      C .NOLIST
 			      C .LIST
 			      C 
+				IncludeLib Irvine32.lib
+				IncludeLib Kernel32.lib
+				IncludeLib User32.lib
 
  00000000			.DATA
 
@@ -1320,7 +1323,12 @@ RestaurantsBillingSystem.asm				     Page 1 - 1
  00002AD0 0A 0D			newLine BYTE 0ah, 0dh
 
  00002AD2 0000000A		divideIt DWORD 10
- 00002AD6  0000000A [		convertedTobyte BYTE 10 DUP(?)
+ 00002AD6  0000000B [		convertedTobyte BYTE 11 DUP(0)
+	    00
+	   ]
+ 00002AE1 00000000		digitCount DWORD 0
+ 00002AE5 00000000		remainder DWORD 0
+ 00002AE9  0000000B [		buff        db 11 dup(?) 
 	    00
 	   ]
 
@@ -1331,10 +1339,12 @@ RestaurantsBillingSystem.asm				     Page 1 - 1
 				dealFastFoodMenu PROTO, noOfDishes :DWORD						  ; To print Fast Food Menu on deals
 				setEcx2          PROTO, dealQuan1  :DWORD					      ; To set the value of ecx
 				setEcx3          PROTO, dealQuan2  :DWORD						  ; To set the value of ecx
-				dealDrinks1_5    PROTO , noOfDrinks:DWORD						  ; To 1.5 liters Drink Menu on deals
+				dealDrinks1_5    PROTO, noOfDrinks:DWORD						  ; To 1.5 liters Drink Menu on deals
+				NumbToStr		 PROTO, x:DWORD, buffer:DWORD
+
 
  00000000			main PROC
- 00000000  B8 0000000F		     mov eax, white
+ 00000000  B8 00000003		     mov eax, cyan
  00000005  E8 00000000 E		 call setTextColor
 
  0000000A  E8 00000000 E	     call crlf
@@ -1361,7 +1371,7 @@ RestaurantsBillingSystem.asm				     Page 1 - 1
  00000041  83 F8 03				cmp eax, 3
  00000044  74 15				je  _exit
 
- 00000046  E8 00000BF3				call error                                                ; calling error Proc...
+ 00000046  E8 00000C0F				call error                                                ; calling error Proc...
  0000004B  EB CC				jmp  op
 
  0000004D					ad:                                                       ; Admin Tag...
@@ -1369,7 +1379,7 @@ RestaurantsBillingSystem.asm				     Page 1 - 1
  00000052  EB C5				   jmp op
 
  00000054					cu:
- 00000054  E8 000003A4				   call customer
+ 00000054  E8 000003C0				   call customer
  00000059  EB BE				   jmp op
 
  0000005B				 _exit:
@@ -1403,7 +1413,7 @@ RestaurantsBillingSystem.asm				     Page 1 - 1
  00000085  68 000027D8 R   *	    push   OFFSET passWord
  0000008A  E8 0000016B	   *	    call   inputPass
 
- 0000008F  E8 0000032B			   call check                                                 ; Check both strings are equal...
+ 0000008F  E8 00000347			   call check                                                 ; Check both strings are equal...
 
  00000094  83 3D 00000074 R		   cmp bool, 0                                                ; Check stores result in bool...
 	   00
@@ -1424,7 +1434,7 @@ RestaurantsBillingSystem.asm				     Page 1 - 1
  000000C4  83 F8 03				  cmp eax, 3
  000000C7  0F 84 000000C3			  je  _exit
 
- 000000CD  E8 00000B6C				  call error                                              ; calling error Proc...
+ 000000CD  E8 00000B88				  call error                                              ; calling error Proc...
  000000D2  EB CD				  jmp ok
 
  000000D4					  pb:                                                     ; Print Bill Tag...
@@ -1448,7 +1458,7 @@ RestaurantsBillingSystem.asm				     Page 1 - 1
  00000103  68 000027D8 R   *	    push   OFFSET passWord
  00000108  E8 000000ED	   *	    call   inputPass
 
- 0000010D  E8 000002AD				     call check                                           ; Rechecking Pass before Changing...
+ 0000010D  E8 000002C9				     call check                                           ; Rechecking Pass before Changing...
 
  00000112  83 3D 00000074 R			     cmp bool, 0
 	   00
@@ -1478,7 +1488,7 @@ RestaurantsBillingSystem.asm				     Page 1 - 1
  00000154  BA 0000283A R	            mov edx, OFFSET wrongPas                              ; Wrong Password Message...
  00000159  E8 00000000 E		        call writeString
 				            
- 0000015E  B8 0000000F					mov eax, white
+ 0000015E  B8 00000003					mov eax, cyan
  00000163  E8 00000000 E			    call setTextColor
 
  00000168  E9 FFFFFF34					jmp ok
@@ -1491,7 +1501,7 @@ RestaurantsBillingSystem.asm				     Page 1 - 1
  0000017C  BA 0000283A R	       mov edx, OFFSET wrongPas                                   ; Wrong Password Message...
  00000181  E8 00000000 E		   call writeString
 
- 00000186  B8 0000000F			   mov eax, white
+ 00000186  B8 00000003			   mov eax, cyan
  0000018B  E8 00000000 E		   call setTextColor
 
  00000190			 _exit:
@@ -1685,8 +1695,6 @@ RestaurantsBillingSystem.asm				     Page 1 - 1
  000002AF  74 35					   je err
 
  000002B1  A3 0000007C R	               mov fHandle, eax                                   ; Copy handle to variable...
-								
-							   
 
 							   INVOKE WriteFile,
 				                      fHandle,
@@ -1749,7 +1757,7 @@ RestaurantsBillingSystem.asm				     Page 1 - 1
  00000311  E8 00000000 E   *	    call   CreateFileA
 						
  00000316  83 F8 FF				 cmp eax, INVALID_HANDLE_VALUE                      ; Checking if handle is valid...
- 00000319  0F 84 00000089			 je err
+ 00000319  0F 84 00000083			 je err
 
  0000031F  A3 0000007C R			mov fHandle,eax
 						INVOKE SetFilePointer,
@@ -1764,7 +1772,7 @@ RestaurantsBillingSystem.asm				     Page 1 - 1
  00000330  E8 00000000 E   *	    call   SetFilePointer
 						
  00000335  83 F8 FF				cmp eax, INVALID_HANDLE_VALUE                   ; Checking if handle is valid...
- 00000338  74 6E				je err
+ 00000338  74 68				je err
 
 						INVOKE WriteFile,
 							fHandle,
@@ -1778,24 +1786,29 @@ RestaurantsBillingSystem.asm				     Page 1 - 1
  00000343  68 00002AC7 R   *	    push   OFFSET nameSale
  00000348  FF 35 0000007C R *	    push   fHandle
  0000034E  E8 00000000 E   *	    call   WriteFile
-							
- 00000353  A1 00000070 R			mov eax, bill
- 00000358  F7 35 00002AD2 R			div divideIt
- 0000035E  A3 00000080 R			mov mockBill,eax
- 00000363  E8 00000000 E			call writeInt
+						
+
+						invoke NumbToStr,bill, ADDR convertedTobyte
+ 00000353  68 00002AD6 R   *	    push   OFFSET convertedTobyte
+ 00000358  FF 35 00000070 R *	    push   bill
+ 0000035E  E8 00000051	   *	    call   NumbToStr
+						
+						;mov esi,eax
+						;mov edi, offset convertedTobyte
+						;MOVSB
 
 						INVOKE WriteFile,
 							fHandle,
-							bill,
-							SIZEOF DWORD,
+							ADDR convertedTobyte,
+							SIZEOF convertedTobyte,
 							ADDR bytWrite,
 							0
- 00000368  6A 00	   *	    push   +000000000h
- 0000036A  68 00000088 R   *	    push   OFFSET bytWrite
- 0000036F  6A 04	   *	    push   +000000004h
- 00000371  FF 35 00000070 R *	    push   bill
- 00000377  FF 35 0000007C R *	    push   fHandle
- 0000037D  E8 00000000 E   *	    call   WriteFile
+ 00000363  6A 00	   *	    push   +000000000h
+ 00000365  68 00000088 R   *	    push   OFFSET bytWrite
+ 0000036A  6A 0B	   *	    push   +00000000Bh
+ 0000036C  68 00002AD6 R   *	    push   OFFSET convertedTobyte
+ 00000371  FF 35 0000007C R *	    push   fHandle
+ 00000377  E8 00000000 E   *	    call   WriteFile
 
 						INVOKE WriteFile,
 							fHandle,
@@ -1803,43 +1816,121 @@ RestaurantsBillingSystem.asm				     Page 1 - 1
 							SIZEOF newLine,
 							ADDR bytWrite,
 							0
- 00000382  6A 00	   *	    push   +000000000h
- 00000384  68 00000088 R   *	    push   OFFSET bytWrite
- 00000389  6A 02	   *	    push   +000000002h
- 0000038B  68 00002AD0 R   *	    push   OFFSET newLine
- 00000390  FF 35 0000007C R *	    push   fHandle
- 00000396  E8 00000000 E   *	    call   WriteFile
+ 0000037C  6A 00	   *	    push   +000000000h
+ 0000037E  68 00000088 R   *	    push   OFFSET bytWrite
+ 00000383  6A 02	   *	    push   +000000002h
+ 00000385  68 00002AD0 R   *	    push   OFFSET newLine
+ 0000038A  FF 35 0000007C R *	    push   fHandle
+ 00000390  E8 00000000 E   *	    call   WriteFile
 
 
 						INVOKE CloseHandle, fHandle                               ; if does not open
- 0000039B  FF 35 0000007C R *	    push   fHandle
- 000003A1  E8 00000000 E   *	    call   CloseHandle
- 000003A6  EB 0F				jmp _exit
- 000003A8				 err:                                               ; File Opening Error block... 
- 000003A8  E8 00000000 E		        call WriteWindowsMsg
- 000003AD  C7 05 00000074 R				mov bool, 0                                    ; if does not open
+ 00000395  FF 35 0000007C R *	    push   fHandle
+ 0000039B  E8 00000000 E   *	    call   CloseHandle
+ 000003A0  EB 0F				jmp _exit
+					 
+ 000003A2				 err:                                               ; File Opening Error block... 
+ 000003A2  E8 00000000 E		        call WriteWindowsMsg
+ 000003A7  C7 05 00000074 R				mov bool, 0                                    ; if does not open
 	   00000000
 
- 000003B7				     _exit:
- 000003B7  9D							POPFD
- 000003B8  61							POPAD
+ 000003B1				     _exit:
+ 000003B1  9D							POPFD
+ 000003B2  61							POPAD
 
- 000003B9  C3				RET
+ 000003B3  C3				RET
 					
- 000003BA			writeSales ENDP
+ 000003B4			writeSales ENDP
 
 
- 000003BA			toByte PROC
- 000003BA  60				PUSHAD
- 000003BB  9C				PUSHFD
-								
+				    ;invoke  NumbToStr,123,ADDR buff
 
- 000003BC  9D				POPFD
- 000003BD  61				POPAD
+				    ;invoke  StdOut,eax
 
- 000003BE  C3				RET
-					
- 000003BF			toByte ENDP
+				  
+
+ 000003B4			NumbToStr PROC uses ebx x:DWORD,buffer:DWORD
+
+ 000003B4  55		   *	    push   ebp
+ 000003B5  8B EC	   *	    mov    ebp, esp
+ 000003B7  53		   *	    push   ebx
+ 000003B8  8B 4D 0C		    mov     ecx,buffer
+ 000003BB  8B 45 08		    mov     eax,x
+ 000003BE  BB 0000000A		    mov     ebx,10
+ 000003C3  03 CB		    add     ecx,ebx             ; ecx = buffer + max size of string
+ 000003C5			@@:
+ 000003C5  33 D2		    xor     edx,edx
+ 000003C7  F7 F3		    div     ebx
+ 000003C9  83 C2 30		    add     edx,48              ; convert the digit to ASCII
+ 000003CC  88 11		    mov     BYTE PTR [ecx],dl   ; store the character in the buffer
+ 000003CE  49			    dec     ecx                 ; decrement ecx pointing the buffer
+ 000003CF  85 C0		    test    eax,eax             ; check if the quotient is 0
+ 000003D1  75 F2		    jnz     @b
+
+ 000003D3  41			    inc     ecx
+ 000003D4  8B C1		    mov     eax,ecx             ; eax points the string in the buffer
+				    ret
+ 000003D6  5B		   *	    pop    ebx
+ 000003D7  C9		   *	    leave  
+ 000003D8  C2 0008	   *	    ret    00008h
+
+ 000003DB			NumbToStr ENDP
+
+				;toByte PROC 
+					;PUSHAD
+					;PUSHFD
+						;mov digitCount,0
+						;mov eax,0
+						;mov eax,bill
+						;mov mockBill, eax
+						;call writeint
+						;call crlf
+						;
+				;
+						;mov edx, offset convertedTobyte
+						;call writestring
+						;
+						;L1:
+							;cmp eax,0
+							;je _out
+				;
+							;call crlf
+							;mov edx,0
+							;mov eax, mockbill
+							;call writeint
+							;call crlf
+							;div divideit
+							;mov mockbill,eax
+							;call writeint
+				;
+							;add edx, 30h
+							;mov remainder, edx
+							;
+							;;process remainder to string
+							;mov edx , offset convertedTobyte + sizeof convertedTobyte-1
+							;mov ebx, 0
+							;mov ebx, remainder
+							;call writestring
+				;
+							;mov eax, remainder 
+							;call crlf
+							;call writeint
+							;call crlf
+				;
+							;mov eax, mockBill
+							;cmp eax,0
+							;je _out
+						;
+							;loop L1
+					;_out:	
+				;
+					;POPFD
+					;POPAD
+				;
+					;RET
+					;
+				;toByte ENDP
+
 
 
 				;-------------------------------------------------------------------
@@ -1848,43 +1939,43 @@ RestaurantsBillingSystem.asm				     Page 1 - 1
 				;| bool = 1 means True && bool = 0 means False...                   |
 				;-------------------------------------------------------------------
 
- 000003BF			check PROC
- 000003BF  60			       PUSHAD
- 000003C0  9C				   PUSHFD
+ 000003DB			check PROC
+ 000003DB  60			       PUSHAD
+ 000003DC  9C				   PUSHFD
 
- 000003C1  A1 00000078 R		   mov eax, byteread
- 000003C6  83 F8 0F			   cmp eax, PASSWORD_SIZE
- 000003C9  7F 25			   jg notEqual
+ 000003DD  A1 00000078 R		   mov eax, byteread
+ 000003E2  83 F8 0F			   cmp eax, PASSWORD_SIZE
+ 000003E5  7F 25			   jg notEqual
 
 					                            ; lea: load effective address is like combination of move and offset...
- 000003CB  8D 35 0000008C R		   lea esi, passfile                                          ; ds:si points to file password string...
- 000003D1  8D 3D 0000009B R	       lea edi, userpass                                          ; ds:di points to input password string...
+ 000003E7  8D 35 0000008C R		   lea esi, passfile                                          ; ds:si points to file password string...
+ 000003ED  8D 3D 0000009B R	       lea edi, userpass                                          ; ds:di points to input password string...
 
- 000003D7			       lab:
- 000003D7  8A 1F		            mov bl, [edi]                                         ; Moving to bl... 
- 000003D9  66| 47					inc di                                                ; inc to get next character...
- 000003DB  AC			            lodsb                                                 ; load al with next char from passFile...
+ 000003F3			       lab:
+ 000003F3  8A 1F		            mov bl, [edi]                                         ; Moving to bl... 
+ 000003F5  66| 47					inc di                                                ; inc to get next character...
+ 000003F7  AC			            lodsb                                                 ; load al with next char from passFile...
 				                                                                  ; note: lodsb inc si automatically...
- 000003DC  3A C3		            cmp al, bl                                            ; compare characters...
- 000003DE  75 10		            jne notEqual                                          ; jump out of loop if not equal...
+ 000003F8  3A C3		            cmp al, bl                                            ; compare characters...
+ 000003FA  75 10		            jne notEqual                                          ; jump out of loop if not equal...
 				 
- 000003E0  3C 00		            cmp al, 0                                             ; they are the same, but end of string?
- 000003E2  75 F3		            jne lab                                               ; no - so go round loop again
+ 000003FC  3C 00		            cmp al, 0                                             ; they are the same, but end of string?
+ 000003FE  75 F3		            jne lab                                               ; no - so go round loop again
 
- 000003E4  C7 05 00000074 R	            mov bool, 1
+ 00000400  C7 05 00000074 R	            mov bool, 1
 	   00000001
- 000003EE  EB 0A			        jmp _exit                                             ; to save from executing notEqual tag...
+ 0000040A  EB 0A			        jmp _exit                                             ; to save from executing notEqual tag...
 
- 000003F0			       notEqual:
- 000003F0  C7 05 00000074 R		            mov bool, 0
+ 0000040C			       notEqual:
+ 0000040C  C7 05 00000074 R		            mov bool, 0
 	   00000000
 
- 000003FA			 _exit:
- 000003FA  9D				   POPFD
- 000003FB  61				   POPAD
+ 00000416			 _exit:
+ 00000416  9D				   POPFD
+ 00000417  61				   POPAD
 
- 000003FC  C3				   RET
- 000003FD			check ENDP
+ 00000418  C3				   RET
+ 00000419			check ENDP
 
 				;-------------------------------------------------------------------
 				;| For customers only...                                            |
@@ -1892,69 +1983,69 @@ RestaurantsBillingSystem.asm				     Page 1 - 1
 				;| Note: It only write bill in file with (False) customer name...   |
 				;-------------------------------------------------------------------
 
- 000003FD			customer PROC
- 000003FD  60			          PUSHAD
- 000003FE  9C					  PUSHFD
+ 00000419			customer PROC
+ 00000419  60			          PUSHAD
+ 0000041A  9C					  PUSHFD
 
- 000003FF				      op:                                                     ; Option Tag...  
- 000003FF  E8 00000000 E			     call crlf
+ 0000041B				      op:                                                     ; Option Tag...  
+ 0000041B  E8 00000000 E			     call crlf
 
- 00000404  BA 000015A7 R				 mov edx, OFFSET options                              ; Printing options...
- 00000409  E8 00000000 E		         call writeString
+ 00000420  BA 000015A7 R				 mov edx, OFFSET options                              ; Printing options...
+ 00000425  E8 00000000 E		         call writeString
 
- 0000040E  E8 00000000 E				 call crlf
- 00000413  E8 00000000 E				 call readInt
+ 0000042A  E8 00000000 E				 call crlf
+ 0000042F  E8 00000000 E				 call readInt
 
- 00000418  83 F8 01					 cmp eax, 1
- 0000041B  74 1B					 je  pm
- 0000041D  83 F8 02					 cmp eax, 2
- 00000420  74 36					 je  do
- 00000422  83 F8 03					 cmp eax, 3
- 00000425  74 38					 je  cm
- 00000427  83 F8 04					 cmp eax, 4
- 0000042A  74 3A					 je  rb
- 0000042C  83 F8 05					 cmp eax, 5
- 0000042F  74 3C					 je  _exit
+ 00000434  83 F8 01					 cmp eax, 1
+ 00000437  74 1B					 je  pm
+ 00000439  83 F8 02					 cmp eax, 2
+ 0000043C  74 36					 je  do
+ 0000043E  83 F8 03					 cmp eax, 3
+ 00000441  74 38					 je  cm
+ 00000443  83 F8 04					 cmp eax, 4
+ 00000446  74 3A					 je  rb
+ 00000448  83 F8 05					 cmp eax, 5
+ 0000044B  74 3C					 je  _exit
 
- 00000431  E8 00000808					 call error                                           ; calling error Proc...
- 00000436  EB C7					 jmp  op
+ 0000044D  E8 00000808					 call error                                           ; calling error Proc...
+ 00000452  EB C7					 jmp  op
 
- 00000438						 pm:                                                  ; Price Menu Tag...
- 00000438  E8 00000000 E				    call crlf
+ 00000454						 pm:                                                  ; Price Menu Tag...
+ 00000454  E8 00000000 E				    call crlf
 
- 0000043D  BA 000016F5 R			        mov edx, OFFSET pMenu
- 00000442  E8 00000000 E		            call writeString
+ 00000459  BA 000016F5 R			        mov edx, OFFSET pMenu
+ 0000045E  E8 00000000 E		            call writeString
 
- 00000447  E8 00000000 E				    call crlf
- 0000044C  E8 00000000 E					call waitMsg                                      ; Call Wait Massage...
- 00000451  E8 00000000 E					call crlf
+ 00000463  E8 00000000 E				    call crlf
+ 00000468  E8 00000000 E					call waitMsg                                      ; Call Wait Massage...
+ 0000046D  E8 00000000 E					call crlf
 
- 00000456  EB A7						jmp  op
+ 00000472  EB A7						jmp  op
 
- 00000458						 do:                                                  ; Deals and Offers Tag...
- 00000458  E8 0000002C						call dealsOffers
- 0000045D  EB A0						jmp op
+ 00000474						 do:                                                  ; Deals and Offers Tag...
+ 00000474  E8 0000002C						call dealsOffers
+ 00000479  EB A0						jmp op
 
- 0000045F						 cm:                                                  ; Choice Menu Tag...
- 0000045F  E8 000000C9						call choiceMenu
- 00000464  EB 99						jmp op
+ 0000047B						 cm:                                                  ; Choice Menu Tag...
+ 0000047B  E8 000000C9						call choiceMenu
+ 00000480  EB 99						jmp op
 
- 00000466						 rb:                                                  ; Reset Bill Tag...
- 00000466  E8 00000711						call resetBill
- 0000046B  EB 92						jmp op
+ 00000482						 rb:                                                  ; Reset Bill Tag...
+ 00000482  E8 00000711						call resetBill
+ 00000487  EB 92						jmp op
 
- 0000046D			    _exit:                                                        ; Exit Tag
- 0000046D  E8 00000763				  call printBill
- 00000472  E8 FFFFFE81				  call WriteSales
- 00000477  C7 05 00000070 R			  mov bill, 0
+ 00000489			    _exit:                                                        ; Exit Tag
+ 00000489  E8 00000763				  call printBill
+ 0000048E  E8 FFFFFE65				  call WriteSales
+ 00000493  C7 05 00000070 R			  mov bill, 0
 	   00000000
- 00000481  E8 00000000 E			  call crlf
+ 0000049D  E8 00000000 E			  call crlf
 
- 00000486  9D					  POPFD
- 00000487  61					  POPAD
+ 000004A2  9D					  POPFD
+ 000004A3  61					  POPAD
 
- 00000488  C3					  RET
- 00000489			customer ENDP
+ 000004A4  C3					  RET
+ 000004A5			customer ENDP
 
 				;-------------------------------------------------------------------
 				;| Print Deals and Offers with Prices for customers...              |
@@ -1962,721 +2053,721 @@ RestaurantsBillingSystem.asm				     Page 1 - 1
 				;| update: bill according to selected Deals and Offers..            |
 				;-------------------------------------------------------------------
 
- 00000489			dealsOffers PROC
- 00000489  60			             PUSHAD
- 0000048A  9C					     PUSHFD
+ 000004A5			dealsOffers PROC
+ 000004A5  60			             PUSHAD
+ 000004A6  9C					     PUSHFD
 						
- 0000048B						 deal:
- 0000048B  E8 00000000 E					 call crlf
+ 000004A7						 deal:
+ 000004A7  E8 00000000 E					 call crlf
 
- 00000490  BA 00001CDD R					 mov edx, OFFSET deals
- 00000495  E8 00000000 E					 call writeString 
- 0000049A  E8 00000000 E					 call crlf 
+ 000004AC  BA 00001CDD R					 mov edx, OFFSET deals
+ 000004B1  E8 00000000 E					 call writeString 
+ 000004B6  E8 00000000 E					 call crlf 
 
- 0000049F  E8 00000000 E					 call readInt
+ 000004BB  E8 00000000 E					 call readInt
 
- 000004A4  83 F8 01						 cmp eax,1	                                      ; Jump to deal One d1 tag
- 000004A7  74 1B						 je d1
+ 000004C0  83 F8 01						 cmp eax,1	                                      ; Jump to deal One d1 tag
+ 000004C3  74 1B						 je d1
 
- 000004A9  83 F8 02						 cmp eax,2		                                  ; Jump to deal Two d2 tag
- 000004AC  74 2D						 je d2
+ 000004C5  83 F8 02						 cmp eax,2		                                  ; Jump to deal Two d2 tag
+ 000004C8  74 2D						 je d2
 
- 000004AE  83 F8 03						 cmp eax,3
- 000004B1  74 3F						 je d3
+ 000004CA  83 F8 03						 cmp eax,3
+ 000004CD  74 3F						 je d3
 
- 000004B3  83 F8 04						 cmp eax,4
- 000004B6  74 51						 je d4
+ 000004CF  83 F8 04						 cmp eax,4
+ 000004D2  74 51						 je d4
 
- 000004B8  83 F8 05						 cmp eax, 5
- 000004BB  74 63				         je  _exit
+ 000004D4  83 F8 05						 cmp eax, 5
+ 000004D7  74 63				         je  _exit
 
- 000004BD  E8 0000077C						 call error
- 000004C2  EB C7						 jmp deal
+ 000004D9  E8 0000077C						 call error
+ 000004DE  EB C7						 jmp deal
 
- 000004C4						 d1: 
- 000004C4  C7 05 00000084 R					 mov dealRep,3								       ; Deal oriental function to add exact 3 dishes
+ 000004E0						 d1: 
+ 000004E0  C7 05 00000084 R					 mov dealRep,3								       ; Deal oriental function to add exact 3 dishes
 	   00000003
 							     invoke dealOrientalMenu, dealRep	
- 000004CE  FF 35 00000084 R *	    push   dealRep
- 000004D4  E8 0000077E	   *	    call   dealOrientalMenu
+ 000004EA  FF 35 00000084 R *	    push   dealRep
+ 000004F0  E8 0000077E	   *	    call   dealOrientalMenu
 								
- 000004D9  EB 45						 jmp _exit
+ 000004F5  EB 45						 jmp _exit
 							 
- 000004DB						  d2:
- 000004DB  C7 05 00000084 R					 mov dealRep,2									  ; Deal Chinese function to add exact 2 dishes
+ 000004F7						  d2:
+ 000004F7  C7 05 00000084 R					 mov dealRep,2									  ; Deal Chinese function to add exact 2 dishes
 	   00000002
 							     invoke dealChineseMenu, dealRep	
- 000004E5  FF 35 00000084 R *	    push   dealRep
- 000004EB  E8 000009BF	   *	    call   dealChineseMenu
+ 00000501  FF 35 00000084 R *	    push   dealRep
+ 00000507  E8 000009BF	   *	    call   dealChineseMenu
 								 
- 000004F0  EB 2E						 jmp _exit
+ 0000050C  EB 2E						 jmp _exit
 								 	 
- 000004F2						 d3:
- 000004F2  C7 05 00000084 R				     mov dealRep,2									  ; Deal Fast Food function to add exact 2 dishes
+ 0000050E						 d3:
+ 0000050E  C7 05 00000084 R				     mov dealRep,2									  ; Deal Fast Food function to add exact 2 dishes
 	   00000002
 							     invoke dealFastFoodMenu, dealRep	
- 000004FC  FF 35 00000084 R *	    push   dealRep
- 00000502  E8 00000B24	   *	    call   dealFastFoodMenu
+ 00000518  FF 35 00000084 R *	    push   dealRep
+ 0000051E  E8 00000B24	   *	    call   dealFastFoodMenu
 								 
- 00000507  EB 17						 jmp _exit
+ 00000523  EB 17						 jmp _exit
 					
 
- 00000509						 d4:
- 00000509  C7 05 00000084 R					mov dealRep, 2
+ 00000525						 d4:
+ 00000525  C7 05 00000084 R					mov dealRep, 2
 	   00000002
 				 			    invoke dealDrinks1_5, dealRep
- 00000513  FF 35 00000084 R *	    push   dealRep
- 00000519  E8 00000C89	   *	    call   dealDrinks1_5
+ 0000052F  FF 35 00000084 R *	    push   dealRep
+ 00000535  E8 00000C89	   *	    call   dealDrinks1_5
 
- 0000051E  EB 00						jmp _exit
+ 0000053A  EB 00						jmp _exit
 							 
- 00000520						 _exit:
+ 0000053C						 _exit:
 
- 00000520  BA 00002A77 R				 mov edx, offset continueOrder
- 00000525  E8 00000000 E				 call writeString
+ 0000053C  BA 00002A77 R				 mov edx, offset continueOrder
+ 00000541  E8 00000000 E				 call writeString
 							 			 
- 0000052A  9D					     POPFD
- 0000052B  61					     POPAD
- 0000052C  C3						 RET
+ 00000546  9D					     POPFD
+ 00000547  61					     POPAD
+ 00000548  C3						 RET
 
- 0000052D			dealsOffers ENDP
+ 00000549			dealsOffers ENDP
 
 				;-------------------------------------------------------------------
 				;| Print Menu with Prices for customers to order...                 |
 				;| Uses:   pMenu string to print...                                 |
 				;-------------------------------------------------------------------
 
- 0000052D			choiceMenu PROC
- 0000052D  60			             PUSHAD
- 0000052E  9C					     PUSHFD
+ 00000549			choiceMenu PROC
+ 00000549  60			             PUSHAD
+ 0000054A  9C					     PUSHFD
 
- 0000052F						 op:                                                  ; Option Tag...
- 0000052F  E8 00000000 E					call crlf
+ 0000054B						 op:                                                  ; Option Tag...
+ 0000054B  E8 00000000 E					call crlf
 
- 00000534  BA 00002054 R			        mov edx, OFFSET cMenu
- 00000539  E8 00000000 E		            call writeString
+ 00000550  BA 00002054 R			        mov edx, OFFSET cMenu
+ 00000555  E8 00000000 E		            call writeString
 
- 0000053E  E8 00000000 E			        call crlf
- 00000543  E8 00000000 E			        call readInt
+ 0000055A  E8 00000000 E			        call crlf
+ 0000055F  E8 00000000 E			        call readInt
 
- 00000548  83 F8 01			            cmp eax, 1
- 0000054B  74 20				        je  ot
- 0000054D  83 F8 02				        cmp eax, 2
- 00000550  74 22				        je  cn
- 00000552  83 F8 03				        cmp eax, 3
- 00000555  74 24				        je  ff
- 00000557  83 F8 04				        cmp eax, 4
- 0000055A  74 26				        je  de
- 0000055C  83 F8 05				        cmp eax, 5
- 0000055F  74 28				        je  dr
- 00000561  83 F8 06						cmp eax, 6
- 00000564  74 2A				        je  _exit
+ 00000564  83 F8 01			            cmp eax, 1
+ 00000567  74 20				        je  ot
+ 00000569  83 F8 02				        cmp eax, 2
+ 0000056C  74 22				        je  cn
+ 0000056E  83 F8 03				        cmp eax, 3
+ 00000571  74 24				        je  ff
+ 00000573  83 F8 04				        cmp eax, 4
+ 00000576  74 26				        je  de
+ 00000578  83 F8 05				        cmp eax, 5
+ 0000057B  74 28				        je  dr
+ 0000057D  83 F8 06						cmp eax, 6
+ 00000580  74 2A				        je  _exit
 
- 00000566  E8 000006D3				        call error                                        ; calling error Proc...
- 0000056B  EB C2				        jmp  op
+ 00000582  E8 000006D3				        call error                                        ; calling error Proc...
+ 00000587  EB C2				        jmp  op
 
- 0000056D					        ot:                                               ; Oriental Tag...
- 0000056D  E8 00000021				           call OrientalMenu
- 00000572  EB BB				           jmp  op
+ 00000589					        ot:                                               ; Oriental Tag...
+ 00000589  E8 00000021				           call OrientalMenu
+ 0000058E  EB BB				           jmp  op
 
- 00000574			                cn:                                               ; Chinese Tag...
- 00000574  E8 000001C0			               call ChineseMenu
- 00000579  EB B4				           jmp op
+ 00000590			                cn:                                               ; Chinese Tag...
+ 00000590  E8 000001C0			               call ChineseMenu
+ 00000595  EB B4				           jmp op
 
- 0000057B			                ff:                                               ; Fast Food Tag...
- 0000057B  E8 00000298			               call FastFoodMenu
- 00000580  EB AD				           jmp op
+ 00000597			                ff:                                               ; Fast Food Tag...
+ 00000597  E8 00000298			               call FastFoodMenu
+ 0000059C  EB AD				           jmp op
 
- 00000582			               de:                                                ; Dessert Tag...
- 00000582  E8 00000370				          call DessertMenu
- 00000587  EB A6				          jmp op
+ 0000059E			               de:                                                ; Dessert Tag...
+ 0000059E  E8 00000370				          call DessertMenu
+ 000005A3  EB A6				          jmp op
 
- 00000589					       dr:                                                ; Drinks Tag...
- 00000589  E8 00000448			              call DrinksMenu
- 0000058E  EB 9F				          jmp op
+ 000005A5					       dr:                                                ; Drinks Tag...
+ 000005A5  E8 00000448			              call DrinksMenu
+ 000005AA  EB 9F				          jmp op
 
- 00000590				   _exit:                                                     ; Exit Tag
- 00000590  9D					     POPFD
- 00000591  61					     POPAD
+ 000005AC				   _exit:                                                     ; Exit Tag
+ 000005AC  9D					     POPFD
+ 000005AD  61					     POPAD
 
- 00000592  C3				    	 RET
- 00000593			choiceMenu ENDP
+ 000005AE  C3				    	 RET
+ 000005AF			choiceMenu ENDP
 
 				;-------------------------------------------------------------------
 				;| Print Oriental Menu with Prices for customers to order...        |
 				;| Updates: Bill ...                                                |
 				;-------------------------------------------------------------------
 
- 00000593			OrientalMenu PROC
- 00000593  60						  PUSHAD
- 00000594  9C						  PUSHFD
+ 000005AF			OrientalMenu PROC
+ 000005AF  60						  PUSHAD
+ 000005B0  9C						  PUSHFD
 
- 00000595						  op:                                                 ; Option Tag...
- 00000595  E8 00000000 E				     call crlf
+ 000005B1						  op:                                                 ; Option Tag...
+ 000005B1  E8 00000000 E				     call crlf
 
- 0000059A  BA 00002113 R			         mov edx, OFFSET oriental
- 0000059F  E8 00000000 E		             call writeString
+ 000005B6  BA 00002113 R			         mov edx, OFFSET oriental
+ 000005BB  E8 00000000 E		             call writeString
 
- 000005A4  E8 00000000 E			         call crlf
- 000005A9  E8 00000000 E			         call readInt
+ 000005C0  E8 00000000 E			         call crlf
+ 000005C5  E8 00000000 E			         call readInt
 
- 000005AE  83 F8 01			             cmp eax, 1
- 000005B1  74 4B				         je  cq
- 000005B3  83 F8 02				         cmp eax, 2
- 000005B6  74 6D				         je  pu
- 000005B8  83 F8 03				         cmp eax, 3
- 000005BB  0F 84 0000008B			         je  cb
- 000005C1  83 F8 04				         cmp eax, 4
- 000005C4  0F 84 000000A9			         je  ck 
- 000005CA  83 F8 05				         cmp eax, 5
- 000005CD  0F 84 000000C7			         je  ct 
- 000005D3  83 F8 06						 cmp eax, 6
- 000005D6  0F 84 000000E5					 je  mh
- 000005DC  83 F8 07						 cmp eax, 7
- 000005DF  0F 84 00000103					 je  na
- 000005E5  83 F8 08						 cmp eax, 8
- 000005E8  0F 84 00000121					 je  rt
- 000005EE  83 F8 09						 cmp eax, 9
- 000005F1  0F 84 0000013F					 je  _exit
+ 000005CA  83 F8 01			             cmp eax, 1
+ 000005CD  74 4B				         je  cq
+ 000005CF  83 F8 02				         cmp eax, 2
+ 000005D2  74 6D				         je  pu
+ 000005D4  83 F8 03				         cmp eax, 3
+ 000005D7  0F 84 0000008B			         je  cb
+ 000005DD  83 F8 04				         cmp eax, 4
+ 000005E0  0F 84 000000A9			         je  ck 
+ 000005E6  83 F8 05				         cmp eax, 5
+ 000005E9  0F 84 000000C7			         je  ct 
+ 000005EF  83 F8 06						 cmp eax, 6
+ 000005F2  0F 84 000000E5					 je  mh
+ 000005F8  83 F8 07						 cmp eax, 7
+ 000005FB  0F 84 00000103					 je  na
+ 00000601  83 F8 08						 cmp eax, 8
+ 00000604  0F 84 00000121					 je  rt
+ 0000060A  83 F8 09						 cmp eax, 9
+ 0000060D  0F 84 0000013F					 je  _exit
 
- 000005F7  E8 00000642				         call error                                       ; calling error Proc...
- 000005FC  EB 97				         jmp  op
+ 00000613  E8 00000642				         call error                                       ; calling error Proc...
+ 00000618  EB 97				         jmp  op
 
- 000005FE					         cq:                                              ; Chicken Quorma Tag...
- 000005FE  BA 00002905 R			            mov edx, OFFSET dishes
- 00000603  E8 00000000 E		                call writeString
+ 0000061A					         cq:                                              ; Chicken Quorma Tag...
+ 0000061A  BA 00002905 R			            mov edx, OFFSET dishes
+ 0000061F  E8 00000000 E		                call writeString
 
- 00000608  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
+ 00000624  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
 
- 0000060D  8B 1D 00000000 R	  				    mov ebx, [oPrice]
- 00000613  F7 E3						    mul ebx                                       ; Mul quantity with price...
- 00000615  03 05 00000070 R					    add eax, bill
- 0000061B  A3 00000070 R					    mov bill, eax
+ 00000629  8B 1D 00000000 R	  				    mov ebx, [oPrice]
+ 0000062F  F7 E3						    mul ebx                                       ; Mul quantity with price...
+ 00000631  03 05 00000070 R					    add eax, bill
+ 00000637  A3 00000070 R					    mov bill, eax
 
- 00000620  E9 FFFFFF70				            jmp  op
+ 0000063C  E9 FFFFFF70				            jmp  op
 
- 00000625			                 pu:                                              ; Pullao Tag...
- 00000625  BA 00002905 R		                mov edx, OFFSET dishes
- 0000062A  E8 00000000 E		                call writeString
+ 00000641			                 pu:                                              ; Pullao Tag...
+ 00000641  BA 00002905 R		                mov edx, OFFSET dishes
+ 00000646  E8 00000000 E		                call writeString
 
- 0000062F  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
+ 0000064B  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
 
- 00000634  8B 1D 00000004 R					    mov ebx, [oPrice + 4]
- 0000063A  F7 E3						    mul ebx                                       ; Mul quantity with price...
- 0000063C  03 05 00000070 R					    add eax, bill
- 00000642  A3 00000070 R					    mov bill, eax
+ 00000650  8B 1D 00000004 R					    mov ebx, [oPrice + 4]
+ 00000656  F7 E3						    mul ebx                                       ; Mul quantity with price...
+ 00000658  03 05 00000070 R					    add eax, bill
+ 0000065E  A3 00000070 R					    mov bill, eax
 
- 00000647  E9 FFFFFF49				            jmp  op
+ 00000663  E9 FFFFFF49				            jmp  op
 
- 0000064C			                 cb:                                              ; Chicken Briyani Tag...
- 0000064C  BA 00002905 R		                mov edx, OFFSET dishes
- 00000651  E8 00000000 E		                call writeString
+ 00000668			                 cb:                                              ; Chicken Briyani Tag...
+ 00000668  BA 00002905 R		                mov edx, OFFSET dishes
+ 0000066D  E8 00000000 E		                call writeString
 
- 00000656  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
+ 00000672  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
 
- 0000065B  8B 1D 00000008 R					    mov ebx, [oPrice + 8]
- 00000661  F7 E3						    mul ebx                                       ; Mul quantity with price...
- 00000663  03 05 00000070 R					    add eax, bill
- 00000669  A3 00000070 R					    mov bill, eax
+ 00000677  8B 1D 00000008 R					    mov ebx, [oPrice + 8]
+ 0000067D  F7 E3						    mul ebx                                       ; Mul quantity with price...
+ 0000067F  03 05 00000070 R					    add eax, bill
+ 00000685  A3 00000070 R					    mov bill, eax
 
- 0000066E  E9 FFFFFF22				            jmp  op
+ 0000068A  E9 FFFFFF22				            jmp  op
 
- 00000673			                 ck:                                              ; Chicken Karahi Tag...
- 00000673  BA 00002905 R			            mov edx, OFFSET dishes
- 00000678  E8 00000000 E		                call writeString
+ 0000068F			                 ck:                                              ; Chicken Karahi Tag...
+ 0000068F  BA 00002905 R			            mov edx, OFFSET dishes
+ 00000694  E8 00000000 E		                call writeString
 
- 0000067D  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
+ 00000699  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
 
- 00000682  8B 1D 0000000C R					    mov ebx, [oPrice + 12]
- 00000688  F7 E3						    mul ebx                                       ; Mul quantity with price...
- 0000068A  03 05 00000070 R					    add eax, bill
- 00000690  A3 00000070 R					    mov bill, eax
+ 0000069E  8B 1D 0000000C R					    mov ebx, [oPrice + 12]
+ 000006A4  F7 E3						    mul ebx                                       ; Mul quantity with price...
+ 000006A6  03 05 00000070 R					    add eax, bill
+ 000006AC  A3 00000070 R					    mov bill, eax
 
- 00000695  E9 FFFFFEFB				            jmp  op
+ 000006B1  E9 FFFFFEFB				            jmp  op
 
- 0000069A					         ct:                                              ; Chicken Tikka Tag...
- 0000069A  BA 00002905 R		                mov edx, OFFSET dishes
- 0000069F  E8 00000000 E		                call writeString
+ 000006B6					         ct:                                              ; Chicken Tikka Tag...
+ 000006B6  BA 00002905 R		                mov edx, OFFSET dishes
+ 000006BB  E8 00000000 E		                call writeString
 
- 000006A4  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
+ 000006C0  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
 
- 000006A9  8B 1D 00000010 R					    mov ebx, [oPrice + 16]
- 000006AF  F7 E3						    mul ebx                                       ; Mul quantity with price...
- 000006B1  03 05 00000070 R					    add eax, bill
- 000006B7  A3 00000070 R					    mov bill, eax
+ 000006C5  8B 1D 00000010 R					    mov ebx, [oPrice + 16]
+ 000006CB  F7 E3						    mul ebx                                       ; Mul quantity with price...
+ 000006CD  03 05 00000070 R					    add eax, bill
+ 000006D3  A3 00000070 R					    mov bill, eax
 
- 000006BC  E9 FFFFFED4				            jmp  op
+ 000006D8  E9 FFFFFED4				            jmp  op
 
- 000006C1						     mh:                                              ; Murgh Haleem Tag...
- 000006C1  BA 00002905 R		                mov edx, OFFSET dishes
- 000006C6  E8 00000000 E		                call writeString
+ 000006DD						     mh:                                              ; Murgh Haleem Tag...
+ 000006DD  BA 00002905 R		                mov edx, OFFSET dishes
+ 000006E2  E8 00000000 E		                call writeString
 
- 000006CB  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
+ 000006E7  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
 
- 000006D0  8B 1D 00000014 R					    mov ebx, [oPrice + 20]
- 000006D6  F7 E3						    mul ebx                                       ; Mul quantity with price...
- 000006D8  03 05 00000070 R					    add eax, bill
- 000006DE  A3 00000070 R					    mov bill, eax
+ 000006EC  8B 1D 00000014 R					    mov ebx, [oPrice + 20]
+ 000006F2  F7 E3						    mul ebx                                       ; Mul quantity with price...
+ 000006F4  03 05 00000070 R					    add eax, bill
+ 000006FA  A3 00000070 R					    mov bill, eax
 
- 000006E3  E9 FFFFFEAD				            jmp  op
+ 000006FF  E9 FFFFFEAD				            jmp  op
 
- 000006E8						     na:                                              ; Naan Tag...
- 000006E8  BA 00002905 R		                mov edx, OFFSET dishes
- 000006ED  E8 00000000 E		                call writeString
+ 00000704						     na:                                              ; Naan Tag...
+ 00000704  BA 00002905 R		                mov edx, OFFSET dishes
+ 00000709  E8 00000000 E		                call writeString
 
- 000006F2  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
+ 0000070E  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
 
- 000006F7  8B 1D 00000018 R					    mov ebx, [oPrice + 24]
- 000006FD  F7 E3						    mul ebx                                       ; Mul quantity with price...
- 000006FF  03 05 00000070 R					    add eax, bill
- 00000705  A3 00000070 R					    mov bill, eax
+ 00000713  8B 1D 00000018 R					    mov ebx, [oPrice + 24]
+ 00000719  F7 E3						    mul ebx                                       ; Mul quantity with price...
+ 0000071B  03 05 00000070 R					    add eax, bill
+ 00000721  A3 00000070 R					    mov bill, eax
 
- 0000070A  E9 FFFFFE86				            jmp  op
+ 00000726  E9 FFFFFE86				            jmp  op
 
- 0000070F						     rt:                                              ; Roti Tag...
- 0000070F  BA 00002905 R		                mov edx, OFFSET dishes
- 00000714  E8 00000000 E		                call writeString
+ 0000072B						     rt:                                              ; Roti Tag...
+ 0000072B  BA 00002905 R		                mov edx, OFFSET dishes
+ 00000730  E8 00000000 E		                call writeString
 
- 00000719  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
+ 00000735  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
 
- 0000071E  8B 1D 0000001C R					    mov ebx, [oPrice + 28]
- 00000724  F7 E3						    mul ebx                                       ; Mul quantity with price...
- 00000726  03 05 00000070 R					    add eax, bill
- 0000072C  A3 00000070 R					    mov bill, eax
+ 0000073A  8B 1D 0000001C R					    mov ebx, [oPrice + 28]
+ 00000740  F7 E3						    mul ebx                                       ; Mul quantity with price...
+ 00000742  03 05 00000070 R					    add eax, bill
+ 00000748  A3 00000070 R					    mov bill, eax
 
- 00000731  E9 FFFFFE5F				            jmp  op
+ 0000074D  E9 FFFFFE5F				            jmp  op
 
- 00000736				    _exit:
- 00000736  9D						  POPFD
- 00000737  61						  POPAD
+ 00000752				    _exit:
+ 00000752  9D						  POPFD
+ 00000753  61						  POPAD
 
- 00000738  C3						  RET
- 00000739			OrientalMenu ENDP
+ 00000754  C3						  RET
+ 00000755			OrientalMenu ENDP
 
 				;-------------------------------------------------------------------
 				;| Print Chinese Menu with Prices for customers to order...         |
 				;| Updates: Bill ...                                                |
 				;-------------------------------------------------------------------
 
- 00000739			ChineseMenu PROC
- 00000739  60						 PUSHAD
- 0000073A  9C						 PUSHFD
+ 00000755			ChineseMenu PROC
+ 00000755  60						 PUSHAD
+ 00000756  9C						 PUSHFD
 
- 0000073B						 op:                                                  ; Option Tag...
- 0000073B  E8 00000000 E				    call crlf
+ 00000757						 op:                                                  ; Option Tag...
+ 00000757  E8 00000000 E				    call crlf
 
- 00000740  BA 000022D2 R			        mov edx, OFFSET chinese
- 00000745  E8 00000000 E		            call writeString
+ 0000075C  BA 000022D2 R			        mov edx, OFFSET chinese
+ 00000761  E8 00000000 E		            call writeString
 
- 0000074A  E8 00000000 E			        call crlf
- 0000074F  E8 00000000 E			        call readInt
+ 00000766  E8 00000000 E			        call crlf
+ 0000076B  E8 00000000 E			        call readInt
 
- 00000754  83 F8 01			            cmp eax, 1
- 00000757  74 23				        je  cm
- 00000759  83 F8 02				        cmp eax, 2
- 0000075C  74 42				        je  fr
- 0000075E  83 F8 03				        cmp eax, 3
- 00000761  74 64				        je  mn
- 00000763  83 F8 04				        cmp eax, 4
- 00000766  0F 84 00000082			        je  sh 
- 0000076C  83 F8 05				        cmp eax, 5
- 0000076F  0F 84 000000A0					je  _exit
+ 00000770  83 F8 01			            cmp eax, 1
+ 00000773  74 23				        je  cm
+ 00000775  83 F8 02				        cmp eax, 2
+ 00000778  74 42				        je  fr
+ 0000077A  83 F8 03				        cmp eax, 3
+ 0000077D  74 64				        je  mn
+ 0000077F  83 F8 04				        cmp eax, 4
+ 00000782  0F 84 00000082			        je  sh 
+ 00000788  83 F8 05				        cmp eax, 5
+ 0000078B  0F 84 000000A0					je  _exit
 
 
- 00000775  E8 000004C4				        call error                                        ; calling error Proc...
- 0000077A  EB BF				        jmp  op
+ 00000791  E8 000004C4				        call error                                        ; calling error Proc...
+ 00000796  EB BF				        jmp  op
 
- 0000077C					        cm:                                               ; Chicken Manchurian Tag...
- 0000077C  BA 00002905 R			           mov edx, OFFSET dishes
- 00000781  E8 00000000 E		               call writeString
+ 00000798					        cm:                                               ; Chicken Manchurian Tag...
+ 00000798  BA 00002905 R			           mov edx, OFFSET dishes
+ 0000079D  E8 00000000 E		               call writeString
 
- 00000786  E8 00000000 E					   call readInt                                   ; Taking input for quantity...
+ 000007A2  E8 00000000 E					   call readInt                                   ; Taking input for quantity...
 
- 0000078B  8B 1D 00000020 R					   mov ebx, [cPrice]
- 00000791  F7 E3						   mul ebx                                        ; Mul quantity with price...
- 00000793  03 05 00000070 R					   add eax, bill
- 00000799  A3 00000070 R					   mov bill, eax
+ 000007A7  8B 1D 00000020 R					   mov ebx, [cPrice]
+ 000007AD  F7 E3						   mul ebx                                        ; Mul quantity with price...
+ 000007AF  03 05 00000070 R					   add eax, bill
+ 000007B5  A3 00000070 R					   mov bill, eax
 
- 0000079E  EB 9B				           jmp  op
+ 000007BA  EB 9B				           jmp  op
 
- 000007A0			                fr:                                               ; Egg Fried Rice Tag...
- 000007A0  BA 00002905 R		               mov edx, OFFSET dishes
- 000007A5  E8 00000000 E		               call writeString
+ 000007BC			                fr:                                               ; Egg Fried Rice Tag...
+ 000007BC  BA 00002905 R		               mov edx, OFFSET dishes
+ 000007C1  E8 00000000 E		               call writeString
 
- 000007AA  E8 00000000 E					   call readInt                                   ; Taking input for quantity...
+ 000007C6  E8 00000000 E					   call readInt                                   ; Taking input for quantity...
 
- 000007AF  8B 1D 00000024 R					   mov ebx, [cPrice + 4]
- 000007B5  F7 E3						   mul ebx                                        ; Mul quantity with price...
- 000007B7  03 05 00000070 R					   add eax, bill
- 000007BD  A3 00000070 R					   mov bill, eax
+ 000007CB  8B 1D 00000024 R					   mov ebx, [cPrice + 4]
+ 000007D1  F7 E3						   mul ebx                                        ; Mul quantity with price...
+ 000007D3  03 05 00000070 R					   add eax, bill
+ 000007D9  A3 00000070 R					   mov bill, eax
 
- 000007C2  E9 FFFFFF74				           jmp  op
+ 000007DE  E9 FFFFFF74				           jmp  op
 
- 000007C7			                mn:                                               ; Chicken Macaroni Tag...
- 000007C7  BA 00002905 R		               mov edx, OFFSET dishes
- 000007CC  E8 00000000 E		               call writeString
+ 000007E3			                mn:                                               ; Chicken Macaroni Tag...
+ 000007E3  BA 00002905 R		               mov edx, OFFSET dishes
+ 000007E8  E8 00000000 E		               call writeString
 
- 000007D1  E8 00000000 E					   call readInt                                   ; Taking input for quantity...
+ 000007ED  E8 00000000 E					   call readInt                                   ; Taking input for quantity...
 
- 000007D6  8B 1D 00000028 R					   mov ebx, [cPrice + 8]
- 000007DC  F7 E3						   mul ebx                                        ; Mul quantity with price...
- 000007DE  03 05 00000070 R					   add eax, bill
- 000007E4  A3 00000070 R					   mov bill, eax
+ 000007F2  8B 1D 00000028 R					   mov ebx, [cPrice + 8]
+ 000007F8  F7 E3						   mul ebx                                        ; Mul quantity with price...
+ 000007FA  03 05 00000070 R					   add eax, bill
+ 00000800  A3 00000070 R					   mov bill, eax
 
- 000007E9  E9 FFFFFF4D				           jmp  op
+ 00000805  E9 FFFFFF4D				           jmp  op
 
- 000007EE			                sh:                                               ; Chicken Shashlik Tag...
- 000007EE  BA 00002905 R			           mov edx, OFFSET dishes
- 000007F3  E8 00000000 E		               call writeString
+ 0000080A			                sh:                                               ; Chicken Shashlik Tag...
+ 0000080A  BA 00002905 R			           mov edx, OFFSET dishes
+ 0000080F  E8 00000000 E		               call writeString
 
- 000007F8  E8 00000000 E					   call readInt                                   ; Taking input for quantity...
+ 00000814  E8 00000000 E					   call readInt                                   ; Taking input for quantity...
 
- 000007FD  8B 1D 0000002C R					   mov ebx, [cPrice + 12]
- 00000803  F7 E3						   mul ebx                                        ; Mul quantity with price...
- 00000805  03 05 00000070 R					   add eax, bill
- 0000080B  A3 00000070 R					   mov bill, eax
+ 00000819  8B 1D 0000002C R					   mov ebx, [cPrice + 12]
+ 0000081F  F7 E3						   mul ebx                                        ; Mul quantity with price...
+ 00000821  03 05 00000070 R					   add eax, bill
+ 00000827  A3 00000070 R					   mov bill, eax
 
- 00000810  E9 FFFFFF26				           jmp  op
+ 0000082C  E9 FFFFFF26				           jmp  op
 
- 00000815				   _exit:
- 00000815  9D						 POPFD
- 00000816  61						 POPAD
+ 00000831				   _exit:
+ 00000831  9D						 POPFD
+ 00000832  61						 POPAD
 
- 00000817  C3						 RET
- 00000818			ChineseMenu ENDP
+ 00000833  C3						 RET
+ 00000834			ChineseMenu ENDP
 
 				;-------------------------------------------------------------------
 				;| Print Fast Food Menu with Prices for customers to order...       |
 				;| Updates: Bill ...                                                |
 				;-------------------------------------------------------------------
 
- 00000818			FastFoodMenu PROC
- 00000818  60						  PUSHAD
- 00000819  9C						  PUSHFD
+ 00000834			FastFoodMenu PROC
+ 00000834  60						  PUSHAD
+ 00000835  9C						  PUSHFD
 
- 0000081A						  op:                                                 ; Option Tag...
- 0000081A  E8 00000000 E				     call crlf
+ 00000836						  op:                                                 ; Option Tag...
+ 00000836  E8 00000000 E				     call crlf
 
- 0000081F  BA 00002400 R			         mov edx, OFFSET fastFood
- 00000824  E8 00000000 E		             call writeString
+ 0000083B  BA 00002400 R			         mov edx, OFFSET fastFood
+ 00000840  E8 00000000 E		             call writeString
 
- 00000829  E8 00000000 E			         call crlf
- 0000082E  E8 00000000 E			         call readInt
+ 00000845  E8 00000000 E			         call crlf
+ 0000084A  E8 00000000 E			         call readInt
 
- 00000833  83 F8 01			             cmp eax, 1
- 00000836  74 23				         je  cp
- 00000838  83 F8 02				         cmp eax, 2
- 0000083B  74 42				         je  zb
- 0000083D  83 F8 03				         cmp eax, 3
- 00000840  74 64				         je  sw
- 00000842  83 F8 04				         cmp eax, 4
- 00000845  0F 84 00000082			         je  ff
- 0000084B  83 F8 05				         cmp eax, 5
- 0000084E  0F 84 000000A0					 je  _exit
+ 0000084F  83 F8 01			             cmp eax, 1
+ 00000852  74 23				         je  cp
+ 00000854  83 F8 02				         cmp eax, 2
+ 00000857  74 42				         je  zb
+ 00000859  83 F8 03				         cmp eax, 3
+ 0000085C  74 64				         je  sw
+ 0000085E  83 F8 04				         cmp eax, 4
+ 00000861  0F 84 00000082			         je  ff
+ 00000867  83 F8 05				         cmp eax, 5
+ 0000086A  0F 84 000000A0					 je  _exit
 
- 00000854  E8 000003E5				         call error                                       ; calling error Proc...
- 00000859  EB BF				         jmp  op
+ 00000870  E8 000003E5				         call error                                       ; calling error Proc...
+ 00000875  EB BF				         jmp  op
 
- 0000085B					         cp:                                              ; Chicken Pizza Tag...
- 0000085B  BA 00002905 R			            mov edx, OFFSET dishes
- 00000860  E8 00000000 E		                call writeString
+ 00000877					         cp:                                              ; Chicken Pizza Tag...
+ 00000877  BA 00002905 R			            mov edx, OFFSET dishes
+ 0000087C  E8 00000000 E		                call writeString
 
- 00000865  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
+ 00000881  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
 
- 0000086A  8B 1D 00000030 R					    mov ebx, [fPrice]
- 00000870  F7 E3						    mul ebx                                       ; Mul quantity with price...
- 00000872  03 05 00000070 R					    add eax, bill
- 00000878  A3 00000070 R					    mov bill, eax
+ 00000886  8B 1D 00000030 R					    mov ebx, [fPrice]
+ 0000088C  F7 E3						    mul ebx                                       ; Mul quantity with price...
+ 0000088E  03 05 00000070 R					    add eax, bill
+ 00000894  A3 00000070 R					    mov bill, eax
 
- 0000087D  EB 9B				            jmp  op
+ 00000899  EB 9B				            jmp  op
 
- 0000087F			                 zb:                                              ; Zinger Burger Rice Tag...
- 0000087F  BA 00002905 R		                mov edx, OFFSET dishes
- 00000884  E8 00000000 E		                call writeString
+ 0000089B			                 zb:                                              ; Zinger Burger Rice Tag...
+ 0000089B  BA 00002905 R		                mov edx, OFFSET dishes
+ 000008A0  E8 00000000 E		                call writeString
 
- 00000889  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
+ 000008A5  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
 
- 0000088E  8B 1D 00000034 R					    mov ebx, [fPrice + 4]
- 00000894  F7 E3						    mul ebx                                       ; Mul quantity with price...
- 00000896  03 05 00000070 R					    add eax, bill
- 0000089C  A3 00000070 R					    mov bill, eax
+ 000008AA  8B 1D 00000034 R					    mov ebx, [fPrice + 4]
+ 000008B0  F7 E3						    mul ebx                                       ; Mul quantity with price...
+ 000008B2  03 05 00000070 R					    add eax, bill
+ 000008B8  A3 00000070 R					    mov bill, eax
 
- 000008A1  E9 FFFFFF74				            jmp  op
+ 000008BD  E9 FFFFFF74				            jmp  op
 
- 000008A6			                 sw:                                              ; Chicken Shawarma Tag...
- 000008A6  BA 00002905 R		                mov edx, OFFSET dishes
- 000008AB  E8 00000000 E		                call writeString
+ 000008C2			                 sw:                                              ; Chicken Shawarma Tag...
+ 000008C2  BA 00002905 R		                mov edx, OFFSET dishes
+ 000008C7  E8 00000000 E		                call writeString
 
- 000008B0  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
+ 000008CC  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
 
- 000008B5  8B 1D 00000038 R					    mov ebx, [fPrice + 8]
- 000008BB  F7 E3						    mul ebx                                       ; Mul quantity with price...
- 000008BD  03 05 00000070 R					    add eax, bill
- 000008C3  A3 00000070 R					    mov bill, eax
+ 000008D1  8B 1D 00000038 R					    mov ebx, [fPrice + 8]
+ 000008D7  F7 E3						    mul ebx                                       ; Mul quantity with price...
+ 000008D9  03 05 00000070 R					    add eax, bill
+ 000008DF  A3 00000070 R					    mov bill, eax
 
- 000008C8  E9 FFFFFF4D				            jmp  op
+ 000008E4  E9 FFFFFF4D				            jmp  op
 									 
- 000008CD			                 ff:                                              ; French Fries Tag...
- 000008CD  BA 00002905 R			            mov edx, OFFSET dishes
- 000008D2  E8 00000000 E		                call writeString
+ 000008E9			                 ff:                                              ; French Fries Tag...
+ 000008E9  BA 00002905 R			            mov edx, OFFSET dishes
+ 000008EE  E8 00000000 E		                call writeString
 
- 000008D7  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
+ 000008F3  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
 
- 000008DC  8B 1D 0000003C R					    mov ebx, [fPrice + 12]
- 000008E2  F7 E3						    mul ebx                                       ; Mul quantity with price...
- 000008E4  03 05 00000070 R					    add eax, bill
- 000008EA  A3 00000070 R					    mov bill, eax
+ 000008F8  8B 1D 0000003C R					    mov ebx, [fPrice + 12]
+ 000008FE  F7 E3						    mul ebx                                       ; Mul quantity with price...
+ 00000900  03 05 00000070 R					    add eax, bill
+ 00000906  A3 00000070 R					    mov bill, eax
 
- 000008EF  E9 FFFFFF26				            jmp  op
+ 0000090B  E9 FFFFFF26				            jmp  op
 
- 000008F4				    _exit:
- 000008F4  9D						  POPFD
- 000008F5  61						  POPAD
+ 00000910				    _exit:
+ 00000910  9D						  POPFD
+ 00000911  61						  POPAD
 
- 000008F6  C3						  RET
- 000008F7			FastFoodMenu ENDP
+ 00000912  C3						  RET
+ 00000913			FastFoodMenu ENDP
 
 				;-------------------------------------------------------------------
 				;| Print Dessert Menu with Prices for customers to order...         |
 				;| Updates: Bill ...                                                |
 				;-------------------------------------------------------------------
 
- 000008F7			DessertMenu PROC
- 000008F7  60						 PUSHAD
- 000008F8  9C						 PUSHFD
+ 00000913			DessertMenu PROC
+ 00000913  60						 PUSHAD
+ 00000914  9C						 PUSHFD
 
- 000008F9						 op:                                                  ; Option Tag...
- 000008F9  E8 00000000 E				    call crlf
+ 00000915						 op:                                                  ; Option Tag...
+ 00000915  E8 00000000 E				    call crlf
 
- 000008FE  BA 0000250D R			        mov edx, OFFSET dessert
- 00000903  E8 00000000 E		            call writeString
+ 0000091A  BA 0000250D R			        mov edx, OFFSET dessert
+ 0000091F  E8 00000000 E		            call writeString
 
- 00000908  E8 00000000 E			        call crlf
- 0000090D  E8 00000000 E			        call readInt
+ 00000924  E8 00000000 E			        call crlf
+ 00000929  E8 00000000 E			        call readInt
 
- 00000912  83 F8 01			            cmp eax, 1
- 00000915  74 23				        je  pc
- 00000917  83 F8 02				        cmp eax, 2
- 0000091A  74 42				        je  cc
- 0000091C  83 F8 03				        cmp eax, 3
- 0000091F  74 64				        je  cu
- 00000921  83 F8 04				        cmp eax, 4
- 00000924  0F 84 00000082			        je  ic
- 0000092A  83 F8 05				        cmp eax, 5
- 0000092D  0F 84 000000A0					je  _exit
+ 0000092E  83 F8 01			            cmp eax, 1
+ 00000931  74 23				        je  pc
+ 00000933  83 F8 02				        cmp eax, 2
+ 00000936  74 42				        je  cc
+ 00000938  83 F8 03				        cmp eax, 3
+ 0000093B  74 64				        je  cu
+ 0000093D  83 F8 04				        cmp eax, 4
+ 00000940  0F 84 00000082			        je  ic
+ 00000946  83 F8 05				        cmp eax, 5
+ 00000949  0F 84 000000A0					je  _exit
 
- 00000933  E8 00000306				        call error                                        ; calling error Proc...
- 00000938  EB BF				        jmp  op
+ 0000094F  E8 00000306				        call error                                        ; calling error Proc...
+ 00000954  EB BF				        jmp  op
 
- 0000093A					        pc:                                               ; Pineapple Cake Tag...
- 0000093A  BA 00002905 R			           mov edx, OFFSET dishes
- 0000093F  E8 00000000 E		               call writeString
+ 00000956					        pc:                                               ; Pineapple Cake Tag...
+ 00000956  BA 00002905 R			           mov edx, OFFSET dishes
+ 0000095B  E8 00000000 E		               call writeString
 
- 00000944  E8 00000000 E					   call readInt                                   ; Taking input for quantity...
+ 00000960  E8 00000000 E					   call readInt                                   ; Taking input for quantity...
 
- 00000949  8B 1D 00000040 R					   mov ebx, [dePrice]
- 0000094F  F7 E3						   mul ebx                                        ; Mul quantity with price...
- 00000951  03 05 00000070 R					   add eax, bill
- 00000957  A3 00000070 R					   mov bill, eax
+ 00000965  8B 1D 00000040 R					   mov ebx, [dePrice]
+ 0000096B  F7 E3						   mul ebx                                        ; Mul quantity with price...
+ 0000096D  03 05 00000070 R					   add eax, bill
+ 00000973  A3 00000070 R					   mov bill, eax
 
- 0000095C  EB 9B				           jmp  op
+ 00000978  EB 9B				           jmp  op
 
- 0000095E			                cc:                                               ; Chocolate Cake Tag...
- 0000095E  BA 00002905 R		               mov edx, OFFSET dishes
- 00000963  E8 00000000 E		               call writeString
+ 0000097A			                cc:                                               ; Chocolate Cake Tag...
+ 0000097A  BA 00002905 R		               mov edx, OFFSET dishes
+ 0000097F  E8 00000000 E		               call writeString
 
- 00000968  E8 00000000 E					   call readInt                                   ; Taking input for quantity...
+ 00000984  E8 00000000 E					   call readInt                                   ; Taking input for quantity...
 
- 0000096D  8B 1D 00000044 R					   mov ebx, [dePrice + 4]
- 00000973  F7 E3						   mul ebx                                        ; Mul quantity with price...
- 00000975  03 05 00000070 R					   add eax, bill
- 0000097B  A3 00000070 R					   mov bill, eax
+ 00000989  8B 1D 00000044 R					   mov ebx, [dePrice + 4]
+ 0000098F  F7 E3						   mul ebx                                        ; Mul quantity with price...
+ 00000991  03 05 00000070 R					   add eax, bill
+ 00000997  A3 00000070 R					   mov bill, eax
 
- 00000980  E9 FFFFFF74				           jmp  op
+ 0000099C  E9 FFFFFF74				           jmp  op
 
- 00000985			                cu:                                               ; Custard Tag...
- 00000985  BA 00002905 R		               mov edx, OFFSET dishes
- 0000098A  E8 00000000 E		               call writeString
+ 000009A1			                cu:                                               ; Custard Tag...
+ 000009A1  BA 00002905 R		               mov edx, OFFSET dishes
+ 000009A6  E8 00000000 E		               call writeString
 
- 0000098F  E8 00000000 E					   call readInt                                   ; Taking input for quantity...
+ 000009AB  E8 00000000 E					   call readInt                                   ; Taking input for quantity...
 
- 00000994  8B 1D 00000048 R					   mov ebx, [dePrice + 8]
- 0000099A  F7 E3						   mul ebx                                        ; Mul quantity with price...
- 0000099C  03 05 00000070 R					   add eax, bill
- 000009A2  A3 00000070 R					   mov bill, eax
+ 000009B0  8B 1D 00000048 R					   mov ebx, [dePrice + 8]
+ 000009B6  F7 E3						   mul ebx                                        ; Mul quantity with price...
+ 000009B8  03 05 00000070 R					   add eax, bill
+ 000009BE  A3 00000070 R					   mov bill, eax
 
- 000009A7  E9 FFFFFF4D				           jmp  op
+ 000009C3  E9 FFFFFF4D				           jmp  op
 									 
- 000009AC			                ic:                                               ; Ice-Cream Tag...
- 000009AC  BA 00002905 R			           mov edx, OFFSET dishes
- 000009B1  E8 00000000 E		               call writeString
+ 000009C8			                ic:                                               ; Ice-Cream Tag...
+ 000009C8  BA 00002905 R			           mov edx, OFFSET dishes
+ 000009CD  E8 00000000 E		               call writeString
 
- 000009B6  E8 00000000 E					   call readInt                                   ; Taking input for quantity...
+ 000009D2  E8 00000000 E					   call readInt                                   ; Taking input for quantity...
 
- 000009BB  8B 1D 0000004C R					   mov ebx, [dePrice + 12]
- 000009C1  F7 E3						   mul ebx                                        ; Mul quantity with price...
- 000009C3  03 05 00000070 R					   add eax, bill
- 000009C9  A3 00000070 R					   mov bill, eax
+ 000009D7  8B 1D 0000004C R					   mov ebx, [dePrice + 12]
+ 000009DD  F7 E3						   mul ebx                                        ; Mul quantity with price...
+ 000009DF  03 05 00000070 R					   add eax, bill
+ 000009E5  A3 00000070 R					   mov bill, eax
 
- 000009CE  E9 FFFFFF26				           jmp  op
+ 000009EA  E9 FFFFFF26				           jmp  op
 
- 000009D3				   _exit:
- 000009D3  9D						 POPFD
- 000009D4  61						 POPAD
+ 000009EF				   _exit:
+ 000009EF  9D						 POPFD
+ 000009F0  61						 POPAD
 
- 000009D5  C3						 RET
- 000009D6			DessertMenu ENDP
+ 000009F1  C3						 RET
+ 000009F2			DessertMenu ENDP
 
 				;-------------------------------------------------------------------
 				;| Print Drinks Menu with Prices for customers to order...          |
 				;| Updates: Bill ...                                                |
 				;-------------------------------------------------------------------
 
- 000009D6			DrinksMenu PROC
- 000009D6  60						PUSHAD
- 000009D7  9C						PUSHFD
+ 000009F2			DrinksMenu PROC
+ 000009F2  60						PUSHAD
+ 000009F3  9C						PUSHFD
 
- 000009D8						op:                                                   ; Option Tag...
- 000009D8  E8 00000000 E				   call crlf
+ 000009F4						op:                                                   ; Option Tag...
+ 000009F4  E8 00000000 E				   call crlf
 
- 000009DD  BA 00002614 R			       mov edx, OFFSET drinks
- 000009E2  E8 00000000 E		           call writeString
+ 000009F9  BA 00002614 R			       mov edx, OFFSET drinks
+ 000009FE  E8 00000000 E		           call writeString
 
- 000009E7  E8 00000000 E			       call crlf
- 000009EC  E8 00000000 E			       call readInt
+ 00000A03  E8 00000000 E			       call crlf
+ 00000A08  E8 00000000 E			       call readInt
 
- 000009F1  83 F8 01			           cmp eax, 1
- 000009F4  74 4B				       je  cj
- 000009F6  83 F8 02				       cmp eax, 2
- 000009F9  74 6D				       je  sj
- 000009FB  83 F8 03				       cmp eax, 3
- 000009FE  0F 84 0000008B			       je  cr
- 00000A04  83 F8 04				       cmp eax, 4
- 00000A07  0F 84 000000A9			       je  sr 
- 00000A0D  83 F8 05				       cmp eax, 5
- 00000A10  0F 84 000000C7			       je  pj
- 00000A16  83 F8 06					   cmp eax, 6
- 00000A19  0F 84 000000E5				   je  ma
- 00000A1F  83 F8 07					   cmp eax, 7
- 00000A22  0F 84 00000103				   je  co
- 00000A28  83 F8 08					   cmp eax, 8
- 00000A2B  0F 84 00000121				   je  te
- 00000A31  83 F8 09					   cmp eax, 9
- 00000A34  0F 84 0000013F				   je  _exit
+ 00000A0D  83 F8 01			           cmp eax, 1
+ 00000A10  74 4B				       je  cj
+ 00000A12  83 F8 02				       cmp eax, 2
+ 00000A15  74 6D				       je  sj
+ 00000A17  83 F8 03				       cmp eax, 3
+ 00000A1A  0F 84 0000008B			       je  cr
+ 00000A20  83 F8 04				       cmp eax, 4
+ 00000A23  0F 84 000000A9			       je  sr 
+ 00000A29  83 F8 05				       cmp eax, 5
+ 00000A2C  0F 84 000000C7			       je  pj
+ 00000A32  83 F8 06					   cmp eax, 6
+ 00000A35  0F 84 000000E5				   je  ma
+ 00000A3B  83 F8 07					   cmp eax, 7
+ 00000A3E  0F 84 00000103				   je  co
+ 00000A44  83 F8 08					   cmp eax, 8
+ 00000A47  0F 84 00000121				   je  te
+ 00000A4D  83 F8 09					   cmp eax, 9
+ 00000A50  0F 84 0000013F				   je  _exit
 
- 00000A3A  E8 000001FF				       call error                                         ; calling error Proc...
- 00000A3F  EB 97				       jmp  op
+ 00000A56  E8 000001FF				       call error                                         ; calling error Proc...
+ 00000A5B  EB 97				       jmp  op
 
- 00000A41					       cj:                                                ; Coca Cola Jumbo Tag...
- 00000A41  BA 00002905 R			          mov edx, OFFSET dishes
- 00000A46  E8 00000000 E		              call writeString
+ 00000A5D					       cj:                                                ; Coca Cola Jumbo Tag...
+ 00000A5D  BA 00002905 R			          mov edx, OFFSET dishes
+ 00000A62  E8 00000000 E		              call writeString
 
- 00000A4B  E8 00000000 E					  call readInt                                    ; Taking input for quantity...
+ 00000A67  E8 00000000 E					  call readInt                                    ; Taking input for quantity...
 
- 00000A50  8B 1D 00000050 R	  				  mov ebx, [drPrice]
- 00000A56  F7 E3						  mul ebx                                         ; Mul quantity with price...
- 00000A58  03 05 00000070 R					  add eax, bill
- 00000A5E  A3 00000070 R					  mov bill, eax
+ 00000A6C  8B 1D 00000050 R	  				  mov ebx, [drPrice]
+ 00000A72  F7 E3						  mul ebx                                         ; Mul quantity with price...
+ 00000A74  03 05 00000070 R					  add eax, bill
+ 00000A7A  A3 00000070 R					  mov bill, eax
 
- 00000A63  E9 FFFFFF70				          jmp  op
+ 00000A7F  E9 FFFFFF70				          jmp  op
 
- 00000A68			               sj:                                                ; Sprite Jumbo Tag...
- 00000A68  BA 00002905 R		              mov edx, OFFSET dishes
- 00000A6D  E8 00000000 E		              call writeString
+ 00000A84			               sj:                                                ; Sprite Jumbo Tag...
+ 00000A84  BA 00002905 R		              mov edx, OFFSET dishes
+ 00000A89  E8 00000000 E		              call writeString
 
- 00000A72  E8 00000000 E					  call readInt                                    ; Taking input for quantity...
+ 00000A8E  E8 00000000 E					  call readInt                                    ; Taking input for quantity...
 
- 00000A77  8B 1D 00000054 R					  mov ebx, [drPrice + 4]
- 00000A7D  F7 E3						  mul ebx                                         ; Mul quantity with price...
- 00000A7F  03 05 00000070 R					  add eax, bill
- 00000A85  A3 00000070 R					  mov bill, eax
+ 00000A93  8B 1D 00000054 R					  mov ebx, [drPrice + 4]
+ 00000A99  F7 E3						  mul ebx                                         ; Mul quantity with price...
+ 00000A9B  03 05 00000070 R					  add eax, bill
+ 00000AA1  A3 00000070 R					  mov bill, eax
 
- 00000A8A  E9 FFFFFF49				          jmp  op
+ 00000AA6  E9 FFFFFF49				          jmp  op
 
- 00000A8F			               cr:                                                ; Coca Cola Regular Tag...
- 00000A8F  BA 00002905 R		              mov edx, OFFSET dishes
- 00000A94  E8 00000000 E		              call writeString
+ 00000AAB			               cr:                                                ; Coca Cola Regular Tag...
+ 00000AAB  BA 00002905 R		              mov edx, OFFSET dishes
+ 00000AB0  E8 00000000 E		              call writeString
 
- 00000A99  E8 00000000 E					  call readInt                                    ; Taking input for quantity...
+ 00000AB5  E8 00000000 E					  call readInt                                    ; Taking input for quantity...
 
- 00000A9E  8B 1D 00000058 R					  mov ebx, [drPrice + 8]
- 00000AA4  F7 E3						  mul ebx                                         ; Mul quantity with price...
- 00000AA6  03 05 00000070 R					  add eax, bill
- 00000AAC  A3 00000070 R					  mov bill, eax
+ 00000ABA  8B 1D 00000058 R					  mov ebx, [drPrice + 8]
+ 00000AC0  F7 E3						  mul ebx                                         ; Mul quantity with price...
+ 00000AC2  03 05 00000070 R					  add eax, bill
+ 00000AC8  A3 00000070 R					  mov bill, eax
 
- 00000AB1  E9 FFFFFF22				          jmp  op
+ 00000ACD  E9 FFFFFF22				          jmp  op
 
- 00000AB6			               sr:                                                ; Sprite Regular Tag...
- 00000AB6  BA 00002905 R			          mov edx, OFFSET dishes
- 00000ABB  E8 00000000 E		              call writeString
+ 00000AD2			               sr:                                                ; Sprite Regular Tag...
+ 00000AD2  BA 00002905 R			          mov edx, OFFSET dishes
+ 00000AD7  E8 00000000 E		              call writeString
 
- 00000AC0  E8 00000000 E					  call readInt                                    ; Taking input for quantity...
+ 00000ADC  E8 00000000 E					  call readInt                                    ; Taking input for quantity...
 
- 00000AC5  8B 1D 0000005C R					  mov ebx, [drPrice + 12]
- 00000ACB  F7 E3						  mul ebx                                         ; Mul quantity with price...
- 00000ACD  03 05 00000070 R					  add eax, bill
- 00000AD3  A3 00000070 R					  mov bill, eax
+ 00000AE1  8B 1D 0000005C R					  mov ebx, [drPrice + 12]
+ 00000AE7  F7 E3						  mul ebx                                         ; Mul quantity with price...
+ 00000AE9  03 05 00000070 R					  add eax, bill
+ 00000AEF  A3 00000070 R					  mov bill, eax
 
- 00000AD8  E9 FFFFFEFB				          jmp  op
+ 00000AF4  E9 FFFFFEFB				          jmp  op
 
- 00000ADD					       pj:                                                ; Pineapple Juice Tag...
- 00000ADD  BA 00002905 R		              mov edx, OFFSET dishes
- 00000AE2  E8 00000000 E		              call writeString
+ 00000AF9					       pj:                                                ; Pineapple Juice Tag...
+ 00000AF9  BA 00002905 R		              mov edx, OFFSET dishes
+ 00000AFE  E8 00000000 E		              call writeString
 
- 00000AE7  E8 00000000 E					  call readInt                                    ; Taking input for quantity...
+ 00000B03  E8 00000000 E					  call readInt                                    ; Taking input for quantity...
 
- 00000AEC  8B 1D 00000060 R					  mov ebx, [drPrice + 16]
- 00000AF2  F7 E3						  mul ebx                                         ; Mul quantity with price...
- 00000AF4  03 05 00000070 R					  add eax, bill
- 00000AFA  A3 00000070 R					  mov bill, eax
+ 00000B08  8B 1D 00000060 R					  mov ebx, [drPrice + 16]
+ 00000B0E  F7 E3						  mul ebx                                         ; Mul quantity with price...
+ 00000B10  03 05 00000070 R					  add eax, bill
+ 00000B16  A3 00000070 R					  mov bill, eax
 
- 00000AFF  E9 FFFFFED4				          jmp  op
+ 00000B1B  E9 FFFFFED4				          jmp  op
 
- 00000B04						   ma:                                                ; Mint Margarita Tag...
- 00000B04  BA 00002905 R		              mov edx, OFFSET dishes
- 00000B09  E8 00000000 E		              call writeString
+ 00000B20						   ma:                                                ; Mint Margarita Tag...
+ 00000B20  BA 00002905 R		              mov edx, OFFSET dishes
+ 00000B25  E8 00000000 E		              call writeString
 
- 00000B0E  E8 00000000 E					  call readInt                                    ; Taking input for quantity...
+ 00000B2A  E8 00000000 E					  call readInt                                    ; Taking input for quantity...
 
- 00000B13  8B 1D 00000064 R					  mov ebx, [drPrice + 20]
- 00000B19  F7 E3						  mul ebx                                         ; Mul quantity with price...
- 00000B1B  03 05 00000070 R					  add eax, bill
- 00000B21  A3 00000070 R					  mov bill, eax
+ 00000B2F  8B 1D 00000064 R					  mov ebx, [drPrice + 20]
+ 00000B35  F7 E3						  mul ebx                                         ; Mul quantity with price...
+ 00000B37  03 05 00000070 R					  add eax, bill
+ 00000B3D  A3 00000070 R					  mov bill, eax
 
- 00000B26  E9 FFFFFEAD				          jmp  op
+ 00000B42  E9 FFFFFEAD				          jmp  op
 
- 00000B2B						   co:                                                ; Coffee Tag...
- 00000B2B  BA 00002905 R		              mov edx, OFFSET dishes
- 00000B30  E8 00000000 E		              call writeString
+ 00000B47						   co:                                                ; Coffee Tag...
+ 00000B47  BA 00002905 R		              mov edx, OFFSET dishes
+ 00000B4C  E8 00000000 E		              call writeString
 
- 00000B35  E8 00000000 E					  call readInt                                    ; Taking input for quantity...
+ 00000B51  E8 00000000 E					  call readInt                                    ; Taking input for quantity...
 
- 00000B3A  8B 1D 00000068 R					  mov ebx, [drPrice + 24]
- 00000B40  F7 E3						  mul ebx                                         ; Mul quantity with price...
- 00000B42  03 05 00000070 R					  add eax, bill
- 00000B48  A3 00000070 R					  mov bill, eax
+ 00000B56  8B 1D 00000068 R					  mov ebx, [drPrice + 24]
+ 00000B5C  F7 E3						  mul ebx                                         ; Mul quantity with price...
+ 00000B5E  03 05 00000070 R					  add eax, bill
+ 00000B64  A3 00000070 R					  mov bill, eax
 
- 00000B4D  E9 FFFFFE86				          jmp  op
+ 00000B69  E9 FFFFFE86				          jmp  op
 
- 00000B52						   te:                                                ; Tea Tag...
- 00000B52  BA 00002905 R		              mov edx, OFFSET dishes
- 00000B57  E8 00000000 E		              call writeString
+ 00000B6E						   te:                                                ; Tea Tag...
+ 00000B6E  BA 00002905 R		              mov edx, OFFSET dishes
+ 00000B73  E8 00000000 E		              call writeString
 
- 00000B5C  E8 00000000 E					  call readInt                                    ; Taking input for quantity...
+ 00000B78  E8 00000000 E					  call readInt                                    ; Taking input for quantity...
 
- 00000B61  8B 1D 0000006C R					  mov ebx, [drPrice + 28]
- 00000B67  F7 E3						  mul ebx                                         ; Mul quantity with price...
- 00000B69  03 05 00000070 R					  add eax, bill
- 00000B6F  A3 00000070 R					  mov bill, eax
+ 00000B7D  8B 1D 0000006C R					  mov ebx, [drPrice + 28]
+ 00000B83  F7 E3						  mul ebx                                         ; Mul quantity with price...
+ 00000B85  03 05 00000070 R					  add eax, bill
+ 00000B8B  A3 00000070 R					  mov bill, eax
 
- 00000B74  E9 FFFFFE5F				          jmp  op
+ 00000B90  E9 FFFFFE5F				          jmp  op
 
- 00000B79				  _exit:
- 00000B79  9D						POPFD
- 00000B7A  61						POPAD
+ 00000B95				  _exit:
+ 00000B95  9D						POPFD
+ 00000B96  61						POPAD
 
- 00000B7B  C3						RET
- 00000B7C			DrinksMenu ENDP
+ 00000B97  C3						RET
+ 00000B98			DrinksMenu ENDP
 
 				;-------------------------------------------------------------------
 				;| Print a message for customers...                                 |
@@ -2684,103 +2775,103 @@ RestaurantsBillingSystem.asm				     Page 1 - 1
 				;| update: Reset the bill to 0...                                   |
 				;-------------------------------------------------------------------
 
- 00000B7C			resetBill PROC
- 00000B7C  60			           PUSHAD
- 00000B7D  9C					   PUSHFD
+ 00000B98			resetBill PROC
+ 00000B98  60			           PUSHAD
+ 00000B99  9C					   PUSHFD
 
- 00000B7E  E8 00000000 E			   call crlf
+ 00000B9A  E8 00000000 E			   call crlf
 
- 00000B83  BA 000028E1 R			   mov edx, OFFSET reMsg
- 00000B88  E8 00000000 E		       call writeString 
+ 00000B9F  BA 000028E1 R			   mov edx, OFFSET reMsg
+ 00000BA4  E8 00000000 E		       call writeString 
 
- 00000B8D  C7 05 00000070 R			   mov bill, 0                                            ; Making bill 0...
+ 00000BA9  C7 05 00000070 R			   mov bill, 0                                            ; Making bill 0...
 	   00000000
 
- 00000B97  9D					   POPFD
- 00000B98  61					   POPAD
+ 00000BB3  9D					   POPFD
+ 00000BB4  61					   POPAD
 
- 00000B99  C3				       RET
- 00000B9A			resetBill ENDP
+ 00000BB5  C3				       RET
+ 00000BB6			resetBill ENDP
 
 				;-------------------------------------------------------------------
 				;|          |
 				;| Uses: Print the bill for Customers...                            |
 				;-------------------------------------------------------------------
 
- 00000B9A			discount PROC
- 00000B9A  60					  PUSHAD
- 00000B9B  9C					  PUSHFD
+ 00000BB6			discount PROC
+ 00000BB6  60					  PUSHAD
+ 00000BB7  9C					  PUSHFD
 
- 00000B9C  A1 00000070 R			  mov eax, bill
- 00000BA1  3D 000007CF				  cmp eax, 1999
- 00000BA6  7F 02				  jg disc
- 00000BA8  EB 28				  jmp _exit
+ 00000BB8  A1 00000070 R			  mov eax, bill
+ 00000BBD  3D 000007CF				  cmp eax, 1999
+ 00000BC2  7F 02				  jg disc
+ 00000BC4  EB 28				  jmp _exit
 
- 00000BAA					  disc:
- 00000BAA  BB 00000014					   mov ebx, 20
- 00000BAF  F7 E3					   mul ebx
- 00000BB1  BA 00000000					   mov edx, 0
- 00000BB6  B9 00000064					   mov ecx, 100
- 00000BBB  F7 F1					   div ecx
- 00000BBD  A3 00000080 R				   mov mockBill, eax
+ 00000BC6					  disc:
+ 00000BC6  BB 00000014					   mov ebx, 20
+ 00000BCB  F7 E3					   mul ebx
+ 00000BCD  BA 00000000					   mov edx, 0
+ 00000BD2  B9 00000064					   mov ecx, 100
+ 00000BD7  F7 F1					   div ecx
+ 00000BD9  A3 00000080 R				   mov mockBill, eax
 
- 00000BC2  A1 00000070 R				   mov eax, bill
- 00000BC7  2B 05 00000080 R				   sub eax, mockBill
- 00000BCD  A3 00000070 R				   mov bill, eax
+ 00000BDE  A1 00000070 R				   mov eax, bill
+ 00000BE3  2B 05 00000080 R				   sub eax, mockBill
+ 00000BE9  A3 00000070 R				   mov bill, eax
 
- 00000BD2				_exit:
- 00000BD2  9D					  POPFD
- 00000BD3  61					  POPAD
+ 00000BEE				_exit:
+ 00000BEE  9D					  POPFD
+ 00000BEF  61					  POPAD
 
- 00000BD4  C3				      RET
- 00000BD5			discount ENDP
+ 00000BF0  C3				      RET
+ 00000BF1			discount ENDP
 
 				;-------------------------------------------------------------------
 				;| Uses: Print the bill for Customers...                            |
 				;-------------------------------------------------------------------
 
- 00000BD5			printBill PROC
- 00000BD5  60			           PUSHAD
- 00000BD6  9C					   PUSHFD
+ 00000BF1			printBill PROC
+ 00000BF1  60			           PUSHAD
+ 00000BF2  9C					   PUSHFD
 
- 00000BD7  E8 00000000 E			   call crlf
+ 00000BF3  E8 00000000 E			   call crlf
 
- 00000BDC  BA 00002972 R			   mov edx, OFFSET billMsg
- 00000BE1  E8 00000000 E		       call writeString 
+ 00000BF8  BA 00002972 R			   mov edx, OFFSET billMsg
+ 00000BFD  E8 00000000 E		       call writeString 
 
- 00000BE6  A1 00000070 R			   mov eax, bill
- 00000BEB  E8 00000000 E			   call writeInt                                         ; Print the original bill...
+ 00000C02  A1 00000070 R			   mov eax, bill
+ 00000C07  E8 00000000 E			   call writeInt                                         ; Print the original bill...
 
- 00000BF0  E8 FFFFFFA5				   call discount
+ 00000C0C  E8 FFFFFFA5				   call discount
 
- 00000BF5  E8 00000000 E			   call crlf
+ 00000C11  E8 00000000 E			   call crlf
 
- 00000BFA  BA 00002989 R			   mov edx, offset totalDis
- 00000BFF  E8 00000000 E			   call writeString
+ 00000C16  BA 00002989 R			   mov edx, offset totalDis
+ 00000C1B  E8 00000000 E			   call writeString
 
- 00000C04  A1 00000080 R			   mov eax, mockbill
- 00000C09  E8 00000000 E			   call writeInt                                           ; Print Total Discount...
+ 00000C20  A1 00000080 R			   mov eax, mockbill
+ 00000C25  E8 00000000 E			   call writeInt                                           ; Print Total Discount...
 
- 00000C0E  E8 00000000 E			   call crlf
+ 00000C2A  E8 00000000 E			   call crlf
 
- 00000C13  BA 000029BA R			   mov edx, offset paybill
- 00000C18  E8 00000000 E			   call writeString
+ 00000C2F  BA 000029BA R			   mov edx, offset paybill
+ 00000C34  E8 00000000 E			   call writeString
 
- 00000C1D  A1 00000070 R			   mov eax, bill
- 00000C22  E8 00000000 E			   call writeInt										   ; Printing Payable Bill...
+ 00000C39  A1 00000070 R			   mov eax, bill
+ 00000C3E  E8 00000000 E			   call writeInt										   ; Printing Payable Bill...
 
- 00000C27  E8 00000000 E			   call crlf
- 00000C2C  E8 00000000 E			   call crlf
+ 00000C43  E8 00000000 E			   call crlf
+ 00000C48  E8 00000000 E			   call crlf
 
- 00000C31  BA 000029D9 R			   mov edx, OFFSET exitMsg                                 ; Printing Exit Note/Msg...
- 00000C36  E8 00000000 E		       call writeString
+ 00000C4D  BA 000029D9 R			   mov edx, OFFSET exitMsg                                 ; Printing Exit Note/Msg...
+ 00000C52  E8 00000000 E		       call writeString
 
- 00000C3B  9D					   POPFD
- 00000C3C  61					   POPAD
+ 00000C57  9D					   POPFD
+ 00000C58  61					   POPAD
 
 
- 00000C3D  C3				       RET
- 00000C3E			printBill ENDP
+ 00000C59  C3				       RET
+ 00000C5A			printBill ENDP
 
 				;-------------------------------------------------------------------
 				;| Shows an Error Box to customers...                               |
@@ -2788,731 +2879,731 @@ RestaurantsBillingSystem.asm				     Page 1 - 1
 				;| Advan: It also works as a pause...                               |
 				;-------------------------------------------------------------------
 
- 00000C3E			error PROC
- 00000C3E  60			       PUSHAD
- 00000C3F  9C				   PUSHFD
+ 00000C5A			error PROC
+ 00000C5A  60			       PUSHAD
+ 00000C5B  9C				   PUSHFD
 
- 00000C40  E8 00000000 E		   call crlf
+ 00000C5C  E8 00000000 E		   call crlf
 
- 00000C45  BB 00002940 R	       mov ebx, OFFSET caption
- 00000C4A  BA 00002948 R		   mov edx, OFFSET errMsg
- 00000C4F  E8 00000000 E		   call msgBox
+ 00000C61  BB 00002940 R	       mov ebx, OFFSET caption
+ 00000C66  BA 00002948 R		   mov edx, OFFSET errMsg
+ 00000C6B  E8 00000000 E		   call msgBox
 
- 00000C54  9D				   POPFD
- 00000C55  61				   POPAD
+ 00000C70  9D				   POPFD
+ 00000C71  61				   POPAD
 
- 00000C56  C3				   RET
- 00000C57			error ENDP
+ 00000C72  C3				   RET
+ 00000C73			error ENDP
 
 				;-------------------------------------------------------------------
 				;| Print Deal Oriental Menu with Prices for customers to order...   |
 				;| Updates: Bill ...                                                |
 				;-------------------------------------------------------------------
 
- 00000C57			dealOrientalMenu PROC , noOfDishes:DWORD
- 00000C57  55		   *	    push   ebp
- 00000C58  8B EC	   *	    mov    ebp, esp
- 00000C5A  60						  PUSHAD
- 00000C5B  9C						  PUSHFD
+ 00000C73			dealOrientalMenu PROC , noOfDishes:DWORD
+ 00000C73  55		   *	    push   ebp
+ 00000C74  8B EC	   *	    mov    ebp, esp
+ 00000C76  60						  PUSHAD
+ 00000C77  9C						  PUSHFD
 
- 00000C5C  A1 00000070 R				  mov eax, bill		
- 00000C61  A3 00000080 R				  mov mockBill, eax								      ; Stores the copy of bill
+ 00000C78  A1 00000070 R				  mov eax, bill		
+ 00000C7D  A3 00000080 R				  mov mockBill, eax								      ; Stores the copy of bill
 
- 00000C66  8B 4D 08					  mov ecx, noOfDishes
+ 00000C82  8B 4D 08					  mov ecx, noOfDishes
 
- 00000C69						  op:                                                 ; Option Tag...				 
- 00000C69  E8 00000000 E					 call crlf
+ 00000C85						  op:                                                 ; Option Tag...				 
+ 00000C85  E8 00000000 E					 call crlf
 
- 00000C6E  BA 00002113 R			         mov edx, OFFSET oriental
- 00000C73  E8 00000000 E		             call writeString
+ 00000C8A  BA 00002113 R			         mov edx, OFFSET oriental
+ 00000C8F  E8 00000000 E		             call writeString
 
- 00000C78  E8 00000000 E			         call crlf
- 00000C7D  E8 00000000 E			         call readInt
+ 00000C94  E8 00000000 E			         call crlf
+ 00000C99  E8 00000000 E			         call readInt
 
- 00000C82  83 F8 01			             cmp eax, 1
- 00000C85  74 51				         je  cq
- 00000C87  83 F8 02				         cmp eax, 2
- 00000C8A  74 76				         je  pu
- 00000C8C  83 F8 03				         cmp eax, 3
- 00000C8F  0F 84 00000097			         je  cb
- 00000C95  83 F8 04				         cmp eax, 4
- 00000C98  0F 84 000000BB			         je  ck 
- 00000C9E  83 F8 05				         cmp eax, 5
- 00000CA1  0F 84 000000DF			         je  ct 
- 00000CA7  83 F8 06						 cmp eax, 6
- 00000CAA  0F 84 00000103					 je  mh
- 00000CB0  83 F8 07						 cmp eax, 7
- 00000CB3  0F 84 00000127					 je  na
- 00000CB9  83 F8 08						 cmp eax, 8
- 00000CBC  0F 84 0000014B					 je  rt
- 00000CC2  83 F8 09						 cmp eax, 9
- 00000CC5  0F 84 0000016F					 je  cancelDeal
+ 00000C9E  83 F8 01			             cmp eax, 1
+ 00000CA1  74 51				         je  cq
+ 00000CA3  83 F8 02				         cmp eax, 2
+ 00000CA6  74 76				         je  pu
+ 00000CA8  83 F8 03				         cmp eax, 3
+ 00000CAB  0F 84 00000097			         je  cb
+ 00000CB1  83 F8 04				         cmp eax, 4
+ 00000CB4  0F 84 000000BB			         je  ck 
+ 00000CBA  83 F8 05				         cmp eax, 5
+ 00000CBD  0F 84 000000DF			         je  ct 
+ 00000CC3  83 F8 06						 cmp eax, 6
+ 00000CC6  0F 84 00000103					 je  mh
+ 00000CCC  83 F8 07						 cmp eax, 7
+ 00000CCF  0F 84 00000127					 je  na
+ 00000CD5  83 F8 08						 cmp eax, 8
+ 00000CD8  0F 84 0000014B					 je  rt
+ 00000CDE  83 F8 09						 cmp eax, 9
+ 00000CE1  0F 84 0000016F					 je  cancelDeal
 
- 00000CCB  E8 FFFFFF6E				         call error                                       ; Calling error Proc...
- 00000CD0  41							 inc ecx										  ; increments ecx after 1 iteration is lost in error
- 00000CD1					         again:
- 00000CD1  E2 96							LOOP op
+ 00000CE7  E8 FFFFFF6E				         call error                                       ; Calling error Proc...
+ 00000CEC  41							 inc ecx										  ; increments ecx after 1 iteration is lost in error
+ 00000CED					         again:
+ 00000CED  E2 96							LOOP op
 
- 00000CD3  E9 0000017D						 jmp _exit
+ 00000CEF  E9 0000017D						 jmp _exit
 
- 00000CD8					         cq:                                              ; Chicken Quorma Tag...
- 00000CD8  BA 00002905 R			            mov edx, OFFSET dishes
- 00000CDD  E8 00000000 E		                call writeString
+ 00000CF4					         cq:                                              ; Chicken Quorma Tag...
+ 00000CF4  BA 00002905 R			            mov edx, OFFSET dishes
+ 00000CF9  E8 00000000 E		                call writeString
 
- 00000CE2  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
-
-									invoke setEcx3, eax
- 00000CE7  50		   *	    push   eax
- 00000CE8  E8 000005B9	   *	    call   setEcx3
-
- 00000CED  8B 1D 00000000 R	  				    mov ebx, [oPrice]
- 00000CF3  F7 E3						    mul ebx                                       ; Mul quantity with price...
- 00000CF5  03 05 00000070 R					    add eax, bill
- 00000CFB  A3 00000070 R					    mov bill, eax
-
- 00000D00  EB CF				            jmp  again
-
- 00000D02			                 pu:                                              ; Pullao Tag...
- 00000D02  BA 00002905 R		                mov edx, OFFSET dishes
- 00000D07  E8 00000000 E		                call writeString
-
- 00000D0C  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
+ 00000CFE  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
 
 									invoke setEcx3, eax
- 00000D11  50		   *	    push   eax
- 00000D12  E8 0000058F	   *	    call   setEcx3
+ 00000D03  50		   *	    push   eax
+ 00000D04  E8 000005B9	   *	    call   setEcx3
 
- 00000D17  8B 1D 00000004 R					    mov ebx, [oPrice + 4]
- 00000D1D  F7 E3						    mul ebx                                       ; Mul quantity with price...
- 00000D1F  03 05 00000070 R					    add eax, bill
- 00000D25  A3 00000070 R					    mov bill, eax
+ 00000D09  8B 1D 00000000 R	  				    mov ebx, [oPrice]
+ 00000D0F  F7 E3						    mul ebx                                       ; Mul quantity with price...
+ 00000D11  03 05 00000070 R					    add eax, bill
+ 00000D17  A3 00000070 R					    mov bill, eax
 
- 00000D2A  EB A5				            jmp  again
+ 00000D1C  EB CF				            jmp  again
 
- 00000D2C			                 cb:                                              ; Chicken Briyani Tag...
- 00000D2C  BA 00002905 R		                mov edx, OFFSET dishes
- 00000D31  E8 00000000 E		                call writeString
+ 00000D1E			                 pu:                                              ; Pullao Tag...
+ 00000D1E  BA 00002905 R		                mov edx, OFFSET dishes
+ 00000D23  E8 00000000 E		                call writeString
 
- 00000D36  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
-
-									invoke setEcx3, eax
- 00000D3B  50		   *	    push   eax
- 00000D3C  E8 00000565	   *	    call   setEcx3
-
- 00000D41  8B 1D 00000008 R					    mov ebx, [oPrice + 8]
- 00000D47  F7 E3						    mul ebx                                       ; Mul quantity with price...
- 00000D49  03 05 00000070 R					    add eax, bill
- 00000D4F  A3 00000070 R					    mov bill, eax
-
- 00000D54  E9 FFFFFF78				            jmp  again
-
- 00000D59			                 ck:                                              ; Chicken Karahi Tag...
- 00000D59  BA 00002905 R			            mov edx, OFFSET dishes
- 00000D5E  E8 00000000 E		                call writeString
-
- 00000D63  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
+ 00000D28  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
 
 									invoke setEcx3, eax
- 00000D68  50		   *	    push   eax
- 00000D69  E8 00000538	   *	    call   setEcx3
+ 00000D2D  50		   *	    push   eax
+ 00000D2E  E8 0000058F	   *	    call   setEcx3
 
- 00000D6E  8B 1D 0000000C R					    mov ebx, [oPrice + 12]
- 00000D74  F7 E3						    mul ebx                                       ; Mul quantity with price...
- 00000D76  03 05 00000070 R					    add eax, bill
- 00000D7C  A3 00000070 R					    mov bill, eax
+ 00000D33  8B 1D 00000004 R					    mov ebx, [oPrice + 4]
+ 00000D39  F7 E3						    mul ebx                                       ; Mul quantity with price...
+ 00000D3B  03 05 00000070 R					    add eax, bill
+ 00000D41  A3 00000070 R					    mov bill, eax
 
- 00000D81  E9 FFFFFF4B				            jmp  again
+ 00000D46  EB A5				            jmp  again
 
- 00000D86					         ct:                                              ; Chicken Tikka Tag...
- 00000D86  BA 00002905 R		                mov edx, OFFSET dishes
- 00000D8B  E8 00000000 E		                call writeString
+ 00000D48			                 cb:                                              ; Chicken Briyani Tag...
+ 00000D48  BA 00002905 R		                mov edx, OFFSET dishes
+ 00000D4D  E8 00000000 E		                call writeString
 
- 00000D90  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
-
-									invoke setEcx3, eax
- 00000D95  50		   *	    push   eax
- 00000D96  E8 0000050B	   *	    call   setEcx3
-
- 00000D9B  8B 1D 00000010 R					    mov ebx, [oPrice + 16]
- 00000DA1  F7 E3						    mul ebx                                       ; Mul quantity with price...
- 00000DA3  03 05 00000070 R					    add eax, bill
- 00000DA9  A3 00000070 R					    mov bill, eax
-
- 00000DAE  E9 FFFFFF1E				            jmp  again
-
- 00000DB3						     mh:                                              ; Murgh Haleem Tag...
- 00000DB3  BA 00002905 R		                mov edx, OFFSET dishes
- 00000DB8  E8 00000000 E		                call writeString
-
- 00000DBD  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
+ 00000D52  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
 
 									invoke setEcx3, eax
- 00000DC2  50		   *	    push   eax
- 00000DC3  E8 000004DE	   *	    call   setEcx3
+ 00000D57  50		   *	    push   eax
+ 00000D58  E8 00000565	   *	    call   setEcx3
 
- 00000DC8  8B 1D 00000014 R					    mov ebx, [oPrice + 20]
- 00000DCE  F7 E3						    mul ebx                                       ; Mul quantity with price...
- 00000DD0  03 05 00000070 R					    add eax, bill
- 00000DD6  A3 00000070 R					    mov bill, eax
+ 00000D5D  8B 1D 00000008 R					    mov ebx, [oPrice + 8]
+ 00000D63  F7 E3						    mul ebx                                       ; Mul quantity with price...
+ 00000D65  03 05 00000070 R					    add eax, bill
+ 00000D6B  A3 00000070 R					    mov bill, eax
 
- 00000DDB  E9 FFFFFEF1				            jmp  again
+ 00000D70  E9 FFFFFF78				            jmp  again
 
- 00000DE0						     na:                                              ; Naan Tag...
- 00000DE0  BA 00002905 R		                mov edx, OFFSET dishes
- 00000DE5  E8 00000000 E		                call writeString
+ 00000D75			                 ck:                                              ; Chicken Karahi Tag...
+ 00000D75  BA 00002905 R			            mov edx, OFFSET dishes
+ 00000D7A  E8 00000000 E		                call writeString
 
- 00000DEA  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
-
-									invoke setEcx3, eax
- 00000DEF  50		   *	    push   eax
- 00000DF0  E8 000004B1	   *	    call   setEcx3
-
- 00000DF5  8B 1D 00000018 R					    mov ebx, [oPrice + 24]
- 00000DFB  F7 E3						    mul ebx                                       ; Mul quantity with price...
- 00000DFD  03 05 00000070 R					    add eax, bill
- 00000E03  A3 00000070 R					    mov bill, eax
-
- 00000E08  E9 FFFFFEC4				            jmp  again
-
- 00000E0D						     rt:                                              ; Roti Tag...
- 00000E0D  BA 00002905 R		                mov edx, OFFSET dishes
- 00000E12  E8 00000000 E		                call writeString
-
- 00000E17  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
+ 00000D7F  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
 
 									invoke setEcx3, eax
- 00000E1C  50		   *	    push   eax
- 00000E1D  E8 00000484	   *	    call   setEcx3
+ 00000D84  50		   *	    push   eax
+ 00000D85  E8 00000538	   *	    call   setEcx3
 
- 00000E22  8B 1D 0000001C R					    mov ebx, [oPrice + 28]
- 00000E28  F7 E3						    mul ebx                                       ; Mul quantity with price...
- 00000E2A  03 05 00000070 R					    add eax, bill
- 00000E30  A3 00000070 R					    mov bill, eax
+ 00000D8A  8B 1D 0000000C R					    mov ebx, [oPrice + 12]
+ 00000D90  F7 E3						    mul ebx                                       ; Mul quantity with price...
+ 00000D92  03 05 00000070 R					    add eax, bill
+ 00000D98  A3 00000070 R					    mov bill, eax
 
- 00000E35  E9 FFFFFE97				            jmp  again
+ 00000D9D  E9 FFFFFF4B				            jmp  again
 
- 00000E3A					 cancelDeal:
- 00000E3A  A1 00000080 R					 mov eax, mockBill				     	          ; Canceled the order and restored the bill
- 00000E3F  A3 00000070 R					 mov bill, eax
- 00000E44  BA 00002AA5 R					 mov edx, offset dealCancel
- 00000E49  E8 00000000 E					 call writeString
- 00000E4E  E8 00000000 E					 call crlf
- 00000E53  EB 54						 jmp finalExit
+ 00000DA2					         ct:                                              ; Chicken Tikka Tag...
+ 00000DA2  BA 00002905 R		                mov edx, OFFSET dishes
+ 00000DA7  E8 00000000 E		                call writeString
 
- 00000E55				    _exit:
+ 00000DAC  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
 
- 00000E55  E8 00000000 E					 call crlf										  ; Printing message to add a deal item in the order
- 00000E5A  BA 0000291C R					 mov edx, offset dealItem
- 00000E5F  E8 00000000 E					 call writeString
- 00000E64  E8 00000000 E					 call crlf
+									invoke setEcx3, eax
+ 00000DB1  50		   *	    push   eax
+ 00000DB2  E8 0000050B	   *	    call   setEcx3
 
- 00000E69  BA 0000250D R					 mov edx, offset dessert						  ; Printing the free desert item menu
- 00000E6E  E8 00000000 E					 call writeString
- 00000E73  E8 00000000 E					 call crlf
- 00000E78  E8 00000000 E					 call readInt
+ 00000DB7  8B 1D 00000010 R					    mov ebx, [oPrice + 16]
+ 00000DBD  F7 E3						    mul ebx                                       ; Mul quantity with price...
+ 00000DBF  03 05 00000070 R					    add eax, bill
+ 00000DC5  A3 00000070 R					    mov bill, eax
+
+ 00000DCA  E9 FFFFFF1E				            jmp  again
+
+ 00000DCF						     mh:                                              ; Murgh Haleem Tag...
+ 00000DCF  BA 00002905 R		                mov edx, OFFSET dishes
+ 00000DD4  E8 00000000 E		                call writeString
+
+ 00000DD9  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
+
+									invoke setEcx3, eax
+ 00000DDE  50		   *	    push   eax
+ 00000DDF  E8 000004DE	   *	    call   setEcx3
+
+ 00000DE4  8B 1D 00000014 R					    mov ebx, [oPrice + 20]
+ 00000DEA  F7 E3						    mul ebx                                       ; Mul quantity with price...
+ 00000DEC  03 05 00000070 R					    add eax, bill
+ 00000DF2  A3 00000070 R					    mov bill, eax
+
+ 00000DF7  E9 FFFFFEF1				            jmp  again
+
+ 00000DFC						     na:                                              ; Naan Tag...
+ 00000DFC  BA 00002905 R		                mov edx, OFFSET dishes
+ 00000E01  E8 00000000 E		                call writeString
+
+ 00000E06  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
+
+									invoke setEcx3, eax
+ 00000E0B  50		   *	    push   eax
+ 00000E0C  E8 000004B1	   *	    call   setEcx3
+
+ 00000E11  8B 1D 00000018 R					    mov ebx, [oPrice + 24]
+ 00000E17  F7 E3						    mul ebx                                       ; Mul quantity with price...
+ 00000E19  03 05 00000070 R					    add eax, bill
+ 00000E1F  A3 00000070 R					    mov bill, eax
+
+ 00000E24  E9 FFFFFEC4				            jmp  again
+
+ 00000E29						     rt:                                              ; Roti Tag...
+ 00000E29  BA 00002905 R		                mov edx, OFFSET dishes
+ 00000E2E  E8 00000000 E		                call writeString
+
+ 00000E33  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
+
+									invoke setEcx3, eax
+ 00000E38  50		   *	    push   eax
+ 00000E39  E8 00000484	   *	    call   setEcx3
+
+ 00000E3E  8B 1D 0000001C R					    mov ebx, [oPrice + 28]
+ 00000E44  F7 E3						    mul ebx                                       ; Mul quantity with price...
+ 00000E46  03 05 00000070 R					    add eax, bill
+ 00000E4C  A3 00000070 R					    mov bill, eax
+
+ 00000E51  E9 FFFFFE97				            jmp  again
+
+ 00000E56					 cancelDeal:
+ 00000E56  A1 00000080 R					 mov eax, mockBill				     	          ; Canceled the order and restored the bill
+ 00000E5B  A3 00000070 R					 mov bill, eax
+ 00000E60  BA 00002AA5 R					 mov edx, offset dealCancel
+ 00000E65  E8 00000000 E					 call writeString
+ 00000E6A  E8 00000000 E					 call crlf
+ 00000E6F  EB 54						 jmp finalExit
+
+ 00000E71				    _exit:
+
+ 00000E71  E8 00000000 E					 call crlf										  ; Printing message to add a deal item in the order
+ 00000E76  BA 0000291C R					 mov edx, offset dealItem
+ 00000E7B  E8 00000000 E					 call writeString
+ 00000E80  E8 00000000 E					 call crlf
+
+ 00000E85  BA 0000250D R					 mov edx, offset dessert						  ; Printing the free desert item menu
+ 00000E8A  E8 00000000 E					 call writeString
+ 00000E8F  E8 00000000 E					 call crlf
+ 00000E94  E8 00000000 E					 call readInt
 								 
- 00000E7D  83 F8 05						 cmp eax,5										  ; Error handling for free item
- 00000E80  74 B8						 je cancelDeal
- 00000E82  83 F8 05						 cmp eax,5
- 00000E85  7F 1B						 jg selectCorrect
- 00000E87  83 F8 00						 cmp eax,0
- 00000E8A  7E 16						 jle selectCorrect
+ 00000E99  83 F8 05						 cmp eax,5										  ; Error handling for free item
+ 00000E9C  74 B8						 je cancelDeal
+ 00000E9E  83 F8 05						 cmp eax,5
+ 00000EA1  7F 1B						 jg selectCorrect
+ 00000EA3  83 F8 00						 cmp eax,0
+ 00000EA6  7E 16						 jle selectCorrect
 								 
- 00000E8C  E8 00000000 E					 call crlf									      ; Printing success message
- 00000E91  BA 00002A3A R					 mov edx, offset dealAdded
- 00000E96  E8 00000000 E					 call writeString
- 00000E9B  E8 00000000 E					 call crlf
- 00000EA0  EB 07						 jmp finalExit
+ 00000EA8  E8 00000000 E					 call crlf									      ; Printing success message
+ 00000EAD  BA 00002A3A R					 mov edx, offset dealAdded
+ 00000EB2  E8 00000000 E					 call writeString
+ 00000EB7  E8 00000000 E					 call crlf
+ 00000EBC  EB 07						 jmp finalExit
 
- 00000EA2						selectCorrect:
- 00000EA2  E8 FFFFFD97						 call error
- 00000EA7  EB AC						 jmp _exit
+ 00000EBE						selectCorrect:
+ 00000EBE  E8 FFFFFD97						 call error
+ 00000EC3  EB AC						 jmp _exit
 
- 00000EA9					finalExit:
+ 00000EC5					finalExit:
 
- 00000EA9  9D						  POPFD
- 00000EAA  61						  POPAD
+ 00000EC5  9D						  POPFD
+ 00000EC6  61						  POPAD
 
 							  RET
- 00000EAB  C9		   *	    leave  
- 00000EAC  C2 0004	   *	    ret    00004h
- 00000EAF			dealOrientalMenu ENDP
+ 00000EC7  C9		   *	    leave  
+ 00000EC8  C2 0004	   *	    ret    00004h
+ 00000ECB			dealOrientalMenu ENDP
 
 				;-------------------------------------------------------------------
 				;| Print deal Chinese Menu with Prices for customers to order...    |
 				;| Updates: Bill ...                                                |
 				;-------------------------------------------------------------------
 
- 00000EAF			dealChineseMenu PROC, noOfDishes:DWORD
- 00000EAF  55		   *	    push   ebp
- 00000EB0  8B EC	   *	    mov    ebp, esp
- 00000EB2  60						 PUSHAD
- 00000EB3  9C						 PUSHFD
+ 00000ECB			dealChineseMenu PROC, noOfDishes:DWORD
+ 00000ECB  55		   *	    push   ebp
+ 00000ECC  8B EC	   *	    mov    ebp, esp
+ 00000ECE  60						 PUSHAD
+ 00000ECF  9C						 PUSHFD
 
- 00000EB4  A1 00000070 R				 mov eax, bill		
- 00000EB9  A3 00000080 R				 mov mockBill, eax								      ; Stores the copy of bill
+ 00000ED0  A1 00000070 R				 mov eax, bill		
+ 00000ED5  A3 00000080 R				 mov mockBill, eax								      ; Stores the copy of bill
 
- 00000EBE  8B 4D 08					 mov ecx, noOfDishes
+ 00000EDA  8B 4D 08					 mov ecx, noOfDishes
 							 
- 00000EC1						 op:                                                  ; Option Tag...
- 00000EC1  E8 00000000 E				    call crlf
+ 00000EDD						 op:                                                  ; Option Tag...
+ 00000EDD  E8 00000000 E				    call crlf
 
- 00000EC6  BA 000022D2 R			        mov edx, OFFSET chinese
- 00000ECB  E8 00000000 E		            call writeString
+ 00000EE2  BA 000022D2 R			        mov edx, OFFSET chinese
+ 00000EE7  E8 00000000 E		            call writeString
 
- 00000ED0  E8 00000000 E			        call crlf
- 00000ED5  E8 00000000 E			        call readInt
-
-
- 00000EDA  83 F8 01			            cmp eax, 1
- 00000EDD  74 29				        je  cm
- 00000EDF  83 F8 02				        cmp eax, 2
- 00000EE2  74 4E				        je  fr
- 00000EE4  83 F8 03				        cmp eax, 3
- 00000EE7  74 73				        je  mn
- 00000EE9  83 F8 04				        cmp eax, 4
- 00000EEC  0F 84 00000097			        je  sh 
- 00000EF2  83 F8 05				        cmp eax, 5
- 00000EF5  0F 84 000000BB					je  cancelDeal
+ 00000EEC  E8 00000000 E			        call crlf
+ 00000EF1  E8 00000000 E			        call readInt
 
 
- 00000EFB  E8 FFFFFD3E				        call error                                        ; calling error Proc...
- 00000F00  41							inc ecx											  ; increments ecx after 1 iteration is lost in error
+ 00000EF6  83 F8 01			            cmp eax, 1
+ 00000EF9  74 29				        je  cm
+ 00000EFB  83 F8 02				        cmp eax, 2
+ 00000EFE  74 4E				        je  fr
+ 00000F00  83 F8 03				        cmp eax, 3
+ 00000F03  74 73				        je  mn
+ 00000F05  83 F8 04				        cmp eax, 4
+ 00000F08  0F 84 00000097			        je  sh 
+ 00000F0E  83 F8 05				        cmp eax, 5
+ 00000F11  0F 84 000000BB					je  cancelDeal
 
- 00000F01							again:
- 00000F01  E2 BE							LOOP  op
- 00000F03  E9 000000C9						jmp _exit
 
- 00000F08					        cm:                                               ; Chicken Manchurian Tag...
- 00000F08  BA 00002905 R			           mov edx, OFFSET dishes
- 00000F0D  E8 00000000 E		               call writeString
+ 00000F17  E8 FFFFFD3E				        call error                                        ; calling error Proc...
+ 00000F1C  41							inc ecx											  ; increments ecx after 1 iteration is lost in error
 
- 00000F12  E8 00000000 E					   call readInt                                   ; Taking input for quantity...
+ 00000F1D							again:
+ 00000F1D  E2 BE							LOOP  op
+ 00000F1F  E9 000000C9						jmp _exit
 
-								   invoke setEcx2, eax
- 00000F17  50		   *	    push   eax
- 00000F18  E8 00000371	   *	    call   setEcx2
+ 00000F24					        cm:                                               ; Chicken Manchurian Tag...
+ 00000F24  BA 00002905 R			           mov edx, OFFSET dishes
+ 00000F29  E8 00000000 E		               call writeString
 
- 00000F1D  8B 1D 00000020 R					   mov ebx, [cPrice]
- 00000F23  F7 E3						   mul ebx                                        ; Mul quantity with price...
- 00000F25  03 05 00000070 R					   add eax, bill
- 00000F2B  A3 00000070 R					   mov bill, eax
-
- 00000F30  EB CF				           jmp  again
-
- 00000F32			                fr:                                               ; Egg Fried Rice Tag...
- 00000F32  BA 00002905 R		               mov edx, OFFSET dishes
- 00000F37  E8 00000000 E		               call writeString
-
- 00000F3C  E8 00000000 E					   call readInt                                   ; Taking input for quantity...
+ 00000F2E  E8 00000000 E					   call readInt                                   ; Taking input for quantity...
 
 								   invoke setEcx2, eax
- 00000F41  50		   *	    push   eax
- 00000F42  E8 00000347	   *	    call   setEcx2
+ 00000F33  50		   *	    push   eax
+ 00000F34  E8 00000371	   *	    call   setEcx2
 
- 00000F47  8B 1D 00000024 R					   mov ebx, [cPrice + 4]
- 00000F4D  F7 E3						   mul ebx                                        ; Mul quantity with price...
- 00000F4F  03 05 00000070 R					   add eax, bill
- 00000F55  A3 00000070 R					   mov bill, eax
+ 00000F39  8B 1D 00000020 R					   mov ebx, [cPrice]
+ 00000F3F  F7 E3						   mul ebx                                        ; Mul quantity with price...
+ 00000F41  03 05 00000070 R					   add eax, bill
+ 00000F47  A3 00000070 R					   mov bill, eax
 
- 00000F5A  EB A5				           jmp  again
+ 00000F4C  EB CF				           jmp  again
 
- 00000F5C			                mn:                                               ; Chicken Macaroni Tag...
- 00000F5C  BA 00002905 R		               mov edx, OFFSET dishes
- 00000F61  E8 00000000 E		               call writeString
+ 00000F4E			                fr:                                               ; Egg Fried Rice Tag...
+ 00000F4E  BA 00002905 R		               mov edx, OFFSET dishes
+ 00000F53  E8 00000000 E		               call writeString
 
- 00000F66  E8 00000000 E					   call readInt                                   ; Taking input for quantity...
-
-								   invoke setEcx2, eax
- 00000F6B  50		   *	    push   eax
- 00000F6C  E8 0000031D	   *	    call   setEcx2
-
- 00000F71  8B 1D 00000028 R					   mov ebx, [cPrice + 8]
- 00000F77  F7 E3						   mul ebx                                        ; Mul quantity with price...
- 00000F79  03 05 00000070 R					   add eax, bill
- 00000F7F  A3 00000070 R					   mov bill, eax
-
- 00000F84  E9 FFFFFF78				           jmp  again
-
- 00000F89			                sh:                                               ; Chicken Shashlik Tag...
- 00000F89  BA 00002905 R			           mov edx, OFFSET dishes
- 00000F8E  E8 00000000 E		               call writeString
-
- 00000F93  E8 00000000 E					   call readInt                                   ; Taking input for quantity...
+ 00000F58  E8 00000000 E					   call readInt                                   ; Taking input for quantity...
 
 								   invoke setEcx2, eax
- 00000F98  50		   *	    push   eax
- 00000F99  E8 000002F0	   *	    call   setEcx2
+ 00000F5D  50		   *	    push   eax
+ 00000F5E  E8 00000347	   *	    call   setEcx2
+
+ 00000F63  8B 1D 00000024 R					   mov ebx, [cPrice + 4]
+ 00000F69  F7 E3						   mul ebx                                        ; Mul quantity with price...
+ 00000F6B  03 05 00000070 R					   add eax, bill
+ 00000F71  A3 00000070 R					   mov bill, eax
+
+ 00000F76  EB A5				           jmp  again
+
+ 00000F78			                mn:                                               ; Chicken Macaroni Tag...
+ 00000F78  BA 00002905 R		               mov edx, OFFSET dishes
+ 00000F7D  E8 00000000 E		               call writeString
+
+ 00000F82  E8 00000000 E					   call readInt                                   ; Taking input for quantity...
+
+								   invoke setEcx2, eax
+ 00000F87  50		   *	    push   eax
+ 00000F88  E8 0000031D	   *	    call   setEcx2
+
+ 00000F8D  8B 1D 00000028 R					   mov ebx, [cPrice + 8]
+ 00000F93  F7 E3						   mul ebx                                        ; Mul quantity with price...
+ 00000F95  03 05 00000070 R					   add eax, bill
+ 00000F9B  A3 00000070 R					   mov bill, eax
+
+ 00000FA0  E9 FFFFFF78				           jmp  again
+
+ 00000FA5			                sh:                                               ; Chicken Shashlik Tag...
+ 00000FA5  BA 00002905 R			           mov edx, OFFSET dishes
+ 00000FAA  E8 00000000 E		               call writeString
+
+ 00000FAF  E8 00000000 E					   call readInt                                   ; Taking input for quantity...
+
+								   invoke setEcx2, eax
+ 00000FB4  50		   *	    push   eax
+ 00000FB5  E8 000002F0	   *	    call   setEcx2
 								   
- 00000F9E  8B 1D 0000002C R					   mov ebx, [cPrice + 12]
- 00000FA4  F7 E3						   mul ebx                                        ; Mul quantity with price...
- 00000FA6  03 05 00000070 R					   add eax, bill
- 00000FAC  A3 00000070 R					   mov bill, eax
+ 00000FBA  8B 1D 0000002C R					   mov ebx, [cPrice + 12]
+ 00000FC0  F7 E3						   mul ebx                                        ; Mul quantity with price...
+ 00000FC2  03 05 00000070 R					   add eax, bill
+ 00000FC8  A3 00000070 R					   mov bill, eax
 
- 00000FB1  E9 FFFFFF4B				           jmp  again
+ 00000FCD  E9 FFFFFF4B				           jmp  again
 					  
- 00000FB6				  cancelDeal:
- 00000FB6  A1 00000080 R					 mov eax, mockBill  						      ; Canceled the order and restored the bill
- 00000FBB  A3 00000070 R					 mov bill, eax
- 00000FC0  BA 00002AA5 R					 mov edx, offset dealCancel
- 00000FC5  E8 00000000 E					 call writeString
- 00000FCA  E8 00000000 E					 call crlf
- 00000FCF  EB 54						 jmp finalExit
+ 00000FD2				  cancelDeal:
+ 00000FD2  A1 00000080 R					 mov eax, mockBill  						      ; Canceled the order and restored the bill
+ 00000FD7  A3 00000070 R					 mov bill, eax
+ 00000FDC  BA 00002AA5 R					 mov edx, offset dealCancel
+ 00000FE1  E8 00000000 E					 call writeString
+ 00000FE6  E8 00000000 E					 call crlf
+ 00000FEB  EB 54						 jmp finalExit
 					  
- 00000FD1				  _exit:
- 00000FD1  E8 00000000 E					call crlf										  ; Printing message to add a deal item in the order
- 00000FD6  BA 0000291C R					mov edx, offset dealItem
- 00000FDB  E8 00000000 E					call writeString
- 00000FE0  E8 00000000 E					call crlf
+ 00000FED				  _exit:
+ 00000FED  E8 00000000 E					call crlf										  ; Printing message to add a deal item in the order
+ 00000FF2  BA 0000291C R					mov edx, offset dealItem
+ 00000FF7  E8 00000000 E					call writeString
+ 00000FFC  E8 00000000 E					call crlf
 
- 00000FE5  BA 00002614 R					mov edx, offset drinks    						  ; Printing the free desert item menu
- 00000FEA  E8 00000000 E					call writeString
- 00000FEF  E8 00000000 E					call crlf
- 00000FF4  E8 00000000 E					call readInt
+ 00001001  BA 00002614 R					mov edx, offset drinks    						  ; Printing the free desert item menu
+ 00001006  E8 00000000 E					call writeString
+ 0000100B  E8 00000000 E					call crlf
+ 00001010  E8 00000000 E					call readInt
 								 
- 00000FF9  83 F8 09						cmp eax,9										  ; Error handling for free item
- 00000FFC  74 B8						je cancelDeal
- 00000FFE  83 F8 09						cmp eax,9
- 00001001  7F 1B						jg selectCorrect
- 00001003  83 F8 00						cmp eax,0
- 00001006  7E 16						jle selectCorrect
+ 00001015  83 F8 09						cmp eax,9										  ; Error handling for free item
+ 00001018  74 B8						je cancelDeal
+ 0000101A  83 F8 09						cmp eax,9
+ 0000101D  7F 1B						jg selectCorrect
+ 0000101F  83 F8 00						cmp eax,0
+ 00001022  7E 16						jle selectCorrect
 
- 00001008  E8 00000000 E					call crlf										  ; Printing success message
- 0000100D  BA 00002A3A R					mov edx, offset dealAdded
- 00001012  E8 00000000 E					call writeString
- 00001017  E8 00000000 E					call crlf
- 0000101C  EB 07						jmp finalExit
+ 00001024  E8 00000000 E					call crlf										  ; Printing success message
+ 00001029  BA 00002A3A R					mov edx, offset dealAdded
+ 0000102E  E8 00000000 E					call writeString
+ 00001033  E8 00000000 E					call crlf
+ 00001038  EB 07						jmp finalExit
 
 						
- 0000101E					selectCorrect:
- 0000101E  E8 FFFFFC1B						 call error
- 00001023  EB AC						 jmp _exit
+ 0000103A					selectCorrect:
+ 0000103A  E8 FFFFFC1B						 call error
+ 0000103F  EB AC						 jmp _exit
 							 
- 00001025					finalExit:
+ 00001041					finalExit:
 
- 00001025  9D							 POPFD
- 00001026  61							 POPAD
+ 00001041  9D							 POPFD
+ 00001042  61							 POPAD
 
 							 RET
- 00001027  C9		   *	    leave  
- 00001028  C2 0004	   *	    ret    00004h
- 0000102B			dealChineseMenu ENDP
+ 00001043  C9		   *	    leave  
+ 00001044  C2 0004	   *	    ret    00004h
+ 00001047			dealChineseMenu ENDP
 
 				;-------------------------------------------------------------------
 				;| Print deal Fast Food Menu with Prices for customers to order...  |
 				;| Updates: Bill ...                                                |
 				;-------------------------------------------------------------------
 
- 0000102B			dealFastFoodMenu PROC, noOfDishes:DWORD
- 0000102B  55		   *	    push   ebp
- 0000102C  8B EC	   *	    mov    ebp, esp
- 0000102E  60						  PUSHAD
- 0000102F  9C						  PUSHFD
+ 00001047			dealFastFoodMenu PROC, noOfDishes:DWORD
+ 00001047  55		   *	    push   ebp
+ 00001048  8B EC	   *	    mov    ebp, esp
+ 0000104A  60						  PUSHAD
+ 0000104B  9C						  PUSHFD
 
- 00001030  A1 00000070 R				  mov eax, bill		
- 00001035  A3 00000080 R				  mov mockBill, eax								      ; Stores the copy of bill	
+ 0000104C  A1 00000070 R				  mov eax, bill		
+ 00001051  A3 00000080 R				  mov mockBill, eax								      ; Stores the copy of bill	
 
- 0000103A  8B 4D 08					  mov ecx, noOfDishes
+ 00001056  8B 4D 08					  mov ecx, noOfDishes
 
- 0000103D						  op:                                                 ; Option Tag...
- 0000103D  E8 00000000 E				     call crlf
+ 00001059						  op:                                                 ; Option Tag...
+ 00001059  E8 00000000 E				     call crlf
 
- 00001042  BA 00002400 R			         mov edx, OFFSET fastFood
- 00001047  E8 00000000 E		             call writeString
+ 0000105E  BA 00002400 R			         mov edx, OFFSET fastFood
+ 00001063  E8 00000000 E		             call writeString
 
- 0000104C  E8 00000000 E			         call crlf
- 00001051  E8 00000000 E			         call readInt
+ 00001068  E8 00000000 E			         call crlf
+ 0000106D  E8 00000000 E			         call readInt
 
- 00001056  83 F8 01			             cmp eax, 1
- 00001059  74 29				         je  cp
- 0000105B  83 F8 02				         cmp eax, 2
- 0000105E  74 4E				         je  zb
- 00001060  83 F8 03				         cmp eax, 3
- 00001063  74 73				         je  sw
- 00001065  83 F8 04				         cmp eax, 4
- 00001068  0F 84 00000097			         je  ff
- 0000106E  83 F8 05				         cmp eax, 5
- 00001071  0F 84 000000BB					 je  cancelDeal
+ 00001072  83 F8 01			             cmp eax, 1
+ 00001075  74 29				         je  cp
+ 00001077  83 F8 02				         cmp eax, 2
+ 0000107A  74 4E				         je  zb
+ 0000107C  83 F8 03				         cmp eax, 3
+ 0000107F  74 73				         je  sw
+ 00001081  83 F8 04				         cmp eax, 4
+ 00001084  0F 84 00000097			         je  ff
+ 0000108A  83 F8 05				         cmp eax, 5
+ 0000108D  0F 84 000000BB					 je  cancelDeal
 
- 00001077  E8 FFFFFBC2				         call error                                       ; calling error Proc...
- 0000107C  41							 inc ecx									      ; increments ecx after 1 iteration is lost in error
+ 00001093  E8 FFFFFBC2				         call error                                       ; calling error Proc...
+ 00001098  41							 inc ecx									      ; increments ecx after 1 iteration is lost in error
 
- 0000107D							 again:
- 0000107D  E2 BE						     LOOP op
- 0000107F  E9 000000C9						 jmp _exit
+ 00001099							 again:
+ 00001099  E2 BE						     LOOP op
+ 0000109B  E9 000000C9						 jmp _exit
 
- 00001084					         cp:                                              ; Chicken Pizza Tag...
- 00001084  BA 00002905 R			            mov edx, OFFSET dishes
- 00001089  E8 00000000 E		                call writeString
+ 000010A0					         cp:                                              ; Chicken Pizza Tag...
+ 000010A0  BA 00002905 R			            mov edx, OFFSET dishes
+ 000010A5  E8 00000000 E		                call writeString
 
- 0000108E  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
-
-									invoke setEcx2, eax
- 00001093  50		   *	    push   eax
- 00001094  E8 000001F5	   *	    call   setEcx2
-
- 00001099  8B 1D 00000030 R					    mov ebx, [fPrice]
- 0000109F  F7 E3						    mul ebx                                       ; Mul quantity with price...
- 000010A1  03 05 00000070 R					    add eax, bill
- 000010A7  A3 00000070 R					    mov bill, eax
-
- 000010AC  EB CF				            jmp  again
-
- 000010AE			                 zb:                                              ; Zinger Burger Rice Tag...
- 000010AE  BA 00002905 R		                mov edx, OFFSET dishes
- 000010B3  E8 00000000 E		                call writeString
-
- 000010B8  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
+ 000010AA  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
 
 									invoke setEcx2, eax
- 000010BD  50		   *	    push   eax
- 000010BE  E8 000001CB	   *	    call   setEcx2
+ 000010AF  50		   *	    push   eax
+ 000010B0  E8 000001F5	   *	    call   setEcx2
 
- 000010C3  8B 1D 00000034 R					    mov ebx, [fPrice + 4]
- 000010C9  F7 E3						    mul ebx                                       ; Mul quantity with price...
- 000010CB  03 05 00000070 R					    add eax, bill
- 000010D1  A3 00000070 R					    mov bill, eax
+ 000010B5  8B 1D 00000030 R					    mov ebx, [fPrice]
+ 000010BB  F7 E3						    mul ebx                                       ; Mul quantity with price...
+ 000010BD  03 05 00000070 R					    add eax, bill
+ 000010C3  A3 00000070 R					    mov bill, eax
 
- 000010D6  EB A5				            jmp  again
+ 000010C8  EB CF				            jmp  again
 
- 000010D8			                 sw:                                              ; Chicken Shawarma Tag...
- 000010D8  BA 00002905 R		                mov edx, OFFSET dishes
- 000010DD  E8 00000000 E		                call writeString
+ 000010CA			                 zb:                                              ; Zinger Burger Rice Tag...
+ 000010CA  BA 00002905 R		                mov edx, OFFSET dishes
+ 000010CF  E8 00000000 E		                call writeString
 
- 000010E2  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
+ 000010D4  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
 
 									invoke setEcx2, eax
- 000010E7  50		   *	    push   eax
- 000010E8  E8 000001A1	   *	    call   setEcx2
+ 000010D9  50		   *	    push   eax
+ 000010DA  E8 000001CB	   *	    call   setEcx2
 
- 000010ED  8B 1D 00000038 R					    mov ebx, [fPrice + 8]
- 000010F3  F7 E3						    mul ebx                                       ; Mul quantity with price...
- 000010F5  03 05 00000070 R					    add eax, bill
- 000010FB  A3 00000070 R					    mov bill, eax
+ 000010DF  8B 1D 00000034 R					    mov ebx, [fPrice + 4]
+ 000010E5  F7 E3						    mul ebx                                       ; Mul quantity with price...
+ 000010E7  03 05 00000070 R					    add eax, bill
+ 000010ED  A3 00000070 R					    mov bill, eax
 
- 00001100  E9 FFFFFF78				            jmp  again
+ 000010F2  EB A5				            jmp  again
+
+ 000010F4			                 sw:                                              ; Chicken Shawarma Tag...
+ 000010F4  BA 00002905 R		                mov edx, OFFSET dishes
+ 000010F9  E8 00000000 E		                call writeString
+
+ 000010FE  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
+
+									invoke setEcx2, eax
+ 00001103  50		   *	    push   eax
+ 00001104  E8 000001A1	   *	    call   setEcx2
+
+ 00001109  8B 1D 00000038 R					    mov ebx, [fPrice + 8]
+ 0000110F  F7 E3						    mul ebx                                       ; Mul quantity with price...
+ 00001111  03 05 00000070 R					    add eax, bill
+ 00001117  A3 00000070 R					    mov bill, eax
+
+ 0000111C  E9 FFFFFF78				            jmp  again
 									 
- 00001105			                 ff:                                              ; French Fries Tag...
- 00001105  BA 00002905 R			            mov edx, OFFSET dishes
- 0000110A  E8 00000000 E		                call writeString
+ 00001121			                 ff:                                              ; French Fries Tag...
+ 00001121  BA 00002905 R			            mov edx, OFFSET dishes
+ 00001126  E8 00000000 E		                call writeString
 
- 0000110F  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
+ 0000112B  E8 00000000 E					    call readInt                                  ; Taking input for quantity...
 
 									invoke setEcx2, eax
- 00001114  50		   *	    push   eax
- 00001115  E8 00000174	   *	    call   setEcx2
+ 00001130  50		   *	    push   eax
+ 00001131  E8 00000174	   *	    call   setEcx2
 
- 0000111A  8B 1D 0000003C R					    mov ebx, [fPrice + 12]
- 00001120  F7 E3						    mul ebx                                       ; Mul quantity with price...
- 00001122  03 05 00000070 R					    add eax, bill
- 00001128  A3 00000070 R					    mov bill, eax
+ 00001136  8B 1D 0000003C R					    mov ebx, [fPrice + 12]
+ 0000113C  F7 E3						    mul ebx                                       ; Mul quantity with price...
+ 0000113E  03 05 00000070 R					    add eax, bill
+ 00001144  A3 00000070 R					    mov bill, eax
 
- 0000112D  E9 FFFFFF4B				            jmp  again
+ 00001149  E9 FFFFFF4B				            jmp  again
 
- 00001132					cancelDeal:
- 00001132  A1 00000080 R					   mov eax, mockBill			 				  ; Canceled the order and restored the bill
- 00001137  A3 00000070 R					   mov bill, eax
- 0000113C  BA 00002AA5 R					   mov edx, offset dealCancel
- 00001141  E8 00000000 E					   call writeString
- 00001146  E8 00000000 E					   call crlf
- 0000114B  EB 54						   jmp finalExit
+ 0000114E					cancelDeal:
+ 0000114E  A1 00000080 R					   mov eax, mockBill			 				  ; Canceled the order and restored the bill
+ 00001153  A3 00000070 R					   mov bill, eax
+ 00001158  BA 00002AA5 R					   mov edx, offset dealCancel
+ 0000115D  E8 00000000 E					   call writeString
+ 00001162  E8 00000000 E					   call crlf
+ 00001167  EB 54						   jmp finalExit
 
- 0000114D				    _exit:
- 0000114D  E8 00000000 E					   call crlf									  ; Printing message to add a deal item in the order
- 00001152  BA 0000291C R					   mov edx, offset dealItem
- 00001157  E8 00000000 E					   call writeString
- 0000115C  E8 00000000 E					   call crlf
+ 00001169				    _exit:
+ 00001169  E8 00000000 E					   call crlf									  ; Printing message to add a deal item in the order
+ 0000116E  BA 0000291C R					   mov edx, offset dealItem
+ 00001173  E8 00000000 E					   call writeString
+ 00001178  E8 00000000 E					   call crlf
 					
- 00001161  BA 00001F16 R					   mov edx, offset regDrink    					  ; Printing the free desert item menu
- 00001166  E8 00000000 E					   call writeString
- 0000116B  E8 00000000 E					   call crlf
- 00001170  E8 00000000 E					   call readInt
+ 0000117D  BA 00001F16 R					   mov edx, offset regDrink    					  ; Printing the free desert item menu
+ 00001182  E8 00000000 E					   call writeString
+ 00001187  E8 00000000 E					   call crlf
+ 0000118C  E8 00000000 E					   call readInt
 								   
- 00001175  83 F8 05						   cmp eax,5						     	      ; Error handling for free item
- 00001178  74 B8					       je cancelDeal
- 0000117A  83 F8 05						   cmp eax,5
- 0000117D  7F 1B						   jg selectCorrect
- 0000117F  83 F8 00						   cmp eax,0
- 00001182  7E 16						   jle selectCorrect
+ 00001191  83 F8 05						   cmp eax,5						     	      ; Error handling for free item
+ 00001194  74 B8					       je cancelDeal
+ 00001196  83 F8 05						   cmp eax,5
+ 00001199  7F 1B						   jg selectCorrect
+ 0000119B  83 F8 00						   cmp eax,0
+ 0000119E  7E 16						   jle selectCorrect
 
- 00001184  E8 00000000 E					   call crlf									  ; Printing success message
- 00001189  BA 00002A3A R					   mov edx, offset dealAdded
- 0000118E  E8 00000000 E					   call writeString
- 00001193  E8 00000000 E					   call crlf
- 00001198  EB 07						   jmp finalExit
+ 000011A0  E8 00000000 E					   call crlf									  ; Printing success message
+ 000011A5  BA 00002A3A R					   mov edx, offset dealAdded
+ 000011AA  E8 00000000 E					   call writeString
+ 000011AF  E8 00000000 E					   call crlf
+ 000011B4  EB 07						   jmp finalExit
 						
- 0000119A					selectCorrect:
- 0000119A  E8 FFFFFA9F						 call error
- 0000119F  EB AC						 jmp _exit
+ 000011B6					selectCorrect:
+ 000011B6  E8 FFFFFA9F						 call error
+ 000011BB  EB AC						 jmp _exit
 
- 000011A1					finalExit:
+ 000011BD					finalExit:
 
- 000011A1  9D						  POPFD
- 000011A2  61						  POPAD
+ 000011BD  9D						  POPFD
+ 000011BE  61						  POPAD
 
 							  RET
- 000011A3  C9		   *	    leave  
- 000011A4  C2 0004	   *	    ret    00004h
- 000011A7			dealFastFoodMenu ENDP
+ 000011BF  C9		   *	    leave  
+ 000011C0  C2 0004	   *	    ret    00004h
+ 000011C3			dealFastFoodMenu ENDP
 
 
- 000011A7			dealDrinks1_5 PROC , noOfDrinks:DWORD
+ 000011C3			dealDrinks1_5 PROC , noOfDrinks:DWORD
 					
- 000011A7  55		   *	    push   ebp
- 000011A8  8B EC	   *	    mov    ebp, esp
- 000011AA  60				PUSHAD
- 000011AB  9C				PUSHFD
+ 000011C3  55		   *	    push   ebp
+ 000011C4  8B EC	   *	    mov    ebp, esp
+ 000011C6  60				PUSHAD
+ 000011C7  9C				PUSHFD
 						
- 000011AC  A1 00000070 R			mov eax, bill		
- 000011B1  A3 00000080 R			mov mockBill, eax								          ; Stores the copy of bill	
+ 000011C8  A1 00000070 R			mov eax, bill		
+ 000011CD  A3 00000080 R			mov mockBill, eax								          ; Stores the copy of bill	
 
- 000011B6  8B 4D 08				mov ecx, noOfDrinks
+ 000011D2  8B 4D 08				mov ecx, noOfDrinks
 
- 000011B9					op:
- 000011B9  E8 00000000 E				call crlf
- 000011BE  BA 00001FDD R				mov edx, offset drinks1_5
- 000011C3  E8 00000000 E				call writeString
- 000011C8  E8 00000000 E				call crlf
+ 000011D5					op:
+ 000011D5  E8 00000000 E				call crlf
+ 000011DA  BA 00001FDD R				mov edx, offset drinks1_5
+ 000011DF  E8 00000000 E				call writeString
+ 000011E4  E8 00000000 E				call crlf
 
- 000011CD  E8 00000000 E				call readInt
+ 000011E9  E8 00000000 E				call readInt
 
- 000011D2  83 F8 01					cmp eax, 1
- 000011D5  74 14					je drink
+ 000011EE  83 F8 01					cmp eax, 1
+ 000011F1  74 14					je drink
 
- 000011D7  83 F8 02					cmp eax, 2
- 000011DA  74 0F					je drink
+ 000011F3  83 F8 02					cmp eax, 2
+ 000011F6  74 0F					je drink
 
- 000011DC  83 F8 03					cmp eax, 3
- 000011DF  74 38					je cancelDeal
+ 000011F8  83 F8 03					cmp eax, 3
+ 000011FB  74 38					je cancelDeal
 
- 000011E1  E8 FFFFFA58					call error
- 000011E6  41						inc ecx											      ; Inc ecx after 1 loop is lost in error
+ 000011FD  E8 FFFFFA58					call error
+ 00001202  41						inc ecx											      ; Inc ecx after 1 loop is lost in error
 
- 000011E7						again:
- 000011E7  E2 D0						LOOP op
+ 00001203						again:
+ 00001203  E2 D0						LOOP op
 
- 000011E9  EB 49					jmp _exit
+ 00001205  EB 49					jmp _exit
 
- 000011EB						drink: 
- 000011EB  BA 00002905 R					mov edx, OFFSET dishes
- 000011F0  E8 00000000 E		            call writeString
+ 00001207						drink: 
+ 00001207  BA 00002905 R					mov edx, OFFSET dishes
+ 0000120C  E8 00000000 E		            call writeString
 
- 000011F5  E8 00000000 E					call readInt
+ 00001211  E8 00000000 E					call readInt
 
 								invoke setEcx2, eax
- 000011FA  50		   *	    push   eax
- 000011FB  E8 0000008E	   *	    call   setEcx2
- 00001200  E8 00000000 E					call crlf
+ 00001216  50		   *	    push   eax
+ 00001217  E8 0000008E	   *	    call   setEcx2
+ 0000121C  E8 00000000 E					call crlf
 
- 00001205  BB 00000050 R					mov ebx, offset [drPrice]
- 0000120A  F7 E3						mul ebx
+ 00001221  BB 00000050 R					mov ebx, offset [drPrice]
+ 00001226  F7 E3						mul ebx
 
- 0000120C  03 05 00000070 R					add eax,bill
- 00001212  A3 00000070 R					mov bill,eax
+ 00001228  03 05 00000070 R					add eax,bill
+ 0000122E  A3 00000070 R					mov bill,eax
 								
- 00001217  EB CE						jmp again
+ 00001233  EB CE						jmp again
 
- 00001219						cancelDeal:
- 00001219  A1 00000080 R					   mov eax, mockBill							  ; Canceled the order and restored the bill
- 0000121E  A3 00000070 R					   mov bill, eax
- 00001223  BA 00002AA5 R					   mov edx, offset dealCancel
- 00001228  E8 00000000 E					   call writeString
- 0000122D  E8 00000000 E					   call crlf
- 00001232  EB 54						   jmp finalExit
+ 00001235						cancelDeal:
+ 00001235  A1 00000080 R					   mov eax, mockBill							  ; Canceled the order and restored the bill
+ 0000123A  A3 00000070 R					   mov bill, eax
+ 0000123F  BA 00002AA5 R					   mov edx, offset dealCancel
+ 00001244  E8 00000000 E					   call writeString
+ 00001249  E8 00000000 E					   call crlf
+ 0000124E  EB 54						   jmp finalExit
 
- 00001234						_exit:
- 00001234  E8 00000000 E						call crlf
- 00001239  BA 0000291C R						mov edx, offset dealItem
- 0000123E  E8 00000000 E						call writeString
- 00001243  E8 00000000 E						call crlf
+ 00001250						_exit:
+ 00001250  E8 00000000 E						call crlf
+ 00001255  BA 0000291C R						mov edx, offset dealItem
+ 0000125A  E8 00000000 E						call writeString
+ 0000125F  E8 00000000 E						call crlf
 					
- 00001248  BA 00001F16 R						mov edx, offset regDrink    				  ; Printing the free desert item menu
- 0000124D  E8 00000000 E						call writeString
- 00001252  E8 00000000 E						call crlf
- 00001257  E8 00000000 E						call readInt
+ 00001264  BA 00001F16 R						mov edx, offset regDrink    				  ; Printing the free desert item menu
+ 00001269  E8 00000000 E						call writeString
+ 0000126E  E8 00000000 E						call crlf
+ 00001273  E8 00000000 E						call readInt
 									
- 0000125C  83 F8 05							cmp eax,5									  ; Error handling for free item
- 0000125F  74 B8					        je cancelDeal
- 00001261  83 F8 05						    cmp eax,5
- 00001264  7F 1B						    jg selectCorrect
- 00001266  83 F8 00						    cmp eax,0
- 00001269  7E 16						    jle selectCorrect
+ 00001278  83 F8 05							cmp eax,5									  ; Error handling for free item
+ 0000127B  74 B8					        je cancelDeal
+ 0000127D  83 F8 05						    cmp eax,5
+ 00001280  7F 1B						    jg selectCorrect
+ 00001282  83 F8 00						    cmp eax,0
+ 00001285  7E 16						    jle selectCorrect
 
- 0000126B  E8 00000000 E					    call crlf									  ; Printing success message
- 00001270  BA 00002A3A R					    mov edx, offset dealAdded
- 00001275  E8 00000000 E					    call writeString
- 0000127A  E8 00000000 E					    call crlf
- 0000127F  EB 07							jmp finalExit
+ 00001287  E8 00000000 E					    call crlf									  ; Printing success message
+ 0000128C  BA 00002A3A R					    mov edx, offset dealAdded
+ 00001291  E8 00000000 E					    call writeString
+ 00001296  E8 00000000 E					    call crlf
+ 0000129B  EB 07							jmp finalExit
 						
- 00001281					selectCorrect:
- 00001281  E8 FFFFF9B8						 call error
- 00001286  EB AC						 jmp _exit
+ 0000129D					selectCorrect:
+ 0000129D  E8 FFFFF9B8						 call error
+ 000012A2  EB AC						 jmp _exit
 							
- 00001288						finalExit:
+ 000012A4						finalExit:
 
- 00001288  9D							POPFD
- 00001289  61							POPAD
+ 000012A4  9D							POPFD
+ 000012A5  61							POPAD
 
 								RET
- 0000128A  C9		   *	    leave  
- 0000128B  C2 0004	   *	    ret    00004h
+ 000012A6  C9		   *	    leave  
+ 000012A7  C2 0004	   *	    ret    00004h
 
- 0000128E			dealDrinks1_5 ENDP
+ 000012AA			dealDrinks1_5 ENDP
 
 				;-------------------------------------------------------------------
 				;| Checking number of dishes for deals 2-4                          |
 				;| Updates: It exit the Loop...                                     |
 				;-------------------------------------------------------------------
 
- 0000128E			setEcx2 PROC uses eax, dealQuan1:DWORD
+ 000012AA			setEcx2 PROC uses eax, dealQuan1:DWORD
 					    
- 0000128E  55		   *	    push   ebp
- 0000128F  8B EC	   *	    mov    ebp, esp
- 00001291  50		   *	    push   eax
- 00001292  8B 45 08				mov eax, dealQuan1
- 00001295  83 F8 02				cmp eax, 2
- 00001298  7D 02				jge setECX
+ 000012AA  55		   *	    push   ebp
+ 000012AB  8B EC	   *	    mov    ebp, esp
+ 000012AD  50		   *	    push   eax
+ 000012AE  8B 45 08				mov eax, dealQuan1
+ 000012B1  83 F8 02				cmp eax, 2
+ 000012B4  7D 02				jge setECX
 								   
- 0000129A  EB 05				jmp ignore										  ; Check the quantity of dishes to decide the value of ecx register
+ 000012B6  EB 05				jmp ignore										  ; Check the quantity of dishes to decide the value of ecx register
 								   
- 0000129C					setECX:
- 0000129C  B9 00000001				mov ecx,1
+ 000012B8					setECX:
+ 000012B8  B9 00000001				mov ecx,1
 
- 000012A1					ignore:
+ 000012BD					ignore:
 						RET
- 000012A1  58		   *	    pop    eax
- 000012A2  C9		   *	    leave  
- 000012A3  C2 0004	   *	    ret    00004h
- 000012A6			setEcx2 ENDP
+ 000012BD  58		   *	    pop    eax
+ 000012BE  C9		   *	    leave  
+ 000012BF  C2 0004	   *	    ret    00004h
+ 000012C2			setEcx2 ENDP
 
 				;-------------------------------------------------------------------
 				;| Checking number of dishes for deal 1                             |
 				;| Updates: Updates: It exit the Loop...                            |
 				;-------------------------------------------------------------------
 
- 000012A6			setEcx3 PROC uses eax, dealQuan2:DWORD
+ 000012C2			setEcx3 PROC uses eax, dealQuan2:DWORD
 					    
- 000012A6  55		   *	    push   ebp
- 000012A7  8B EC	   *	    mov    ebp, esp
- 000012A9  50		   *	    push   eax
- 000012AA  8B 45 08				mov eax, dealQuan2
- 000012AD  83 F8 03				cmp eax, 3
- 000012B0  7D 02				jge setECX
+ 000012C2  55		   *	    push   ebp
+ 000012C3  8B EC	   *	    mov    ebp, esp
+ 000012C5  50		   *	    push   eax
+ 000012C6  8B 45 08				mov eax, dealQuan2
+ 000012C9  83 F8 03				cmp eax, 3
+ 000012CC  7D 02				jge setECX
 								   
- 000012B2  EB 05				jmp ignore										  ; Check the quantity of dishes to decide the value of ecx register
+ 000012CE  EB 05				jmp ignore										  ; Check the quantity of dishes to decide the value of ecx register
 								   
- 000012B4					setECX:
- 000012B4  B9 00000001				mov ecx,1
+ 000012D0					setECX:
+ 000012D0  B9 00000001				mov ecx,1
 
- 000012B9					ignore:
+ 000012D5					ignore:
 						RET
- 000012B9  58		   *	    pop    eax
- 000012BA  C9		   *	    leave  
- 000012BB  C2 0004	   *	    ret    00004h
- 000012BE			setEcx3 ENDP
+ 000012D5  58		   *	    pop    eax
+ 000012D6  C9		   *	    leave  
+ 000012D7  C2 0004	   *	    ret    00004h
+ 000012DA			setEcx3 ENDP
 
 				END main
-Microsoft (R) Macro Assembler Version 14.16.27031.1	    12/19/19 17:44:33
+Microsoft (R) Macro Assembler Version 14.16.27031.1	    12/27/19 11:54:48
 RestaurantsBillingSystem.asm				     Symbols 2 - 1
 
 
@@ -3606,21 +3697,21 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 00002AE0 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 000012BE Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 00002AF4 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 000012DA Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
 
                 N a m e                 Type     Value    Attr
 
-ChineseMenu  . . . . . . . . . .	P Near	 00000739 _TEXT	Length= 000000DF Public STDCALL
-  op . . . . . . . . . . . . . .	L Near	 0000073B _TEXT	
-  cm . . . . . . . . . . . . . .	L Near	 0000077C _TEXT	
-  fr . . . . . . . . . . . . . .	L Near	 000007A0 _TEXT	
-  mn . . . . . . . . . . . . . .	L Near	 000007C7 _TEXT	
-  sh . . . . . . . . . . . . . .	L Near	 000007EE _TEXT	
-  _exit  . . . . . . . . . . . .	L Near	 00000815 _TEXT	
+ChineseMenu  . . . . . . . . . .	P Near	 00000755 _TEXT	Length= 000000DF Public STDCALL
+  op . . . . . . . . . . . . . .	L Near	 00000757 _TEXT	
+  cm . . . . . . . . . . . . . .	L Near	 00000798 _TEXT	
+  fr . . . . . . . . . . . . . .	L Near	 000007BC _TEXT	
+  mn . . . . . . . . . . . . . .	L Near	 000007E3 _TEXT	
+  sh . . . . . . . . . . . . . .	L Near	 0000080A _TEXT	
+  _exit  . . . . . . . . . . . .	L Near	 00000831 _TEXT	
 CloseFile  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 CloseHandle  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 Clrscr . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -3628,34 +3719,34 @@ CreateFileA  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 CreateOutputFile . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 Crlf . . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 Delay  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-DessertMenu  . . . . . . . . . .	P Near	 000008F7 _TEXT	Length= 000000DF Public STDCALL
-  op . . . . . . . . . . . . . .	L Near	 000008F9 _TEXT	
-  pc . . . . . . . . . . . . . .	L Near	 0000093A _TEXT	
-  cc . . . . . . . . . . . . . .	L Near	 0000095E _TEXT	
-  cu . . . . . . . . . . . . . .	L Near	 00000985 _TEXT	
-  ic . . . . . . . . . . . . . .	L Near	 000009AC _TEXT	
-  _exit  . . . . . . . . . . . .	L Near	 000009D3 _TEXT	
-DrinksMenu . . . . . . . . . . .	P Near	 000009D6 _TEXT	Length= 000001A6 Public STDCALL
-  op . . . . . . . . . . . . . .	L Near	 000009D8 _TEXT	
-  cj . . . . . . . . . . . . . .	L Near	 00000A41 _TEXT	
-  sj . . . . . . . . . . . . . .	L Near	 00000A68 _TEXT	
-  cr . . . . . . . . . . . . . .	L Near	 00000A8F _TEXT	
-  sr . . . . . . . . . . . . . .	L Near	 00000AB6 _TEXT	
-  pj . . . . . . . . . . . . . .	L Near	 00000ADD _TEXT	
-  ma . . . . . . . . . . . . . .	L Near	 00000B04 _TEXT	
-  co . . . . . . . . . . . . . .	L Near	 00000B2B _TEXT	
-  te . . . . . . . . . . . . . .	L Near	 00000B52 _TEXT	
-  _exit  . . . . . . . . . . . .	L Near	 00000B79 _TEXT	
+DessertMenu  . . . . . . . . . .	P Near	 00000913 _TEXT	Length= 000000DF Public STDCALL
+  op . . . . . . . . . . . . . .	L Near	 00000915 _TEXT	
+  pc . . . . . . . . . . . . . .	L Near	 00000956 _TEXT	
+  cc . . . . . . . . . . . . . .	L Near	 0000097A _TEXT	
+  cu . . . . . . . . . . . . . .	L Near	 000009A1 _TEXT	
+  ic . . . . . . . . . . . . . .	L Near	 000009C8 _TEXT	
+  _exit  . . . . . . . . . . . .	L Near	 000009EF _TEXT	
+DrinksMenu . . . . . . . . . . .	P Near	 000009F2 _TEXT	Length= 000001A6 Public STDCALL
+  op . . . . . . . . . . . . . .	L Near	 000009F4 _TEXT	
+  cj . . . . . . . . . . . . . .	L Near	 00000A5D _TEXT	
+  sj . . . . . . . . . . . . . .	L Near	 00000A84 _TEXT	
+  cr . . . . . . . . . . . . . .	L Near	 00000AAB _TEXT	
+  sr . . . . . . . . . . . . . .	L Near	 00000AD2 _TEXT	
+  pj . . . . . . . . . . . . . .	L Near	 00000AF9 _TEXT	
+  ma . . . . . . . . . . . . . .	L Near	 00000B20 _TEXT	
+  co . . . . . . . . . . . . . .	L Near	 00000B47 _TEXT	
+  te . . . . . . . . . . . . . .	L Near	 00000B6E _TEXT	
+  _exit  . . . . . . . . . . . .	L Near	 00000B95 _TEXT	
 DumpMem  . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 DumpRegs . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 ExitProcess  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-FastFoodMenu . . . . . . . . . .	P Near	 00000818 _TEXT	Length= 000000DF Public STDCALL
-  op . . . . . . . . . . . . . .	L Near	 0000081A _TEXT	
-  cp . . . . . . . . . . . . . .	L Near	 0000085B _TEXT	
-  zb . . . . . . . . . . . . . .	L Near	 0000087F _TEXT	
-  sw . . . . . . . . . . . . . .	L Near	 000008A6 _TEXT	
-  ff . . . . . . . . . . . . . .	L Near	 000008CD _TEXT	
-  _exit  . . . . . . . . . . . .	L Near	 000008F4 _TEXT	
+FastFoodMenu . . . . . . . . . .	P Near	 00000834 _TEXT	Length= 000000DF Public STDCALL
+  op . . . . . . . . . . . . . .	L Near	 00000836 _TEXT	
+  cp . . . . . . . . . . . . . .	L Near	 00000877 _TEXT	
+  zb . . . . . . . . . . . . . .	L Near	 0000089B _TEXT	
+  sw . . . . . . . . . . . . . .	L Near	 000008C2 _TEXT	
+  ff . . . . . . . . . . . . . .	L Near	 000008E9 _TEXT	
+  _exit  . . . . . . . . . . . .	L Near	 00000910 _TEXT	
 FileTimeToDosDateTime  . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 FileTimeToSystemTime . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 FlushConsoleInputBuffer  . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -3690,18 +3781,21 @@ LocalFree  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 MessageBoxA  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 MsgBoxAsk  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 MsgBox . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
+NumbToStr  . . . . . . . . . . .	P Near	 000003B4 _TEXT	Length= 00000027 Public STDCALL
+  x  . . . . . . . . . . . . . .	DWord	 bp + 00000008
+  buffer . . . . . . . . . . . .	DWord	 bp + 0000000C
 OpenInputFile  . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-OrientalMenu . . . . . . . . . .	P Near	 00000593 _TEXT	Length= 000001A6 Public STDCALL
-  op . . . . . . . . . . . . . .	L Near	 00000595 _TEXT	
-  cq . . . . . . . . . . . . . .	L Near	 000005FE _TEXT	
-  pu . . . . . . . . . . . . . .	L Near	 00000625 _TEXT	
-  cb . . . . . . . . . . . . . .	L Near	 0000064C _TEXT	
-  ck . . . . . . . . . . . . . .	L Near	 00000673 _TEXT	
-  ct . . . . . . . . . . . . . .	L Near	 0000069A _TEXT	
-  mh . . . . . . . . . . . . . .	L Near	 000006C1 _TEXT	
-  na . . . . . . . . . . . . . .	L Near	 000006E8 _TEXT	
-  rt . . . . . . . . . . . . . .	L Near	 0000070F _TEXT	
-  _exit  . . . . . . . . . . . .	L Near	 00000736 _TEXT	
+OrientalMenu . . . . . . . . . .	P Near	 000005AF _TEXT	Length= 000001A6 Public STDCALL
+  op . . . . . . . . . . . . . .	L Near	 000005B1 _TEXT	
+  cq . . . . . . . . . . . . . .	L Near	 0000061A _TEXT	
+  pu . . . . . . . . . . . . . .	L Near	 00000641 _TEXT	
+  cb . . . . . . . . . . . . . .	L Near	 00000668 _TEXT	
+  ck . . . . . . . . . . . . . .	L Near	 0000068F _TEXT	
+  ct . . . . . . . . . . . . . .	L Near	 000006B6 _TEXT	
+  mh . . . . . . . . . . . . . .	L Near	 000006DD _TEXT	
+  na . . . . . . . . . . . . . .	L Near	 00000704 _TEXT	
+  rt . . . . . . . . . . . . . .	L Near	 0000072B _TEXT	
+  _exit  . . . . . . . . . . . .	L Near	 00000752 _TEXT	
 ParseDecimal32 . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 ParseInteger32 . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 PeekConsoleInputA  . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -3764,85 +3858,85 @@ admin  . . . . . . . . . . . . .	P Near	 0000006C _TEXT	Length= 00000127 Public 
   wrongReset . . . . . . . . . .	L Near	 00000145 _TEXT	
   wrong  . . . . . . . . . . . .	L Near	 0000016D _TEXT	
   _exit  . . . . . . . . . . . .	L Near	 00000190 _TEXT	
-check  . . . . . . . . . . . . .	P Near	 000003BF _TEXT	Length= 0000003E Public STDCALL
-  lab  . . . . . . . . . . . . .	L Near	 000003D7 _TEXT	
-  notEqual . . . . . . . . . . .	L Near	 000003F0 _TEXT	
-  _exit  . . . . . . . . . . . .	L Near	 000003FA _TEXT	
-choiceMenu . . . . . . . . . . .	P Near	 0000052D _TEXT	Length= 00000066 Public STDCALL
-  op . . . . . . . . . . . . . .	L Near	 0000052F _TEXT	
-  ot . . . . . . . . . . . . . .	L Near	 0000056D _TEXT	
-  cn . . . . . . . . . . . . . .	L Near	 00000574 _TEXT	
-  ff . . . . . . . . . . . . . .	L Near	 0000057B _TEXT	
-  de . . . . . . . . . . . . . .	L Near	 00000582 _TEXT	
-  dr . . . . . . . . . . . . . .	L Near	 00000589 _TEXT	
-  _exit  . . . . . . . . . . . .	L Near	 00000590 _TEXT	
-customer . . . . . . . . . . . .	P Near	 000003FD _TEXT	Length= 0000008C Public STDCALL
-  op . . . . . . . . . . . . . .	L Near	 000003FF _TEXT	
-  pm . . . . . . . . . . . . . .	L Near	 00000438 _TEXT	
-  do . . . . . . . . . . . . . .	L Near	 00000458 _TEXT	
-  cm . . . . . . . . . . . . . .	L Near	 0000045F _TEXT	
-  rb . . . . . . . . . . . . . .	L Near	 00000466 _TEXT	
-  _exit  . . . . . . . . . . . .	L Near	 0000046D _TEXT	
-dealChineseMenu  . . . . . . . .	P Near	 00000EAF _TEXT	Length= 0000017C Public STDCALL
+check  . . . . . . . . . . . . .	P Near	 000003DB _TEXT	Length= 0000003E Public STDCALL
+  lab  . . . . . . . . . . . . .	L Near	 000003F3 _TEXT	
+  notEqual . . . . . . . . . . .	L Near	 0000040C _TEXT	
+  _exit  . . . . . . . . . . . .	L Near	 00000416 _TEXT	
+choiceMenu . . . . . . . . . . .	P Near	 00000549 _TEXT	Length= 00000066 Public STDCALL
+  op . . . . . . . . . . . . . .	L Near	 0000054B _TEXT	
+  ot . . . . . . . . . . . . . .	L Near	 00000589 _TEXT	
+  cn . . . . . . . . . . . . . .	L Near	 00000590 _TEXT	
+  ff . . . . . . . . . . . . . .	L Near	 00000597 _TEXT	
+  de . . . . . . . . . . . . . .	L Near	 0000059E _TEXT	
+  dr . . . . . . . . . . . . . .	L Near	 000005A5 _TEXT	
+  _exit  . . . . . . . . . . . .	L Near	 000005AC _TEXT	
+customer . . . . . . . . . . . .	P Near	 00000419 _TEXT	Length= 0000008C Public STDCALL
+  op . . . . . . . . . . . . . .	L Near	 0000041B _TEXT	
+  pm . . . . . . . . . . . . . .	L Near	 00000454 _TEXT	
+  do . . . . . . . . . . . . . .	L Near	 00000474 _TEXT	
+  cm . . . . . . . . . . . . . .	L Near	 0000047B _TEXT	
+  rb . . . . . . . . . . . . . .	L Near	 00000482 _TEXT	
+  _exit  . . . . . . . . . . . .	L Near	 00000489 _TEXT	
+dealChineseMenu  . . . . . . . .	P Near	 00000ECB _TEXT	Length= 0000017C Public STDCALL
   noOfDishes . . . . . . . . . .	DWord	 bp + 00000008
-  op . . . . . . . . . . . . . .	L Near	 00000EC1 _TEXT	
-  again  . . . . . . . . . . . .	L Near	 00000F01 _TEXT	
-  cm . . . . . . . . . . . . . .	L Near	 00000F08 _TEXT	
-  fr . . . . . . . . . . . . . .	L Near	 00000F32 _TEXT	
-  mn . . . . . . . . . . . . . .	L Near	 00000F5C _TEXT	
-  sh . . . . . . . . . . . . . .	L Near	 00000F89 _TEXT	
-  cancelDeal . . . . . . . . . .	L Near	 00000FB6 _TEXT	
-  _exit  . . . . . . . . . . . .	L Near	 00000FD1 _TEXT	
-  selectCorrect  . . . . . . . .	L Near	 0000101E _TEXT	
-  finalExit  . . . . . . . . . .	L Near	 00001025 _TEXT	
-dealDrinks1_5  . . . . . . . . .	P Near	 000011A7 _TEXT	Length= 000000E7 Public STDCALL
+  op . . . . . . . . . . . . . .	L Near	 00000EDD _TEXT	
+  again  . . . . . . . . . . . .	L Near	 00000F1D _TEXT	
+  cm . . . . . . . . . . . . . .	L Near	 00000F24 _TEXT	
+  fr . . . . . . . . . . . . . .	L Near	 00000F4E _TEXT	
+  mn . . . . . . . . . . . . . .	L Near	 00000F78 _TEXT	
+  sh . . . . . . . . . . . . . .	L Near	 00000FA5 _TEXT	
+  cancelDeal . . . . . . . . . .	L Near	 00000FD2 _TEXT	
+  _exit  . . . . . . . . . . . .	L Near	 00000FED _TEXT	
+  selectCorrect  . . . . . . . .	L Near	 0000103A _TEXT	
+  finalExit  . . . . . . . . . .	L Near	 00001041 _TEXT	
+dealDrinks1_5  . . . . . . . . .	P Near	 000011C3 _TEXT	Length= 000000E7 Public STDCALL
   noOfDrinks . . . . . . . . . .	DWord	 bp + 00000008
-  op . . . . . . . . . . . . . .	L Near	 000011B9 _TEXT	
-  again  . . . . . . . . . . . .	L Near	 000011E7 _TEXT	
-  drink  . . . . . . . . . . . .	L Near	 000011EB _TEXT	
-  cancelDeal . . . . . . . . . .	L Near	 00001219 _TEXT	
-  _exit  . . . . . . . . . . . .	L Near	 00001234 _TEXT	
-  selectCorrect  . . . . . . . .	L Near	 00001281 _TEXT	
-  finalExit  . . . . . . . . . .	L Near	 00001288 _TEXT	
-dealFastFoodMenu . . . . . . . .	P Near	 0000102B _TEXT	Length= 0000017C Public STDCALL
+  op . . . . . . . . . . . . . .	L Near	 000011D5 _TEXT	
+  again  . . . . . . . . . . . .	L Near	 00001203 _TEXT	
+  drink  . . . . . . . . . . . .	L Near	 00001207 _TEXT	
+  cancelDeal . . . . . . . . . .	L Near	 00001235 _TEXT	
+  _exit  . . . . . . . . . . . .	L Near	 00001250 _TEXT	
+  selectCorrect  . . . . . . . .	L Near	 0000129D _TEXT	
+  finalExit  . . . . . . . . . .	L Near	 000012A4 _TEXT	
+dealFastFoodMenu . . . . . . . .	P Near	 00001047 _TEXT	Length= 0000017C Public STDCALL
   noOfDishes . . . . . . . . . .	DWord	 bp + 00000008
-  op . . . . . . . . . . . . . .	L Near	 0000103D _TEXT	
-  again  . . . . . . . . . . . .	L Near	 0000107D _TEXT	
-  cp . . . . . . . . . . . . . .	L Near	 00001084 _TEXT	
-  zb . . . . . . . . . . . . . .	L Near	 000010AE _TEXT	
-  sw . . . . . . . . . . . . . .	L Near	 000010D8 _TEXT	
-  ff . . . . . . . . . . . . . .	L Near	 00001105 _TEXT	
-  cancelDeal . . . . . . . . . .	L Near	 00001132 _TEXT	
-  _exit  . . . . . . . . . . . .	L Near	 0000114D _TEXT	
-  selectCorrect  . . . . . . . .	L Near	 0000119A _TEXT	
-  finalExit  . . . . . . . . . .	L Near	 000011A1 _TEXT	
-dealOrientalMenu . . . . . . . .	P Near	 00000C57 _TEXT	Length= 00000258 Public STDCALL
+  op . . . . . . . . . . . . . .	L Near	 00001059 _TEXT	
+  again  . . . . . . . . . . . .	L Near	 00001099 _TEXT	
+  cp . . . . . . . . . . . . . .	L Near	 000010A0 _TEXT	
+  zb . . . . . . . . . . . . . .	L Near	 000010CA _TEXT	
+  sw . . . . . . . . . . . . . .	L Near	 000010F4 _TEXT	
+  ff . . . . . . . . . . . . . .	L Near	 00001121 _TEXT	
+  cancelDeal . . . . . . . . . .	L Near	 0000114E _TEXT	
+  _exit  . . . . . . . . . . . .	L Near	 00001169 _TEXT	
+  selectCorrect  . . . . . . . .	L Near	 000011B6 _TEXT	
+  finalExit  . . . . . . . . . .	L Near	 000011BD _TEXT	
+dealOrientalMenu . . . . . . . .	P Near	 00000C73 _TEXT	Length= 00000258 Public STDCALL
   noOfDishes . . . . . . . . . .	DWord	 bp + 00000008
-  op . . . . . . . . . . . . . .	L Near	 00000C69 _TEXT	
-  again  . . . . . . . . . . . .	L Near	 00000CD1 _TEXT	
-  cq . . . . . . . . . . . . . .	L Near	 00000CD8 _TEXT	
-  pu . . . . . . . . . . . . . .	L Near	 00000D02 _TEXT	
-  cb . . . . . . . . . . . . . .	L Near	 00000D2C _TEXT	
-  ck . . . . . . . . . . . . . .	L Near	 00000D59 _TEXT	
-  ct . . . . . . . . . . . . . .	L Near	 00000D86 _TEXT	
-  mh . . . . . . . . . . . . . .	L Near	 00000DB3 _TEXT	
-  na . . . . . . . . . . . . . .	L Near	 00000DE0 _TEXT	
-  rt . . . . . . . . . . . . . .	L Near	 00000E0D _TEXT	
-  cancelDeal . . . . . . . . . .	L Near	 00000E3A _TEXT	
-  _exit  . . . . . . . . . . . .	L Near	 00000E55 _TEXT	
-  selectCorrect  . . . . . . . .	L Near	 00000EA2 _TEXT	
-  finalExit  . . . . . . . . . .	L Near	 00000EA9 _TEXT	
-dealsOffers  . . . . . . . . . .	P Near	 00000489 _TEXT	Length= 000000A4 Public STDCALL
-  deal . . . . . . . . . . . . .	L Near	 0000048B _TEXT	
-  d1 . . . . . . . . . . . . . .	L Near	 000004C4 _TEXT	
-  d2 . . . . . . . . . . . . . .	L Near	 000004DB _TEXT	
-  d3 . . . . . . . . . . . . . .	L Near	 000004F2 _TEXT	
-  d4 . . . . . . . . . . . . . .	L Near	 00000509 _TEXT	
-  _exit  . . . . . . . . . . . .	L Near	 00000520 _TEXT	
-discount . . . . . . . . . . . .	P Near	 00000B9A _TEXT	Length= 0000003B Public STDCALL
-  disc . . . . . . . . . . . . .	L Near	 00000BAA _TEXT	
-  _exit  . . . . . . . . . . . .	L Near	 00000BD2 _TEXT	
-error  . . . . . . . . . . . . .	P Near	 00000C3E _TEXT	Length= 00000019 Public STDCALL
+  op . . . . . . . . . . . . . .	L Near	 00000C85 _TEXT	
+  again  . . . . . . . . . . . .	L Near	 00000CED _TEXT	
+  cq . . . . . . . . . . . . . .	L Near	 00000CF4 _TEXT	
+  pu . . . . . . . . . . . . . .	L Near	 00000D1E _TEXT	
+  cb . . . . . . . . . . . . . .	L Near	 00000D48 _TEXT	
+  ck . . . . . . . . . . . . . .	L Near	 00000D75 _TEXT	
+  ct . . . . . . . . . . . . . .	L Near	 00000DA2 _TEXT	
+  mh . . . . . . . . . . . . . .	L Near	 00000DCF _TEXT	
+  na . . . . . . . . . . . . . .	L Near	 00000DFC _TEXT	
+  rt . . . . . . . . . . . . . .	L Near	 00000E29 _TEXT	
+  cancelDeal . . . . . . . . . .	L Near	 00000E56 _TEXT	
+  _exit  . . . . . . . . . . . .	L Near	 00000E71 _TEXT	
+  selectCorrect  . . . . . . . .	L Near	 00000EBE _TEXT	
+  finalExit  . . . . . . . . . .	L Near	 00000EC5 _TEXT	
+dealsOffers  . . . . . . . . . .	P Near	 000004A5 _TEXT	Length= 000000A4 Public STDCALL
+  deal . . . . . . . . . . . . .	L Near	 000004A7 _TEXT	
+  d1 . . . . . . . . . . . . . .	L Near	 000004E0 _TEXT	
+  d2 . . . . . . . . . . . . . .	L Near	 000004F7 _TEXT	
+  d3 . . . . . . . . . . . . . .	L Near	 0000050E _TEXT	
+  d4 . . . . . . . . . . . . . .	L Near	 00000525 _TEXT	
+  _exit  . . . . . . . . . . . .	L Near	 0000053C _TEXT	
+discount . . . . . . . . . . . .	P Near	 00000BB6 _TEXT	Length= 0000003B Public STDCALL
+  disc . . . . . . . . . . . . .	L Near	 00000BC6 _TEXT	
+  _exit  . . . . . . . . . . . .	L Near	 00000BEE _TEXT	
+error  . . . . . . . . . . . . .	P Near	 00000C5A _TEXT	Length= 00000019 Public STDCALL
 inputPass  . . . . . . . . . . .	P Near	 000001FA _TEXT	Length= 00000027 Public STDCALL
   passString . . . . . . . . . .	DWord	 bp + 00000008
   _exit  . . . . . . . . . . . .	L Near	 0000021B _TEXT	
@@ -3851,7 +3945,7 @@ main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 0000006C Public 
   ad . . . . . . . . . . . . . .	L Near	 0000004D _TEXT	
   cu . . . . . . . . . . . . . .	L Near	 00000054 _TEXT	
   _exit  . . . . . . . . . . . .	L Near	 0000005B _TEXT	
-printBill  . . . . . . . . . . .	P Near	 00000BD5 _TEXT	Length= 00000069 Public STDCALL
+printBill  . . . . . . . . . . .	P Near	 00000BF1 _TEXT	Length= 00000069 Public STDCALL
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 readPasswordFile . . . . . . . .	P Near	 00000221 _TEXT	Length= 0000006D Public STDCALL
   err  . . . . . . . . . . . . .	L Near	 0000027C _TEXT	
@@ -3859,23 +3953,22 @@ readPasswordFile . . . . . . . .	P Near	 00000221 _TEXT	Length= 0000006D Public 
 readSalesFile  . . . . . . . . .	P Near	 00000193 _TEXT	Length= 00000067 Public STDCALL
   err  . . . . . . . . . . . . .	L Near	 000001E8 _TEXT	
   _exit  . . . . . . . . . . . .	L Near	 000001F7 _TEXT	
-resetBill  . . . . . . . . . . .	P Near	 00000B7C _TEXT	Length= 0000001E Public STDCALL
+resetBill  . . . . . . . . . . .	P Near	 00000B98 _TEXT	Length= 0000001E Public STDCALL
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
-setEcx2  . . . . . . . . . . . .	P Near	 0000128E _TEXT	Length= 00000018 Public STDCALL
+setEcx2  . . . . . . . . . . . .	P Near	 000012AA _TEXT	Length= 00000018 Public STDCALL
   dealQuan1  . . . . . . . . . .	DWord	 bp + 00000008
-  setECX . . . . . . . . . . . .	L Near	 0000129C _TEXT	
-  ignore . . . . . . . . . . . .	L Near	 000012A1 _TEXT	
-setEcx3  . . . . . . . . . . . .	P Near	 000012A6 _TEXT	Length= 00000018 Public STDCALL
+  setECX . . . . . . . . . . . .	L Near	 000012B8 _TEXT	
+  ignore . . . . . . . . . . . .	L Near	 000012BD _TEXT	
+setEcx3  . . . . . . . . . . . .	P Near	 000012C2 _TEXT	Length= 00000018 Public STDCALL
   dealQuan2  . . . . . . . . . .	DWord	 bp + 00000008
-  setECX . . . . . . . . . . . .	L Near	 000012B4 _TEXT	
-  ignore . . . . . . . . . . . .	L Near	 000012B9 _TEXT	
-toByte . . . . . . . . . . . . .	P Near	 000003BA _TEXT	Length= 00000005 Public STDCALL
+  setECX . . . . . . . . . . . .	L Near	 000012D0 _TEXT	
+  ignore . . . . . . . . . . . .	L Near	 000012D5 _TEXT	
 writePassword  . . . . . . . . .	P Near	 0000028E _TEXT	Length= 0000006A Public STDCALL
   err  . . . . . . . . . . . . .	L Near	 000002E6 _TEXT	
   _exit  . . . . . . . . . . . .	L Near	 000002F5 _TEXT	
-writeSales . . . . . . . . . . .	P Near	 000002F8 _TEXT	Length= 000000C2 Public STDCALL
-  err  . . . . . . . . . . . . .	L Near	 000003A8 _TEXT	
-  _exit  . . . . . . . . . . . .	L Near	 000003B7 _TEXT	
+writeSales . . . . . . . . . . .	P Near	 000002F8 _TEXT	Length= 000000BC Public STDCALL
+  err  . . . . . . . . . . . . .	L Near	 000003A2 _TEXT	
+  _exit  . . . . . . . . . . . .	L Near	 000003B1 _TEXT	
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 
 
@@ -4102,6 +4195,7 @@ black  . . . . . . . . . . . . .	Number	 00000000h
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 bool . . . . . . . . . . . . . .	DWord	 00000074 _DATA	
 brown  . . . . . . . . . . . . .	Number	 00000006h   
+buff . . . . . . . . . . . . . .	Byte	 00002AE9 _DATA	
 bytWrite . . . . . . . . . . . .	DWord	 00000088 _DATA	
 byteRead . . . . . . . . . . . .	DWord	 00000078 _DATA	
 cMenu  . . . . . . . . . . . . .	Byte	 00002054 _DATA	
@@ -4120,6 +4214,7 @@ dealItem . . . . . . . . . . . .	Byte	 0000291C _DATA
 dealRep  . . . . . . . . . . . .	DWord	 00000084 _DATA	
 deals  . . . . . . . . . . . . .	Byte	 00001CDD _DATA	
 dessert  . . . . . . . . . . . .	Byte	 0000250D _DATA	
+digitCount . . . . . . . . . . .	DWord	 00002AE1 _DATA	
 dishes . . . . . . . . . . . . .	Byte	 00002905 _DATA	
 divideIt . . . . . . . . . . . .	DWord	 00002AD2 _DATA	
 drPrice  . . . . . . . . . . . .	DWord	 00000050 _DATA	
@@ -4157,6 +4252,7 @@ paybill  . . . . . . . . . . . .	Byte	 000029BA _DATA
 reMsg  . . . . . . . . . . . . .	Byte	 000028E1 _DATA	
 red  . . . . . . . . . . . . . .	Number	 00000004h   
 regDrink . . . . . . . . . . . .	Byte	 00001F16 _DATA	
+remainder  . . . . . . . . . . .	DWord	 00002AE5 _DATA	
 saleFileName . . . . . . . . . .	Byte	 000027CE _DATA	
 saleFile . . . . . . . . . . . .	Byte	 000000AC _DATA	
 totalDis . . . . . . . . . . . .	Byte	 00002989 _DATA	

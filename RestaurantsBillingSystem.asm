@@ -1,4 +1,7 @@
-INCLUDE Irvine32.inc
+Include Irvine32.inc
+IncludeLib Irvine32.lib
+IncludeLib Kernel32.lib
+IncludeLib User32.lib
 
 .DATA
 
@@ -204,7 +207,10 @@ nameSale BYTE " Sale : ", 0
 newLine BYTE 0ah, 0dh
 
 divideIt DWORD 10
-convertedTobyte BYTE 10 DUP(?)
+convertedTobyte BYTE 11 DUP(0)
+digitCount DWORD 0
+remainder DWORD 0
+buff        db 11 dup(?) 
 
 .CODE
 inputPass        PROTO, passString :PTR BYTE					  ; To print Oriental Menu on deals
@@ -213,7 +219,9 @@ dealChineseMenu  PROTO, noOfDishes :DWORD						  ; To print Chinese Menu on deal
 dealFastFoodMenu PROTO, noOfDishes :DWORD						  ; To print Fast Food Menu on deals
 setEcx2          PROTO, dealQuan1  :DWORD					      ; To set the value of ecx
 setEcx3          PROTO, dealQuan2  :DWORD						  ; To set the value of ecx
-dealDrinks1_5    PROTO , noOfDrinks:DWORD						  ; To 1.5 liters Drink Menu on deals
+dealDrinks1_5    PROTO, noOfDrinks:DWORD						  ; To 1.5 liters Drink Menu on deals
+NumbToStr		 PROTO, x:DWORD, buffer:DWORD
+
 
 main PROC
      mov eax, cyan
@@ -582,16 +590,18 @@ writeSales PROC
 			SIZEOF nameSale,
 			ADDR bytWrite,
 			0
-			
-		mov eax, bill
-		div divideIt
-		mov mockBill,eax
-		call writeInt
+		
+
+		invoke NumbToStr,bill, ADDR convertedTobyte
+		
+		;mov esi,eax
+		;mov edi, offset convertedTobyte
+		;MOVSB
 
 		INVOKE WriteFile,
 			fHandle,
-			bill,
-			SIZEOF DWORD,
+			ADDR convertedTobyte,
+			SIZEOF convertedTobyte,
 			ADDR bytWrite,
 			0
 
@@ -618,23 +628,91 @@ writeSales PROC
 	
 writeSales ENDP
 
-<<<<<<< HEAD
 
-toByte PROC
-	PUSHAD
-	PUSHFD
-				
+    ;invoke  NumbToStr,123,ADDR buff
 
-	POPFD
-	POPAD
+    ;invoke  StdOut,eax
 
-	RET
-	
-toByte ENDP
+  
+
+NumbToStr PROC uses ebx x:DWORD,buffer:DWORD
+
+    mov     ecx,buffer
+    mov     eax,x
+    mov     ebx,10
+    add     ecx,ebx             ; ecx = buffer + max size of string
+@@:
+    xor     edx,edx
+    div     ebx
+    add     edx,48              ; convert the digit to ASCII
+    mov     BYTE PTR [ecx],dl   ; store the character in the buffer
+    dec     ecx                 ; decrement ecx pointing the buffer
+    test    eax,eax             ; check if the quotient is 0
+    jnz     @b
+
+    inc     ecx
+    mov     eax,ecx             ; eax points the string in the buffer
+    ret
+
+NumbToStr ENDP
+
+;toByte PROC 
+	;PUSHAD
+	;PUSHFD
+		;mov digitCount,0
+		;mov eax,0
+		;mov eax,bill
+		;mov mockBill, eax
+		;call writeint
+		;call crlf
+		;
+;
+		;mov edx, offset convertedTobyte
+		;call writestring
+		;
+		;L1:
+			;cmp eax,0
+			;je _out
+;
+			;call crlf
+			;mov edx,0
+			;mov eax, mockbill
+			;call writeint
+			;call crlf
+			;div divideit
+			;mov mockbill,eax
+			;call writeint
+;
+			;add edx, 30h
+			;mov remainder, edx
+			;
+			;;process remainder to string
+			;mov edx , offset convertedTobyte + sizeof convertedTobyte-1
+			;mov ebx, 0
+			;mov ebx, remainder
+			;call writestring
+;
+			;mov eax, remainder 
+			;call crlf
+			;call writeint
+			;call crlf
+;
+			;mov eax, mockBill
+			;cmp eax,0
+			;je _out
+		;
+			;loop L1
+	;_out:	
+;
+	;POPFD
+	;POPAD
+;
+	;RET
+	;
+;toByte ENDP
 
 
-=======
->>>>>>> a23607f94d06994a76e20dc061c5e9f67422fb34
+
 ;-------------------------------------------------------------------
 ;| Check the password...                                            |
 ;| Uses: bool variable to represent result..                        |
