@@ -628,12 +628,9 @@ writeSales PROC
 	
 writeSales ENDP
 
-
-    ;invoke  NumbToStr,123,ADDR buff
-
-    ;invoke  StdOut,eax
-
-  
+;-----------------------------------------------------
+; Integer to String Conversion                       |
+;-----------------------------------------------------
 
 NumbToStr PROC uses ebx x:DWORD,buffer:DWORD
 
@@ -710,7 +707,6 @@ NumbToStr ENDP
 	;RET
 	;
 ;toByte ENDP
-
 
 
 ;-------------------------------------------------------------------
