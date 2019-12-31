@@ -1,2 +1,8 @@
 .vs/
 Debug/
+*.lst
+*.sdf
+*.sln
+*.v12
+*.vcxproj
+*.vcxproj.user
